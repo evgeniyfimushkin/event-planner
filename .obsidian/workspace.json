@@ -1,0 +1,181 @@
+{
+  "main": {
+    "id": "b6b19bb9a434fb64",
+    "type": "split",
+    "children": [
+      {
+        "id": "bd1c9fcc2f4924d1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "dc7a49b6120a9ce8",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "backend/reports/Описание сервисов.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Описание сервисов"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "39e12fa92d19c43b",
+    "type": "split",
+    "children": [
+      {
+        "id": "d57fd85810c00d75",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b5dc0653c2eb4122",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "a28be686559b1dc5",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "2a88ffb890be7ebb",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "f381b8a76cfe17ae",
+    "type": "split",
+    "children": [
+      {
+        "id": "822e9c9ccc5b7fa1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d01b898f9a551073",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "backend/reports/Описание сервисов.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for Описание сервисов"
+            }
+          },
+          {
+            "id": "4a0a079ff3e7ff0e",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "backend/reports/Описание сервисов.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from Описание сервисов"
+            }
+          },
+          {
+            "id": "8502ed2a28b89a41",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "ba7888d6ba5bd586",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "backend/reports/Описание сервисов.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of Описание сервисов"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "dc7a49b6120a9ce8",
+  "lastOpenFiles": [
+    "backend/reports/images/Pasted image 20250215122259.png",
+    "backend/reports/images/image_2025-02-15_11-33-37.png",
+    "backend/reports/Описание сервисов.md",
+    "backend/reports/images/Pasted image 20250215122250.png",
+    "backend/reports/images",
+    "backend/reports",
+    "backend"
+  ]
+}

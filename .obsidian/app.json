@@ -1,0 +1,9 @@
+{
+  "useMarkdownLinks": true,
+  "newLinkFormat": "relative",
+  "newFileLocation": "current",
+  "newFileFolderPath": "backend/reports/images",
+  "attachmentFolderPath": "backend/reports/images",
+  "readableLineLength": true,
+  "strictLineBreaks": false
+}
