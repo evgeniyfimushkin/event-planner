@@ -1,0 +1,36 @@
+package config
+
+import (
+	"log"
+	"github.com/kelseyhightower/envconfig"
+)
+
+type Config struct {
+    Env string `yaml:"env" envconfig:"ENV" default:"local"`
+	Server struct {
+		Port int    `yaml:"port" envconfig:"SERVER_PORT" default:"8080"`
+		Addr string `yaml:"host" envconfig:"SERVER_ADDR" default:"0.0.0.0"`
+	    ReadTimeout   int    `yaml:"read_timeout" envconfig:"SERVER_READ_TIMEOUT" default:"10"` 
+    	WriteTimeout  int    `yaml:"write_timeout" envconfig:"SERVER_WRITE_TIMEOUT" default:"10"`
+        IdleTimeout  int    `yaml:"idle_timeout" envconfig:"SERVER_IDLE_TIMEOUT" default:"60"`
+	}
+	Database struct {
+        User     string `yaml:"user" envconfig:"DB_USER" default:"postgres"`
+        Password string `yaml:"password" envconfig:"DB_PASSWORD" default:"postgres"`
+		Host     string `yaml:"host" envconfig:"DB_HOST" default:"localhost"`
+		Port     string `yaml:"port" envconfig:"DB_PORT" default:"5432"`
+		Name     string `yaml:"name" envconfig:"DB_NAME" default:"authdb"`
+	}
+    PrivateKey string `yaml:"private_key" envconfig:"PRIVATE_KEY"`
+    PublicKey string `yaml:"public_key" envconfig:"PUBLIC_KEY"`
+}
+
+func MustLoadConfig() *Config {
+	var config Config
+	err := envconfig.Process("", &config)
+	if err != nil {
+        log.Fatal("Env variables error: ", err)
+	}
+	return &config
+}
+
