@@ -16,6 +16,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/httprate"
 )
 
 func main(){
@@ -34,6 +35,7 @@ func main(){
     userRepo.Create(&models.User{Username: "ivan",Email: "ivan@gmail",PassHash: "123"})
 
     loginService, err := service.NewLoginService(userRepo, cfg.PrivateKey)
+    registerService, err := service.NewRegisterService(userRepo)
     if err != nil {
         log.Error("failed to init login service", logger.Err(err))
     }
@@ -45,6 +47,8 @@ func main(){
     router.Use(middleware.Recoverer)
     router.Use(middleware.URLFormat)
     router.Post("/api/v1/auth/login", handler.Login(loginService))
+    registerLimiter := httprate.LimitByIP(5, 1*time.Minute)
+    router.With(registerLimiter).Post("/api/v1/auth/register", handler.Register(registerService))
 
     srv := &http.Server{
         Addr: fmt.Sprintf("%s:%d",cfg.Server.Addr, cfg.Server.Port),
