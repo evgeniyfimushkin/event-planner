@@ -9,6 +9,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -16,9 +17,10 @@ import (
 type LoginService struct {
     userRepo *repository.UserRepository
     privateKey *ecdsa.PrivateKey
+    tokenTTL time.Duration
 }
 
-func NewLoginService(userRepo *repository.UserRepository, secret string) (*LoginService, error) {
+func NewLoginService(userRepo *repository.UserRepository, secret string, tokenTTL time.Duration) (*LoginService, error) {
 	keyBytes, err := base64.StdEncoding.DecodeString(secret)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode secret: %w", err)
@@ -36,6 +38,7 @@ func NewLoginService(userRepo *repository.UserRepository, secret string) (*Login
 	return &LoginService{
 		userRepo:  userRepo,
 		privateKey: privateKey,
+        tokenTTL: tokenTTL,
 	}, nil
 }
 
@@ -62,6 +65,8 @@ func (s *LoginService) generateJWT(user *models.User)(string, error) {
     claims := token.Claims.(jwt.MapClaims)
     claims["username"] = user.Username
     claims["email"] = user.Email
+    claims["exp"] = time.Now().Add(s.tokenTTL).Unix()
+    claims["iat"] = time.Now().Unix()
     tokenString, err := token.SignedString(s.privateKey)
     if err != nil {
         return "", err

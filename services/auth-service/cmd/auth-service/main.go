@@ -34,7 +34,7 @@ func main(){
     _ = userRepo
     userRepo.Create(&models.User{Username: "ivan",Email: "ivan@gmail",PassHash: "123"})
 
-    loginService, err := service.NewLoginService(userRepo, cfg.PrivateKey)
+    loginService, err := service.NewLoginService(userRepo, cfg.PrivateKey, cfg.TokenTTL)
     registerService, err := service.NewRegisterService(userRepo)
     if err != nil {
         log.Error("failed to init login service", logger.Err(err))
@@ -53,9 +53,9 @@ func main(){
     srv := &http.Server{
         Addr: fmt.Sprintf("%s:%d",cfg.Server.Addr, cfg.Server.Port),
         Handler: router,
-        ReadTimeout: time.Duration(cfg.Server.ReadTimeout)   * time.Second,
-        WriteTimeout: time.Duration(cfg.Server.WriteTimeout) * time.Second,
-        IdleTimeout: time.Duration(cfg.Server.IdleTimeout)   * time.Second ,
+        ReadTimeout: cfg.Server.ReadTimeout,
+        WriteTimeout: cfg.Server.WriteTimeout,
+        IdleTimeout: cfg.Server.IdleTimeout,
     }
 
     log.Info(fmt.Sprintf("Server listening on port %d", cfg.Server.Port))

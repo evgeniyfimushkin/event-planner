@@ -2,6 +2,8 @@ package config
 
 import (
 	"log"
+	"time"
+
 	"github.com/kelseyhightower/envconfig"
 )
 
@@ -10,9 +12,9 @@ type Config struct {
 	Server struct {
 		Port int    `yaml:"port" envconfig:"SERVER_PORT" default:"8080"`
 		Addr string `yaml:"host" envconfig:"SERVER_ADDR" default:"0.0.0.0"`
-	    ReadTimeout   int    `yaml:"read_timeout" envconfig:"SERVER_READ_TIMEOUT" default:"10"` 
-    	WriteTimeout  int    `yaml:"write_timeout" envconfig:"SERVER_WRITE_TIMEOUT" default:"10"`
-        IdleTimeout  int    `yaml:"idle_timeout" envconfig:"SERVER_IDLE_TIMEOUT" default:"60"`
+	    ReadTimeout   time.Duration    `yaml:"read_timeout" envconfig:"SERVER_READ_TIMEOUT" default:"10s"` 
+    	WriteTimeout  time.Duration    `yaml:"write_timeout" envconfig:"SERVER_WRITE_TIMEOUT" default:"10s"`
+        IdleTimeout  time.Duration    `yaml:"idle_timeout" envconfig:"SERVER_IDLE_TIMEOUT" default:"60s"`
 	}
 	Database struct {
         User     string `yaml:"user" envconfig:"DB_USER" default:"postgres"`
@@ -23,6 +25,7 @@ type Config struct {
 	}
     PrivateKey string `yaml:"private_key" envconfig:"PRIVATE_KEY"`
     PublicKey string `yaml:"public_key" envconfig:"PUBLIC_KEY"`
+    TokenTTL time.Duration `yaml:"token_ttl" envconfig:"TOKEN_TTL" default:"15m"`
 }
 
 func MustLoadConfig() *Config {
