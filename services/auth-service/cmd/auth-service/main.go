@@ -50,6 +50,8 @@ func main(){
     registerLimiter := httprate.LimitByIP(5, 1*time.Minute)
     router.With(registerLimiter).Post("/api/v1/auth/register", handler.Register(registerService))
 
+    // TODO: Oauth
+
     srv := &http.Server{
         Addr: fmt.Sprintf("%s:%d",cfg.Server.Addr, cfg.Server.Port),
         Handler: router,

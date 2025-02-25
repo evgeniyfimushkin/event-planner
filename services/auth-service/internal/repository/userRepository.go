@@ -21,6 +21,11 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 }
 
 func (repo *UserRepository) Create(user *models.User) error {
+    var existingUser models.User
+    if err := repo.db.Where("email = ?", user.Email).First(&existingUser).Error; err == nil {
+        return fmt.Errorf("user with email %s already exists", user.Email)
+    }
+
 	result := repo.db.Create(user)
 	if result.Error != nil {
 		return fmt.Errorf("unable to create user: %w", result.Error)

@@ -25,6 +25,8 @@ type Config struct {
 	}
     PrivateKey string `yaml:"private_key" envconfig:"PRIVATE_KEY"`
     PublicKey string `yaml:"public_key" envconfig:"PUBLIC_KEY"`
+    GoogleClientId string `yaml:"google_client_id" envconfig:"GOOGLE_CLIENT_ID"`
+    GoogleClientSecret string `yaml:"google_client_secret" envconfig:"GOOGLE_CLIENT_SECRET"`
     TokenTTL time.Duration `yaml:"token_ttl" envconfig:"TOKEN_TTL" default:"15m"`
 }
 
