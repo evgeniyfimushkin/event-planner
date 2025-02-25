@@ -21,7 +21,7 @@ import (
 
 func main(){
     cfg := config.MustLoadConfig()
-    log := logger.SetupLogger(cfg.Env)
+    log := logger.SetupLogger(cfg.Env, cfg.LogFile)
     fmt.Print(cfg.PrivateKey)
 
     log.Info("Connecting to db with params: ")
