@@ -1,5 +1,7 @@
 ## Описание сервисов
-![](images/Pasted%20image%2020250226095030.png)
+![dall](images/Pasted%20image%2020250226095030.png)
+
+
 ![](images/Pasted%20image%2020250226094733.png)
 
 
@@ -16,19 +18,14 @@
 Auth service - сервис, отвечающий за безопасность, управление пользователями и их доступом. Он обеспечивает регистрацию пользователей, аутентификацию и авторизацию с использование JWT-токенов.
 ``` go
 type User struct {
-    ID        uint      `gorm:"primaryKey"`
-    Username  string    `gorm:"type:varchar(100);not null"`
-    Email     string    `gorm:"type:varchar(100);unique;not null"`
-    CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP"`
-    UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+    ID        uint      `gorm:"primaryKey" json:"id"`
+    Username  string    `gorm:"type:varchar(100);not null" json:"username"`
+    Email     string    `gorm:"type:varchar(100);unique;not null" json:"email"`
+    PassHash  string    `gorm:"type:varchar(255);not null" json:"pass_hash"`
+    CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
+    UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
-
 ```
-users:
-- id
-- username
-- email
-- pass_hash
 
 **Основные функции**:
 - Регистрация пользователей: Принимает данные, валидирует их и создаёт новый аккаунт. Сохраняется хэш пароля.
@@ -37,19 +34,15 @@ users:
 ### User Service
 Управляет даннными профиля пользователей. Хранит и обрабатывает информацию о пользователях, такую как их личные данные, настройки и историю активности.
 
-users:
-- id
-- username
-- email
 ```go
 type UserProfile struct {
-    ID            uint      `gorm:"primaryKey"`
-    Username      string    `gorm:"type:varchar(100);not null"`
-    Email         string    `gorm:"type:varchar(100);unique;not null"`
-    ProfilePicture string   `gorm:"type:varchar(255)"` // URL к изображению профиля
-    NotificationsEnabled bool `gorm:"default:true"`
-    CreatedAt     time.Time `gorm:"default:CURRENT_TIMESTAMP"`
-    UpdatedAt     time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+    ID                   uint      `gorm:"primaryKey" json:"id"`
+    Username             string    `gorm:"type:varchar(100);not null" json:"username"`
+    Email                string    `gorm:"type:varchar(100);unique;not null" json:"email"`
+    ProfilePicture       string    `gorm:"type:varchar(255)" json:"profile_picture"`
+    NotificationsEnabled bool      `gorm:"default:true" json:"notifications_enabled"`
+    CreatedAt            time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
+    UpdatedAt            time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
 
 ```
@@ -62,56 +55,33 @@ type UserProfile struct {
 ### Event Service
 Управляет созданием, редактированием, удаление и получением информации о мероприятиях. Отвечает за логику, связанную с меропрятиями, такими как место, время, описание и доступность.
 
-Поля тиблицы events:
-- id
-- name
-- desctiption
-- category
-- image_path
-- location
-- start_time
-- end_time
-- max_participants
-- created_by - id организатора
-- created_at
-- updated_at
-- status - активно, завершено, отменено
-
-Поля таблицы Locations:
-- id
-- city
-- address 
-- latitude - широта
-- longitude - долгота
-
 ```go
 type Event struct {
-    ID               uint      `gorm:"primaryKey"`
-    Name             string    `gorm:"type:varchar(255);not null"`
-    Description      string    `gorm:"type:text"`
-    Category         string    `gorm:"type:varchar(100)"`
-    ImagePath        string    `gorm:"type:varchar(255)"`
-    Location         string    `gorm:"type:varchar(255)"`
-    StartTime        time.Time `gorm:"not null"`
-    EndTime          time.Time
-    MaxParticipants  int       `gorm:"default:100"`
-    CreatedBy        uint      `gorm:"not null"`
-    CreatedAt        time.Time `gorm:"default:CURRENT_TIMESTAMP"`
-    UpdatedAt        time.Time `gorm:"default:CURRENT_TIMESTAMP"`
-    Status           string    `gorm:"type:varchar(50);default:'active'"` // 'active', 'completed', 'cancelled'
+    ID              uint      `gorm:"primaryKey" json:"id"`
+    Name            string    `gorm:"type:varchar(255);not null" json:"name"`
+    Description     string    `gorm:"type:text" json:"description"`
+    Category        string    `gorm:"type:varchar(100)" json:"category"`
+    ImagePath       string    `gorm:"type:varchar(255)" json:"image_path"`
+    Location        string    `gorm:"type:varchar(255)" json:"location"`
+    StartTime       time.Time `gorm:"not null" json:"start_time"`
+    EndTime         time.Time `json:"end_time"`
+    MaxParticipants int       `gorm:"default:100" json:"max_participants"`
+    CreatedBy       uint      `gorm:"not null" json:"created_by"`
+    CreatedAt       time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
+    UpdatedAt       time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
+    Status          string    `gorm:"type:varchar(50);default:'active'" json:"status"`
 }
-
 ```
 
 ```go
 type Location struct {
-    ID        uint      `gorm:"primaryKey"`
-    City      string    `gorm:"type:varchar(100);not null"`
-    Address   string    `gorm:"type:varchar(255)"`
-    Latitude  float64   `gorm:"type:double"`
-    Longitude float64   `gorm:"type:double"`
-    CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP"`
-    UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+    ID        uint      `gorm:"primaryKey" json:"id"`
+    City      string    `gorm:"type:varchar(100);not null" json:"city"`
+    Address   string    `gorm:"type:varchar(255)" json:"address"`
+    Latitude  float64   `gorm:"type:double" json:"latitude"`
+    Longitude float64   `gorm:"type:double" json:"longitude"`
+    CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
+    UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
 
 ```
@@ -122,32 +92,18 @@ type Location struct {
 
 ### Reviews Service
 
-Поля табрицы reviews:
-- id
-- event_id
-- user_id
-- rating
-- comment
-- created_at
 ```go
 type Review struct {
-    ID        uint      `gorm:"primaryKey"`
-    EventID   uint      `gorm:"not null"`
-    UserID    uint      `gorm:"not null"`
-    Rating    int       `gorm:"not null;check:rating>=1 AND rating<=5"` // Оценка от 1 до 5
-    Comment   string    `gorm:"type:text"`
-    CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+    ID        uint      `gorm:"primaryKey" json:"id"`
+    EventID   uint      `gorm:"not null" json:"event_id"`
+    UserID    uint      `gorm:"not null" json:"user_id"`
+    Rating    int       `gorm:"not null;check:rating>=1 AND rating<=5" json:"rating"`
+    Comment   string    `gorm:"type:text" json:"comment"`
+    CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 }
-
 ```
 ### EventMedia
 
-table event_media:
-- id
-- event_id
-- media_url
-- media_type
-- uploaded_at
 ```go
 type EventMedia struct {
     ID        uint      `gorm:"primaryKey"`
@@ -159,52 +115,33 @@ type EventMedia struct {
 
 ```
 ### Chat service
-event_chat:
-- id
-- event_id
-- created_at
+
 ```go
 type EventChat struct {
-    ID        uint      `gorm:"primaryKey"`
-    EventID   uint      `gorm:"not null"`
-    CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+    ID        uint      `gorm:"primaryKey" json:"id"`
+    EventID   uint      `gorm:"not null" json:"event_id"`
+    CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 }
-
 ```
-chat_messages:
-- id
-- chat_id
-- user_id
-- message
-- message_type
-- created_at
 ``` go
 type ChatMessage struct {
-    ID        uint      `gorm:"primaryKey"`
-    ChatID    uint      `gorm:"not null"`
-    UserID    uint      `gorm:"not null"`
-    Message   string    `gorm:"type:text"`
-    MessageType string  `gorm:"type:varchar(50);check:message_type IN ('text', 'media')"`
-    CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+    ID          uint      `gorm:"primaryKey" json:"id"`
+    ChatID      uint      `gorm:"not null" json:"chat_id"`
+    UserID      uint      `gorm:"not null" json:"user_id"`
+    Message     string    `gorm:"type:text" json:"message"`
+    MessageType string    `gorm:"type:varchar(50);check:message_type IN ('text', 'media')" json:"message_type"`
+    CreatedAt   time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 }
-
 ```
-websocket_connection:
-- id
-- user_id
-- connection_id
-- chat_id
-- connected_at
-- disconnected_at
 
 ```go
 type WebSocketConnection struct {
-    ID            uint      `gorm:"primaryKey"`
-    UserID        uint      `gorm:"not null"`
-    ConnectionID  string    `gorm:"type:varchar(255);unique;not null"`
-    ChatID        uint      `gorm:"not null"`
-    ConnectedAt   time.Time `gorm:"default:CURRENT_TIMESTAMP"`
-    DisconnectedAt time.Time
+    ID             uint      `gorm:"primaryKey" json:"id"`
+    UserID         uint      `gorm:"not null" json:"user_id"`
+    ConnectionID   string    `gorm:"type:varchar(255);unique;not null" json:"connection_id"`
+    ChatID         uint      `gorm:"not null" json:"chat_id"`
+    ConnectedAt    time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"connected_at"`
+    DisconnectedAt time.Time `json:"disconnected_at"`
 }
 
 ```
@@ -212,20 +149,15 @@ type WebSocketConnection struct {
 ### Registration Service
 управляет регистрацией пользователей на мероприятия, обрабатывает запросы на запись, проверяет доступность и сохраняет информацию о регистрации.
 
-Поля БД:
-- id
-- event_id
-- user_id
-- registration_time
-- status
 ```go
 type EventRegistration struct {
-    ID               uint      `gorm:"primaryKey"`
-    EventID          uint      `gorm:"not null"`
-    UserID           uint      `gorm:"not null"`
-    RegistrationTime time.Time `gorm:"default:CURRENT_TIMESTAMP"`
-    Status           string    `gorm:"type:varchar(50);default:'registered'"` // 'registered', 'cancelled', 'no_show'
+    ID               uint      `gorm:"primaryKey" json:"id"`
+    EventID          uint      `gorm:"not null" json:"event_id"`
+    UserID           uint      `gorm:"not null" json:"user_id"`
+    RegistrationTime time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"registration_time"`
+    Status           string    `gorm:"type:varchar(50);default:'registered'" json:"status"`
 }
+
 ```
 **Основные функции**
 - Регистрация на мероприятие
@@ -236,15 +168,14 @@ type EventRegistration struct {
 Отвечает за отправку уведомлений пользователям. Он подписывается на события, происходящие в других сервисах, и отправляет соответствующие уведомления.
 ```go
 type Notification struct {
-    ID          uint      `gorm:"primaryKey"`
-    UserID      uint      `gorm:"not null"` 
-    EventID     uint      `gorm:"not null"` 
-    Message     string    `gorm:"type:text;not null"`
-    SentAt      time.Time `gorm:"default:CURRENT_TIMESTAMP"` 
-    Status      string    `gorm:"type:varchar(50);default:'pending'"` // Статус: 'pending', 'sent', 'failed'
-    NotificationType string `gorm:"type:varchar(50);not null"` // Тип уведомления: 'email', 'telegram'
+    ID               uint      `gorm:"primaryKey" json:"id"`
+    UserID           uint      `gorm:"not null" json:"user_id"`
+    EventID          uint      `gorm:"not null" json:"event_id"`
+    Message          string    `gorm:"type:text;not null" json:"message"`
+    SentAt           time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"sent_at"`
+    Status           string    `gorm:"type:varchar(50);default:'pending'" json:"status"`
+    NotificationType string    `gorm:"type:varchar(50);not null" json:"notification_type"`
 }
-
 ```
 **Основные фукнции**
 - подписка на события в kafka
