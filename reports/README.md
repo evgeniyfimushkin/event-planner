@@ -1,5 +1,5 @@
 ## Описание сервисов
-![](images/DALL·E%202025-02-26%2009.45.01%20-%20A%20mermaid%20diagram%20showing%20a%20system%20architecture%20where%20each%20microservice%20is%20connected%20to%20its%20own%20separate%20instance%20of%20Postgres.%20Each%20service%20(Auth%20Serv.webp)
+![](images/Pasted%20image%2020250226095030.png)
 ![](images/Pasted%20image%2020250226094733.png)
 
 
