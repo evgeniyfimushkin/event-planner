@@ -1,8 +1,10 @@
 package logger
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
+
 	"github.com/samber/slog-multi"
 )
 
@@ -26,7 +28,8 @@ func setupPrettySlog(logFileName string) *slog.Logger {
 	
 	logFile, err := os.OpenFile(logFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		panic(err)
+        fmt.Println("Logfile failed to open")
+		//panic(err)
 	}
 	fileHandler := slog.NewJSONHandler(logFile, &slog.HandlerOptions{
 		Level: slog.LevelDebug,
@@ -47,7 +50,8 @@ func setupFileAndStdoutLogger(logFileName string, level slog.Level) *slog.Logger
 
 	logFile, err := os.OpenFile(logFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		panic(err)
+        fmt.Println("Logfile failed to open")
+		//panic(err)
 	}
 	fileHandler := slog.NewJSONHandler(logFile, &slog.HandlerOptions{
 		Level: level,
