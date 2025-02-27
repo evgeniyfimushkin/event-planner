@@ -22,7 +22,7 @@ import (
 func main(){
     cfg := config.MustLoadConfig()
     log := logger.SetupLogger(cfg.Env, cfg.LogFile)
-    fmt.Print(cfg.PrivateKey)
+    fmt.Print(cfg.PublicKey)
 
     log.Info("Connecting to db with params: ")
     log.Info("Database: ", slog.String("host", cfg.Database.Host), slog.String("port", cfg.Database.Port))
@@ -38,6 +38,13 @@ func main(){
     registerService, err := service.NewRegisterService(userRepo)
     if err != nil {
         log.Error("failed to init login service", logger.Err(err))
+        panic("failed to init login service")
+    }
+
+    refreshService, err := service.NewRefreshService(userRepo, cfg.PrivateKey, cfg.PublicKey)
+    if err != nil {
+        log.Error("failed to init refresh service", logger.Err(err))
+        panic("failed to init refresh service")
     }
 
     router := chi.NewRouter()
@@ -46,9 +53,11 @@ func main(){
     router.Use(middlewarelogger.New(log))
     router.Use(middleware.Recoverer)
     router.Use(middleware.URLFormat)
-    router.Post("/api/v1/auth/login", handler.Login(loginService))
+    router.Get("/api/v1/auth/login", handler.Login(loginService))
+    router.Get("/api/v1/auth/refresh", handler.Refresh(refreshService))
     registerLimiter := httprate.LimitByIP(5, 1*time.Minute)
     router.With(registerLimiter).Post("/api/v1/auth/register", handler.Register(registerService))
+
 
     // TODO: Oauth
 

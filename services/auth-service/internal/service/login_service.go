@@ -45,28 +45,26 @@ func NewLoginService(userRepo *repository.UserRepository, secret string, tokenTT
 func (s *LoginService) Login(username, passhash string) (string, error) {
 	user, err := s.userRepo.GetUserByUsername(username)
 	if err != nil {
-		return "", fmt.Errorf("authentication failed: %w", err)
+		return  "", fmt.Errorf("authentication failed: %w", err)
 	}
 
 	if user.PassHash != passhash {
-		return "", fmt.Errorf("incorrect password: %w", err)
+		return  "", fmt.Errorf("incorrect password: %w", err)
 	}
 
-	token, err := s.generateJWT(user)
+	refreshToken, err := s.generateRefreshJWT(user, 7 * 24 * time.Hour)
 	if err != nil {
-		return "", fmt.Errorf("failed to generate token: %w", err)
+		return  "", fmt.Errorf("failed to generateRefresh token: %w", err)
 	}
 
-	return token, nil
+	return refreshToken, nil
 }
 
-func (s *LoginService) generateJWT(user *models.User)(string, error) {
+func (s *LoginService) generateRefreshJWT(user *models.User, tokenTTL time.Duration)(string, error) {
     token := jwt.New(jwt.SigningMethodES256)
     claims := token.Claims.(jwt.MapClaims)
-    claims["username"] = user.Username
-    claims["email"] = user.Email
-    claims["exp"] = time.Now().Add(s.tokenTTL).Unix()
-    claims["iat"] = time.Now().Unix()
+    claims["userID"] = user.ID
+    claims["exp"] = time.Now().Add(tokenTTL).Unix()
     tokenString, err := token.SignedString(s.privateKey)
     if err != nil {
         return "", err

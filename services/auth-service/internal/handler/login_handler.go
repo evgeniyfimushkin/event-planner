@@ -20,13 +20,22 @@ func Login(loginService *service.LoginService) http.HandlerFunc {
             return
         }
 
-        token, err := loginService.Login(req.Username, req.PassHash)
+        refreshToken, err := loginService.Login(req.Username, req.PassHash)
         if err != nil {
             http.Error(w, err.Error(), http.StatusUnauthorized)
             return
         }
 
+        http.SetCookie(w, &http.Cookie{
+            Name: "refresh_token",
+            Value: refreshToken,
+            Path: "api/v1/auth/refresh",
+            HttpOnly: true,
+            Secure: true,
+            SameSite: http.SameSiteStrictMode,
+            MaxAge: 604800, //7days
+        })
         w.Header().Set("Content-Type", "application/json")
-        json.NewEncoder(w).Encode(map[string]string{"token":token})
+        json.NewEncoder(w).Encode(map[string]string{"message": "Login successful"})
     }
 }

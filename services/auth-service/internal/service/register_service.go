@@ -26,7 +26,13 @@ func (s *RegisterService) Register(username, email, passhash string) error {
     if passhash == "" {
         return fmt.Errorf("passhash is required")
     }
-    err := s.userRepo.Create(&models.User{Username: username, Email: email, PassHash: passhash})
+    // TODO: add admin role
+    err := s.userRepo.Create(&models.User{
+        Username: username,
+        Email: email,
+        PassHash: passhash,
+        Role: "user",
+    })
     if err != nil {
         return err
     }
