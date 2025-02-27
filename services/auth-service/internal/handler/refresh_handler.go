@@ -21,6 +21,15 @@ func Refresh(refreshService *service.RefreshService) http.HandlerFunc {
             return
         }
 
+        http.SetCookie(w, &http.Cookie{
+            Name: "access_token",
+            Value: accessToken,
+            Path: "/",
+            HttpOnly: true,
+            Secure: true,
+            SameSite: http.SameSiteStrictMode,
+        })
+
         w.Header().Set("Content-Type", "application/json")
         json.NewEncoder(w).Encode(map[string]string{"access_token": accessToken})
     }

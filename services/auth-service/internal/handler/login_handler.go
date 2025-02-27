@@ -35,7 +35,5 @@ func Login(loginService *service.LoginService) http.HandlerFunc {
             SameSite: http.SameSiteStrictMode,
             MaxAge: 604800, //7days
         })
-        w.Header().Set("Content-Type", "application/json")
-        json.NewEncoder(w).Encode(map[string]string{"message": "Login successful"})
     }
 }
