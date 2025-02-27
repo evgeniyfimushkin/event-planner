@@ -9,7 +9,6 @@ import (
 
 type Config struct {
     Env string `yaml:"env" envconfig:"ENV" default:"local"`
-    LogFile string `yaml:"log_file" envconfig:"LOG_FILE" default:"/var/log/auth-service.log"`
 	Server struct {
 		Port int    `yaml:"port" envconfig:"SERVER_PORT" default:"8080"`
 		Addr string `yaml:"host" envconfig:"SERVER_ADDR" default:"0.0.0.0"`

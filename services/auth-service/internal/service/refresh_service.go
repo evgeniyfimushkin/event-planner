@@ -87,7 +87,7 @@ func (r *RefreshService) Refresh(refreshToken string) (string, error) {
     }
 
     if time.Now().Unix() > int64(exp) {
-        return "", errors.New("invalid parse exp")
+        return "", errors.New("refresh token is too old")
     }
 
     userIDFloat, ok := claims["userID"].(float64)
