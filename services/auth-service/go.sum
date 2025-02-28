@@ -1,11 +1,10 @@
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
 github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
-github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250228015935-8eff92fbb72f h1:Q/vFP5Ig4ouK5p56XJd5VQHOOY4rDOM8c2WymaBOdqQ=
-github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250228015935-8eff92fbb72f/go.mod h1:lWSbTN277ODkuIFMIFU5U+22sbgJIzwmm0QXuXw+Rw0=
+github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250228033250-0a41e3bcabe9 h1:3KVbQvrrFJNmZn9Orkw5m/odXeHYiGXhxR4bqY0mMHI=
+github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250228033250-0a41e3bcabe9/go.mod h1:aLsA9ue6kYr8Sew85aYJ8NlEW7XMXoMtBCDMYoUuPZA=
 github.com/fatih/color v1.18.0 h1:S8gINlzdQ840/4pfAwic/ZE0djQEH3wM94VfqLTZcOM=
 github.com/fatih/color v1.18.0/go.mod h1:4FelSpRwEGDpQ12mAdzqdOukCy4u8WUtOY6lkT/6HfU=
 github.com/go-chi/chi/v5 v5.2.1 h1:KOIHODQj58PmL80G2Eak4WdvUzjSJSm0vG72crDCqb8=

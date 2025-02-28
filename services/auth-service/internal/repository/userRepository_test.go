@@ -49,6 +49,58 @@ func TestUserRepository_CRUD(t *testing.T) {
 
 	deletedUser, err := repo.GetByID(user.ID)
 	assert.Nil(t, deletedUser)
-	assert.Nil(t, err)
+	assert.Error(t, err)
+}
+
+func TestUserRepository_GetByEmail(t *testing.T) {
+	db := setupTestDB()
+	repo := NewUserRepository(db)
+
+	user := &models.User{
+		Email:    "user@example.com",
+		Username: "user1",
+	}
+	err := repo.Create(user)
+	assert.NoError(t, err)
+
+	retrievedUser, err := repo.GetByEmail("user@example.com")
+	assert.NoError(t, err)
+	assert.NotNil(t, retrievedUser)
+	assert.Equal(t, "user@example.com", retrievedUser.Email)
+}
+
+func TestUserRepository_GetUserByUsername(t *testing.T) {
+	db := setupTestDB()
+	repo := NewUserRepository(db)
+
+	user := &models.User{
+		Email:    "test2@example.com",
+		Username: "user2",
+	}
+	err := repo.Create(user)
+	assert.NoError(t, err)
+
+	retrievedUser, err := repo.GetUserByUsername("user2")
+	assert.NoError(t, err)
+	assert.NotNil(t, retrievedUser)
+	assert.Equal(t, "user2", retrievedUser.Username)
+}
+
+func TestUserRepository_GetByEmail_NotFound(t *testing.T) {
+	db := setupTestDB()
+	repo := NewUserRepository(db)
+
+	user, err := repo.GetByEmail("notfound@example.com")
+	assert.Nil(t, user)
+	assert.Error(t, err)
+}
+
+func TestUserRepository_GetUserByUsername_NotFound(t *testing.T) {
+	db := setupTestDB()
+	repo := NewUserRepository(db)
+
+	user, err := repo.GetUserByUsername("nonexistent")
+	assert.Nil(t, user)
+	assert.Error(t, err)
 }
 
