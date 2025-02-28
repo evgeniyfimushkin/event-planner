@@ -7,6 +7,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
+// Config contains app configuration variables
 type Config struct {
     Env string `yaml:"env" envconfig:"ENV" default:"local"`
 	Server struct {
@@ -25,11 +26,12 @@ type Config struct {
 	}
     PrivateKey string `yaml:"private_key" envconfig:"PRIVATE_KEY"`
     PublicKey string `yaml:"public_key" envconfig:"PUBLIC_KEY"`
-    GoogleClientId string `yaml:"google_client_id" envconfig:"GOOGLE_CLIENT_ID"`
+    GoogleClientID string `yaml:"google_client_id" envconfig:"GOOGLE_CLIENT_ID"`
     GoogleClientSecret string `yaml:"google_client_secret" envconfig:"GOOGLE_CLIENT_SECRET"`
     TokenTTL time.Duration `yaml:"token_ttl" envconfig:"TOKEN_TTL" default:"15m"`
 }
 
+// MustLoadConfig load configs from env variables
 func MustLoadConfig() *Config {
 	var config Config
 	err := envconfig.Process("", &config)

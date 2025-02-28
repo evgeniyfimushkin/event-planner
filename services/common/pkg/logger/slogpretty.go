@@ -13,6 +13,7 @@ type PrettyHandlerOptions struct {
 	SlogOpts *slog.HandlerOptions
 }
 
+// PrettyHandler - loger for local env, for development and user-friendly logs
 type PrettyHandler struct {
 	opts PrettyHandlerOptions
 	slog.Handler

@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// SetupLogger get env var and configure returns configured loggers that depends on env var
 func SetupLogger(env string) *slog.Logger {
     var log *slog.Logger
     switch env {
