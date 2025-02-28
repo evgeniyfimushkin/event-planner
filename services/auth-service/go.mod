@@ -14,7 +14,7 @@ require (
 
 require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250228012944-7ba39c118a50 // indirect
+	github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250228014430-7805b3ca5c0f // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgx/v5 v5.5.5 // indirect

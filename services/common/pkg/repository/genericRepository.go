@@ -6,15 +6,15 @@ import (
 )
 
 type GenericRepository[T any] struct {
-	db *gorm.DB
+	Db *gorm.DB
 }
 
 func NewGenericRepository[T any](db *gorm.DB) *GenericRepository[T] {
-	return &GenericRepository[T]{db: db}
+	return &GenericRepository[T]{Db: db}
 }
 
 func (repo *GenericRepository[T]) Create(entity *T) error {
-	result := repo.db.Create(entity)
+	result := repo.Db.Create(entity)
 	if result.Error != nil {
 		return fmt.Errorf("unable to create entity: %w", result.Error)
 	}
@@ -23,7 +23,7 @@ func (repo *GenericRepository[T]) Create(entity *T) error {
 
 func (repo *GenericRepository[T]) GetByID(id int) (*T, error) {
 	var entity T
-	result := repo.db.First(&entity, id)
+	result := repo.Db.First(&entity, id)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -34,7 +34,7 @@ func (repo *GenericRepository[T]) GetByID(id int) (*T, error) {
 }
 
 func (repo *GenericRepository[T]) Update(entity *T) error {
-	result := repo.db.Save(entity)
+	result := repo.Db.Save(entity)
 	if result.Error != nil {
 		return fmt.Errorf("unable to update entity: %w", result.Error)
 	}
@@ -42,7 +42,7 @@ func (repo *GenericRepository[T]) Update(entity *T) error {
 }
 
 func (repo *GenericRepository[T]) Delete(id int) error {
-	result := repo.db.Delete(new(T), id)
+	result := repo.Db.Delete(new(T), id)
 	if result.Error != nil {
 		return fmt.Errorf("unable to delete entity: %w", result.Error)
 	}
@@ -51,7 +51,7 @@ func (repo *GenericRepository[T]) Delete(id int) error {
 
 func (repo *GenericRepository[T]) GetAll() ([]T, error) {
 	var entities []T
-	result := repo.db.Find(&entities)
+	result := repo.Db.Find(&entities)
 	if result.Error != nil {
 		return nil, fmt.Errorf("unable to fetch entities: %w", result.Error)
 	}
