@@ -11,7 +11,7 @@ type UserRepository struct {
 }
 
 func NewUserRepository(db *gorm.DB) *UserRepository {
-	return &UserRepository{repository.GenericRepository: NewGenericRepository[models.User](db)}
+    return &UserRepository{GenericRepository: repository.NewGenericRepository[models.User](db)}
 }
 
 func (repo *UserRepository) GetByEmail(email string) (*models.User, error) {
