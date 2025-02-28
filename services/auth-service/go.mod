@@ -3,7 +3,7 @@ module auth-service
 go 1.23.6
 
 require (
-	github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250228015223-f6bc229725ac
+	github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250228015935-8eff92fbb72f
 	github.com/fatih/color v1.18.0
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-chi/httprate v0.14.1

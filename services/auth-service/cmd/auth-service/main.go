@@ -2,7 +2,6 @@ package main
 
 import (
 	"auth-service/internal/handler"
-	"auth-service/internal/http-server/middlewarelogger"
 	"auth-service/internal/models"
 	"auth-service/internal/repository"
 	"auth-service/internal/service"
@@ -14,6 +13,7 @@ import (
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/config"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/db"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/logger"
+    "github.com/evgeniyfimushkin/event-planner/services/common/pkg/middlewarelogger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httprate"
