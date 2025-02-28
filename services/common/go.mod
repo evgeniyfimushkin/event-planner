@@ -1,4 +1,4 @@
-module common
+module github.com/evgeniyfimushkin/event-planner/services/common
 
 go 1.23.6
 
