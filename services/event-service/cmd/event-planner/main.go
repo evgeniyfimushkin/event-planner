@@ -6,6 +6,8 @@ import (
 
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/config"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/logger"
+	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/db"
+	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/repository"
 )
 
 
@@ -18,6 +20,5 @@ func main(){
 
     dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s",cfg.Database.User, cfg.Database.Password, "authdb", cfg.Database.Host, cfg.Database.Port, "disable")
     dbConnection := db.SetupDB(dsn)
-
- 
+   
 }
