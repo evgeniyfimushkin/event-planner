@@ -22,17 +22,16 @@ import (
 func main(){
     cfg := config.MustLoadConfig()
     log := logger.SetupLogger(cfg.Env)
-    fmt.Print(cfg.PublicKey)
 
     log.Info("Connecting to db with params: ")
     log.Info("Database: ", slog.String("host", cfg.Database.Host), slog.String("port", cfg.Database.Port))
 
     dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s",cfg.Database.User, cfg.Database.Password, "authdb", cfg.Database.Host, cfg.Database.Port, "disable")
-    dbConnection := db.SetupDB(dsn)
+    //TODO: configure sllmode with postgres
+    dbConnection := db.SetupDB(dsn, &models.User{})
 
     userRepo := repository.NewUserRepository(dbConnection)
     _ = userRepo
-    userRepo.Create(&models.User{Username: "ivan",Email: "ivan@gmail",PassHash: "123"})
 
     loginService, err := service.NewLoginService(userRepo, cfg.PrivateKey, cfg.TokenTTL)
     registerService, err := service.NewRegisterService(userRepo)
