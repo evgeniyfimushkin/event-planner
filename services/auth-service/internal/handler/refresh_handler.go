@@ -2,7 +2,6 @@ package handler
 
 import (
 	"auth-service/internal/service"
-	"encoding/json"
 	"net/http"
 )
 
@@ -29,8 +28,5 @@ func Refresh(refreshService *service.RefreshService) http.HandlerFunc {
             Secure: true,
             SameSite: http.SameSiteStrictMode,
         })
-
-        w.Header().Set("Content-Type", "application/json")
-        json.NewEncoder(w).Encode(map[string]string{"access_token": accessToken})
     }
 }

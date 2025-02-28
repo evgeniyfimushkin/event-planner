@@ -27,4 +27,3 @@ func setupPrettySlog() *slog.Logger {
     handler := opts.NewPrettyHandler(os.Stdout)
     return slog.New(handler)
 }
-
