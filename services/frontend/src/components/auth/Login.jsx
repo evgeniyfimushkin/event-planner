@@ -5,21 +5,23 @@ import axios from "axios";
 import AuthContext from "../../services/AuthContext";
 
 export default function Login({}) {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const { login } = useContext(AuthContext);
+    const [username, setUsername] = useState("");
+    const [passhash, setPasshash] = useState("");
+    const { login, access_token, refresh_token } = useContext(AuthContext);
 
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.get("http://localhost:5000/api/v1/auth/login", { email, password });
+            const res = await axios.post("http://localhost:8081/api/v1/auth/login", { username, passhash });
+
             login({
                 "access_token": res.data.access_token,
                 "refresh_token": res.data.refresh_token,
             });
-            alert("Connected!")
+            alert("Connected!");
+            console.log(res.headers);
         } catch (error) {
-            alert("Connection error!\n"+e);
+            alert("Connection error!\n"+e.message);
         }
     };
 
@@ -27,8 +29,8 @@ export default function Login({}) {
         <div>
             <h1>Log in</h1>
             <form onSubmit={handleLogin} className="form">
-                <input type="text" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
+                <input type="password" placeholder="Password" value={passhash} onChange={(e) => setPasshash(e.target.value)} />
                 <button type="submit">Log in</button>
             </form>
         </div>

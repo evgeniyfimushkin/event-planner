@@ -11,7 +11,7 @@ export default function Register({}) {
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post("http://localhost:5000/api/v1/auth/register", { username, email, passhash });
+            const res = await axios.post("http://localhost:8081/api/v1/auth/register", { username, email, passhash });
             // todo process response
             alert("Registered!")
         } catch (error) {
