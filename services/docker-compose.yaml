@@ -1,0 +1,75 @@
+services:
+  db:
+    container_name: db
+    image: postgres:17.2
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:z
+    ports:
+      - "5432:5432"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "db|{{.Name}}|{{.ID}}"
+    restart: always
+
+  # front:
+  #   container_name: front
+  #   image: evgeniyfimushkin/frontend
+  #   build: ./frontend
+  #   ports:
+  #     - "8080:8080"
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "3"
+  #       tag: "db|{{.Name}}|{{.ID}}"
+  #   restart: always
+  
+  auth-service:
+    container_name: auth-service
+    image: evgeniyfimushkin/auth-service
+    build: ./auth-service
+    environment:
+      - DB_NAME=auth_db
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_HOST=${POSTGRES_HOST}
+      - DB_PORT=${POSTGRES_PORT}
+      - PRIVATE_KEY=${PRIVATE_KEY}
+      - PUBLIC_KEY=${PUBLIC_KEY}
+    ports:
+      - "8081:8080"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "db|{{.Name}}|{{.ID}}"
+    restart: always
+ 
+  # event-service:
+  #   container_name: event-service
+  #   image: evgeniyfimushkin/event-service
+  #   build: ./event-service
+  #   environment:
+  #     - DB_NAME=event_db
+  #     - DB_USER=${POSTGRES_USER}
+  #     - DB_PASSWORD=${POSTGRES_PASSWORD}
+  #     - DB_HOST=${POSTGRES_HOST}
+  #     - DB_PORT=${POSTGRES_PORT}
+  #     - PUBLIC_KEY=${PUBLIC_KEY}
+  #   ports:
+  #     - "8082:8080"
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "3"
+  #       tag: "db|{{.Name}}|{{.ID}}"
+  #   restart: always
