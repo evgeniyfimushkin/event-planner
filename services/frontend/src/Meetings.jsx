@@ -5,6 +5,8 @@ import Login from './components/auth/Login.jsx'
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./services/AuthContext.jsx";
+import Register from './components/auth/Register.jsx';
+import PrivateRoute from './services/PrivateRoute.jsx';
 
 function App() {
   return (
@@ -12,12 +14,13 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
-            <Route path="/" element={
-              <>
-                <Bar />
-                <Grid />
-              </>
-            }/>
+          <Route path="/" element={
+            <PrivateRoute>
+              <Bar />
+              <Grid />
+            </PrivateRoute>
+          }/>
+          <Route path="/register" element={<Register />}/>
         </Routes>
       </Router>
     </AuthProvider>

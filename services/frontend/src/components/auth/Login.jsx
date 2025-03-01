@@ -12,8 +12,11 @@ export default function Login({}) {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post("http://localhost:5000/api/v1/auth/login", { email, password });
-            login(res.data.token);
+            const res = await axios.get("http://localhost:5000/api/v1/auth/login", { email, password });
+            login({
+                "access_token": res.data.access_token,
+                "refresh_token": res.data.refresh_token,
+            });
             alert("Connected!")
         } catch (error) {
             alert("Connection error!\n"+e);
