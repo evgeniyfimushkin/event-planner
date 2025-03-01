@@ -10,7 +10,7 @@ type Event struct {
     ImagePath       string    `gorm:"type:varchar(255)" json:"image_path"`
     Location        string    `gorm:"type:varchar(255)" json:"location"`
     StartTime       time.Time `gorm:"not null" json:"start_time"`
-    EndTime         time.Time `json:"end_time"`
+    EndTime         time.Time `gorm:"not null" json:"end_time"`
     MaxParticipants int       `gorm:"default:100" json:"max_participants"`
     CreatedBy       uint      `gorm:"not null" json:"created_by"`
     CreatedAt       time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`

@@ -26,7 +26,7 @@ func main(){
     log.Info("Connecting to db with params: ")
     log.Info("Database: ", slog.String("host", cfg.Database.Host), slog.String("port", cfg.Database.Port))
 
-    dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s",cfg.Database.User, cfg.Database.Password, "authdb", cfg.Database.Host, cfg.Database.Port, "disable")
+    dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s",cfg.Database.User, cfg.Database.Password, cfg.Database.Name, cfg.Database.Host, cfg.Database.Port, "disable")
     //TODO: configure sllmode with postgres
     dbConnection := db.SetupDB(dsn, &models.User{})
 
