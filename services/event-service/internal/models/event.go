@@ -11,7 +11,8 @@ type Event struct {
     Description     string    `gorm:"type:text" json:"description"`
     Category        string    `gorm:"type:varchar(100);index" json:"category"`
     MaxParticipants int       `gorm:"default:100;check:max_participants >= 1" json:"max_participants"`
-    // base64 image
+
+    // Base64 image
     ImageData       []byte    `gorm:"type:bytea" json:"image_data"`
 
     City            string    `gorm:"type:varchar(100);not null;index" json:"city"`
