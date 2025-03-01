@@ -3,23 +3,37 @@ import "./Auth.css"
 import { useState, useContext } from "react";
 import axios from "axios";
 import AuthContext from "../../services/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Login({}) {
     const [username, setUsername] = useState("");
     const [passhash, setPasshash] = useState("");
-    const { login, access_token, refresh_token } = useContext(AuthContext);
+    const { login } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post("http://localhost:8081/api/v1/auth/login", { username, passhash });
+            const res = await axios.post("http://localhost/api/v1/auth/login", { username, passhash });
 
-            login({
-                "access_token": res.data.access_token,
-                "refresh_token": res.data.refresh_token,
-            });
+            // const fr = await fetch("http://localhost/api/v1/auth/login", {
+            //     method: "POST",
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify({ username, passhash }),
+            // });
+
+            // login({
+            //     "access_token": res.data.access_token,
+            //     "refresh_token": res.data.refresh_token,
+            // });
+            login();
             alert("Connected!");
-            console.log(res.headers);
+            const refresh = await axios.get("http://localhost/api/v1/auth/refresh");
+            alert("Got token!\n"+refresh);
+            navigate("/");
+            // console.log(res.headers);
         } catch (error) {
             alert("Connection error!\n"+e.message);
         }
