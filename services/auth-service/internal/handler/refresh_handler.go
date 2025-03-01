@@ -25,8 +25,8 @@ func Refresh(refreshService *service.RefreshService) http.HandlerFunc {
             Value: accessToken,
             Path: "/",
             HttpOnly: true,
-            Secure: true,
-            SameSite: http.SameSiteStrictMode,
+            Secure: false,
+            SameSite: http.SameSiteLaxMode,
         })
     }
 }

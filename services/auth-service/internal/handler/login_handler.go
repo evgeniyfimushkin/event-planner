@@ -31,8 +31,8 @@ func Login(loginService *service.LoginService) http.HandlerFunc {
             Value: refreshToken,
             Path: "api/v1/auth/refresh",
             HttpOnly: true,
-            Secure: true,
-            SameSite: http.SameSiteStrictMode,
+            Secure: false,
+            SameSite: http.SameSiteLaxMode,
             MaxAge: 604800, //7days
         })
     }
