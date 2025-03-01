@@ -1,13 +1,14 @@
 package main
 
 import (
+	"event-service/internal/models"
+	"event-service/internal/repository"
 	"fmt"
 	"log/slog"
 
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/config"
-	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/logger"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/db"
-	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/repository"
+	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/logger"
 )
 
 
@@ -18,7 +19,15 @@ func main(){
     log.Info("Connecting to db with params")
     log.Info("Database: ", slog.String("host", cfg.Database.Host), slog.String("port", cfg.Database.Port))
 
-    dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s",cfg.Database.User, cfg.Database.Password, "authdb", cfg.Database.Host, cfg.Database.Port, "disable")
-    dbConnection := db.SetupDB(dsn)
+    dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s",cfg.Database.User, cfg.Database.Password, cfg.Database.Name, cfg.Database.Host, cfg.Database.Port, "disable")
+    dbConnection := db.SetupDB(dsn, &models.Event{})
+    eventRepo := repository.NewEventRepository(dbConnection)
+    _ = eventRepo
+
+    // init services
+
+    // configure routers
+
+    // start server
    
 }

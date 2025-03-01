@@ -2,12 +2,13 @@ module event-service
 
 go 1.23.6
 
-require github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250228033250-0a41e3bcabe9
+require (
+	github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250228033250-0a41e3bcabe9
+	gorm.io/gorm v1.25.12
+)
 
 require (
 	github.com/fatih/color v1.18.0 // indirect
-	github.com/go-chi/chi/v5 v5.2.1 // indirect
-	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgx/v5 v5.5.5 // indirect
@@ -22,5 +23,4 @@ require (
 	golang.org/x/sys v0.26.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	gorm.io/driver/postgres v1.5.11 // indirect
-	gorm.io/gorm v1.25.12 // indirect
 )

@@ -52,3 +52,24 @@ services:
         max-file: "3"
         tag: "db|{{.Name}}|{{.ID}}"
     restart: always
+ 
+  event-service:
+    container_name: event-service
+    image: evgeniyfimushkin/event-service
+    build: ./event-service
+    environment:
+      - DB_NAME=event_db
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_HOST=${POSTGRES_HOST}
+      - DB_PORT=${POSTGRES_PORT}
+      - PUBLIC_KEY=${PUBLIC_KEY}
+    ports:
+      - "8082:8080"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "db|{{.Name}}|{{.ID}}"
+    restart: always

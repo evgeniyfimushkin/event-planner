@@ -24,6 +24,7 @@ type Config struct {
 		Port     string `yaml:"port" envconfig:"DB_PORT" default:"5432"`
 		Name     string `yaml:"name" envconfig:"DB_NAME" default:"authdb"`
 	}
+    // PrivateKey and PublicKey is base64 encoded ecdsa256 keys
     PrivateKey string `yaml:"private_key" envconfig:"PRIVATE_KEY"`
     PublicKey string `yaml:"public_key" envconfig:"PUBLIC_KEY"`
     GoogleClientID string `yaml:"google_client_id" envconfig:"GOOGLE_CLIENT_ID"`
