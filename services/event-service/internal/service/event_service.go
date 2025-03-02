@@ -1,12 +1,12 @@
 package service
 
 import (
+	"errors"
 	"event-service/internal/models"
 	"event-service/internal/repository"
 	"fmt"
 
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/auth"
-	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/logger"
 )
 
 type EventService struct {
@@ -25,4 +25,9 @@ func NewEventService (verifier *auth.Verifier, eventRepo *repository.EventReposi
 }
 
 func (es *EventService) CreateEvent(accessToken string, event *models.Event) (*models.Event, error) {
+    err := es.verifier.VerifyJWTToken(accessToken)
+    if err != nil {
+        return nil, err
+    }
+    es.eventRepo.Create
 }
