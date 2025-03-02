@@ -42,22 +42,22 @@ func NewLoginService(userRepo *repository.UserRepository, secret string, tokenTT
 	}, nil
 }
 
-func (s *LoginService) Login(username, passhash string) (string, error) {
+func (s *LoginService) Login(username, passhash string) (*models.User, string, error) {
 	user, err := s.userRepo.GetUserByUsername(username)
 	if err != nil {
-		return  "", fmt.Errorf("authentication failed: %w", err)
+		return  nil, "", fmt.Errorf("User not found")
 	}
 
 	if user.PassHash != passhash {
-		return  "", fmt.Errorf("incorrect password: %w", err)
+		return  nil, "", fmt.Errorf("Incorrect password")
 	}
 
 	refreshToken, err := s.generateRefreshJWT(user, 7 * 24 * time.Hour)
 	if err != nil {
-		return  "", fmt.Errorf("failed to generateRefresh token: %w", err)
+		return  nil, "", fmt.Errorf("Failed to generate token")
 	}
 
-	return refreshToken, nil
+	return user, refreshToken, nil
 }
 
 func (s *LoginService) generateRefreshJWT(user *models.User, tokenTTL time.Duration)(string, error) {

@@ -16,26 +16,26 @@ func NewRegisterService(userRepo *repository.UserRepository) (*RegisterService, 
     }, nil
 }
 
-func (s *RegisterService) Register(username, email, passhash string) error {
+func (s *RegisterService) Register(username, email, passhash string) (*models.User, error) {
     if username == ""{
-        return fmt.Errorf("username is required")
+        return  nil, fmt.Errorf("username is required")
     }
     if email == "" {
-        return fmt.Errorf("email is required")
+        return  nil, fmt.Errorf("email is required")
     }
     if passhash == "" {
-        return fmt.Errorf("passhash is required")
+        return  nil, fmt.Errorf("passhash is required")
     }
     // TODO: add admin role
-    err := s.userRepo.Create(&models.User{
+    user, err := s.userRepo.Create(&models.User{
         Username: username,
         Email: email,
         PassHash: passhash,
         Role: "user",
     })
     if err != nil {
-        return err
+        return nil, err
     }
-    return nil
+    return user, nil
 }
     

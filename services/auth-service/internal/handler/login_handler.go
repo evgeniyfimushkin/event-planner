@@ -20,7 +20,7 @@ func Login(loginService *service.LoginService) http.HandlerFunc {
             return
         }
 
-        refreshToken, err := loginService.Login(req.Username, req.PassHash)
+        user, refreshToken, err := loginService.Login(req.Username, req.PassHash)
         if err != nil {
             http.Error(w, err.Error(), http.StatusUnauthorized)
             return
@@ -35,5 +35,8 @@ func Login(loginService *service.LoginService) http.HandlerFunc {
             SameSite: http.SameSiteLaxMode,
             MaxAge: 604800, //7days
         })
+        user.PassHash = ""
+        w.WriteHeader(http.StatusOK)
+        json.NewEncoder(w).Encode(user) 
     }
 }

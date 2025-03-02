@@ -1,7 +1,6 @@
 package service
 
 import (
-	"errors"
 	"event-service/internal/models"
 	"event-service/internal/repository"
 	"fmt"
@@ -29,5 +28,5 @@ func (es *EventService) CreateEvent(accessToken string, event *models.Event) (*m
     if err != nil {
         return nil, err
     }
-    es.eventRepo.Create
+    return nil, nil
 }
