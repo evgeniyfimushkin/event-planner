@@ -33,6 +33,16 @@ services:
         tag: "db|{{.Name}}|{{.ID}}"
     restart: always
 
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "3333:8080"
+    environment:
+      SWAGGER_JSON: /swagger/openapi.yaml
+    volumes:
+      - ./swagger:/swagger:z
+
+
   front:
     container_name: front
     image: evgeniyfimushkin/frontend

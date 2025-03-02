@@ -16,7 +16,10 @@
 
 ### Auth Service
 Auth service - сервис, отвечающий за безопасность, управление пользователями и их доступом. Он обеспечивает регистрацию пользователей, аутентификацию и авторизацию с использование JWT-токенов.
-json:
+
+#### api
+GET /api/v1/auth/g
+#### json
 ```json
 {
     "username": "ivan",
@@ -25,7 +28,7 @@ json:
 }
 ```
 
-golang:
+#### golang
 ``` go
 type User struct {
     ID        uint      `gorm:"primaryKey" json:"id"`
