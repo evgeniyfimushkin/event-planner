@@ -12,6 +12,9 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+
+var ErrTokenExpired = errors.New("token is expired")
+
 // Verifier - sevice, that contains publicKey and verifys jwt tokens
 type Verifier struct {
 	publicKey  *ecdsa.PublicKey
@@ -47,7 +50,7 @@ func NewVerifier (publicKeyString string) (*Verifier, error) {
 }
 
 // VerifyJWTToken takes accessToken as string and verified the signature
-func (a *Verifier) VerifyJWTToken(accessToken string) (bool, error) {
+func (a *Verifier) VerifyJWTToken(accessToken string) (error) {
     token, err := jwt.Parse(accessToken, func (token *jwt.Token) (interface{}, error) {
         if _, ok := token.Method.(*jwt.SigningMethodECDSA); !ok {
             return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -55,26 +58,26 @@ func (a *Verifier) VerifyJWTToken(accessToken string) (bool, error) {
         return a.publicKey, nil
     })
     if err != nil {
-        return false, fmt.Errorf("invalid access token: %w", err)
+        return  fmt.Errorf("invalid access token: %w", err)
     }
 
     if !token.Valid {
-        return false, errors.New("invalid access token")
+        return  errors.New("invalid access token")
     }
 
     claims, ok := token.Claims.(jwt.MapClaims)
     if !ok {
-        return false, errors.New("cannot parse token claims")
+        return  errors.New("cannot parse token claims")
     }
 
     exp, ok := claims["exp"].(float64)
     if !ok {
-        return false, errors.New("invalid exp claim in access token")
+        return  errors.New("invalid exp claim in access token")
     }
 
     if time.Now().Unix() > int64(exp) {
-        return false, errors.New("token is expired")
+        return ErrTokenExpired
     }
-    return true, nil
+    return  nil
 }
 

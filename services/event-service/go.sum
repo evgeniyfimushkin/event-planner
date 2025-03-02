@@ -3,8 +3,12 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250228033250-0a41e3bcabe9 h1:3KVbQvrrFJNmZn9Orkw5m/odXeHYiGXhxR4bqY0mMHI=
 github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250228033250-0a41e3bcabe9/go.mod h1:aLsA9ue6kYr8Sew85aYJ8NlEW7XMXoMtBCDMYoUuPZA=
+github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250301042221-7055cc01335e h1:nAoFp9y6vUNP5FZ21sR+kfw9CCA/XEEG1LEM0M8iR+I=
+github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250301042221-7055cc01335e/go.mod h1:aLsA9ue6kYr8Sew85aYJ8NlEW7XMXoMtBCDMYoUuPZA=
 github.com/fatih/color v1.18.0 h1:S8gINlzdQ840/4pfAwic/ZE0djQEH3wM94VfqLTZcOM=
 github.com/fatih/color v1.18.0/go.mod h1:4FelSpRwEGDpQ12mAdzqdOukCy4u8WUtOY6lkT/6HfU=
+github.com/golang-jwt/jwt/v5 v5.2.1 h1:OuVbFODueb089Lh128TAcimifWaLhJwVflnrgM17wHk=
+github.com/golang-jwt/jwt/v5 v5.2.1/go.mod h1:pqrtFR0X4osieyHYxtmOUWsAWrfe1Q5UVIyoH402zdk=
 github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsIM=
 github.com/jackc/pgpassfile v1.0.0/go.mod h1:CEx0iS5ambNFdcRtxPj5JhEz+xB6uRky5eyVu/W2HEg=
 github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a h1:bbPeKD0xmW/Y25WS6cokEszi5g+S0QxI/d45PkRi7Nk=
