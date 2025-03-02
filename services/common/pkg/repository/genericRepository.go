@@ -145,3 +145,41 @@ func (repo *GenericRepository[T]) BulkUpdate(condition interface{}, args []inter
 	}
 	return nil
 }
+
+
+// ExecuteInTransaction executes the provided function within a transaction.
+// If the function returns an error, the transaction is rolled back; otherwise, it is committed.
+// Example:
+// err := repo.ExecuteInTransaction(func(tx *gorm.DB) error {
+// 		txRepo := NewGenericRepository[TestEntity](tx)
+// 		entity, err := txRepo.Create(&TestEntity{Name: "Entity1"})
+// 		if err != nil {
+// 			return err
+// 		}
+// 		entity.Name = "Entity1 Updated"
+// 		_, err = txRepo.Update(entity)
+// 		if err != nil {
+// 			return err
+// 		}
+//     }
+
+func (repo *GenericRepository[T]) ExecuteInTransaction(fn func(tx *gorm.DB) error) error {
+	tx := repo.Db.Begin()
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+			panic(r)
+		}
+	}()
+
+	if err := fn(tx); err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit().Error
+}
+

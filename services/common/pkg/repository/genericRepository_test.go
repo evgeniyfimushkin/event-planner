@@ -219,3 +219,108 @@ func TestGenericRepository_BulkUpdate(t *testing.T) {
 	assert.Len(t, updated, 2, "expected 2 entities to be updated")
 }
 
+
+func TestExecuteInTransaction_Success(t *testing.T) {
+	db := setupTestDB(t)
+	repo := NewGenericRepository[TestEntity](db)
+
+	err := repo.ExecuteInTransaction(func(tx *gorm.DB) error {
+		result := tx.Create(&TestEntity{Name: "Transacted Entity"})
+		return result.Error
+	})
+	assert.NoError(t, err, "transaction should commit without error")
+
+	entities, err := repo.GetAll()
+	assert.NoError(t, err, "failed to get all entities")
+	assert.Len(t, entities, 1, "there should be 1 entity after commit")
+	assert.Equal(t, "Transacted Entity", entities[0].Name)
+}
+
+func TestExecuteInTransaction_Failure(t *testing.T) {
+	db := setupTestDB(t)
+	repo := NewGenericRepository[TestEntity](db)
+
+	testErr := fmt.Errorf("intentional error")
+	err := repo.ExecuteInTransaction(func(tx *gorm.DB) error {
+		result := tx.Create(&TestEntity{Name: "Entity That Will Not Persist"})
+		if result.Error != nil {
+			return result.Error
+		}
+		return testErr
+	})
+	assert.Error(t, err, "transaction should fail")
+	assert.Equal(t, testErr, err, "error should match the intentional error")
+
+	entities, err := repo.GetAll()
+	assert.NoError(t, err, "failed to get all entities")
+	assert.Len(t, entities, 0, "there should be 0 entities after rollback")
+}
+
+func TestExecuteInTransaction_Panic(t *testing.T) {
+	db := setupTestDB(t)
+	repo := NewGenericRepository[TestEntity](db)
+
+	assert.Panics(t, func() {
+		_ = repo.ExecuteInTransaction(func(tx *gorm.DB) error {
+			tx.Create(&TestEntity{Name: "Entity Before Panic"})
+			panic("unexpected panic")
+		})
+	}, "transaction should panic")
+
+	// Проверяем, что сущность не была создана (rollback выполнен)
+	entities, err := repo.GetAll()
+	assert.NoError(t, err, "failed to get all entities")
+	assert.Len(t, entities, 0, "there should be 0 entities after panic and rollback")
+}
+
+func TestExecuteInTransaction_MultipleMethods(t *testing.T) {
+	db := setupTestDB(t)
+	repo := NewGenericRepository[TestEntity](db)
+
+	err := repo.ExecuteInTransaction(func(tx *gorm.DB) error {
+		txRepo := NewGenericRepository[TestEntity](tx)
+
+		entity, err := txRepo.Create(&TestEntity{Name: "Entity1"})
+		if err != nil {
+			return err
+		}
+
+		entity.Name = "Entity1 Updated"
+		_, err = txRepo.Update(entity)
+		if err != nil {
+			return err
+		}
+
+		bulkEntities := []*TestEntity{
+			{Name: "Bulk1"},
+			{Name: "Bulk2"},
+		}
+		err = txRepo.BulkInsert(bulkEntities)
+		if err != nil {
+			return err
+		}
+
+		count, err := txRepo.Count("name LIKE ?", "Bulk%")
+		if err != nil {
+			return err
+		}
+		if count != 2 {
+			return fmt.Errorf("expected count to be 2, got %d", count)
+		}
+
+		all, err := txRepo.GetAll()
+		if err != nil {
+			return err
+		}
+		if len(all) != 3 {
+			return fmt.Errorf("expected 3 total entities, got %d", len(all))
+		}
+		return nil
+	})
+	assert.NoError(t, err, "transaction with multiple operations should complete successfully")
+
+	all, err := repo.GetAll()
+	assert.NoError(t, err)
+	assert.Len(t, all, 3, "expected 3 total entities after transaction")
+}
+
