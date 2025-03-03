@@ -1,397 +1,452 @@
-package handler_test
+package handler
 
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
+	"net/url"
 	"testing"
 
-	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/handler"
-	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/repository"
-	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/service"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+
+	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/repository"
+	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/service"
 )
 
-// TestEntity is a dummy struct for testing GenericHandler.
+// TestEntity - test entity for integration tests.
 type TestEntity struct {
-	ID   int    `json:"id" gorm:"primaryKey;autoIncrement"`
+	ID   int    `gorm:"primaryKey" json:"id"`
 	Name string `json:"name"`
 }
 
-// setupTestDB creates an isolated in-memory SQLite database and migrates TestEntity.
+// setupTestDB opens an in-memory SQLite database and migrates the TestEntity model.
+// It constructs a unique DSN for each test using t.Name().
 func setupTestDB(t *testing.T) *gorm.DB {
-	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+	dsn := fmt.Sprintf("file:%s?mode=memory&cache=shared", t.Name())
+	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
 	if err != nil {
 		t.Fatalf("failed to open database: %v", err)
 	}
-
-	// Limit the connection pool to force a single connection (ensuring isolation for :memory: DB).
-	sqlDB, err := db.DB()
-	if err != nil {
-		t.Fatalf("failed to get generic database: %v", err)
-	}
-	sqlDB.SetMaxOpenConns(1)
-
 	if err := db.AutoMigrate(&TestEntity{}); err != nil {
-		t.Fatalf("failed to migrate: %v", err)
+		t.Fatalf("failed to migrate TestEntity: %v", err)
 	}
 	return db
 }
 
-// setupHandler creates a new GenericHandler[TestEntity] instance using a GenericRepository.
-func setupHandler(t *testing.T) (*handler.GenericHandler[TestEntity], *gorm.DB) {
+// newTestHandler creates a repository, service, and handler for TestEntity.
+func newTestHandler(t *testing.T) (*GenericHandler[TestEntity], *gorm.DB) {
 	db := setupTestDB(t)
 	repo := repository.NewGenericRepository[TestEntity](db)
-    service := service.NewGenericService(repo)
-	h := handler.NewGenericHandler(service)
+	svc := service.NewGenericService[TestEntity](repo)
+	h := NewGenericHandler[TestEntity](svc)
 	return h, db
 }
 
-// TestCreateHandler tests the CreateHandler endpoint.
-func TestCreateHandler(t *testing.T) {
-	h, _ := setupHandler(t)
-	entity := TestEntity{Name: "TestCreate"}
-	body, _ := json.Marshal(entity)
-	req := httptest.NewRequest(http.MethodPost, "/create", bytes.NewReader(body))
-	w := httptest.NewRecorder()
-	h.CreateHandler().ServeHTTP(w, req)
-	if w.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d", w.Code)
+// ------------------- Integration tests for CreateHandler -------------------
+
+func TestCreateHandlerIntegration(t *testing.T) {
+	h, db := newTestHandler(t)
+
+	reqBody := `{"name": "test entity"}`
+	req := httptest.NewRequest(http.MethodPost, "/create", bytes.NewBufferString(reqBody))
+	rec := httptest.NewRecorder()
+
+	h.CreateHandler()(rec, req)
+	res := rec.Result()
+	if res.StatusCode != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", res.StatusCode)
 	}
-	var created TestEntity
-	if err := json.Unmarshal(w.Body.Bytes(), &created); err != nil {
-		t.Fatalf("error unmarshalling response: %v", err)
+
+	var entity TestEntity
+	if err := json.NewDecoder(res.Body).Decode(&entity); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
 	}
-	if created.ID == 0 {
-		t.Fatalf("expected valid ID, got %d", created.ID)
+	if entity.ID == 0 {
+		t.Errorf("expected non-zero ID, got %d", entity.ID)
 	}
-	if created.Name != entity.Name {
-		t.Fatalf("expected name %s, got %s", entity.Name, created.Name)
+	if entity.Name != "test entity" {
+		t.Errorf("expected name 'test entity', got '%s'", entity.Name)
+	}
+
+	// Check in the database
+	var dbEntity TestEntity
+	if err := db.First(&dbEntity, entity.ID).Error; err != nil {
+		t.Errorf("failed to find entity in db: %v", err)
 	}
 }
 
-// TestGetByIDHandler tests the GetByIDHandler endpoint.
-func TestGetByIDHandler(t *testing.T) {
-	h, db := setupHandler(t)
-	// Create entity directly in DB.
-	entity := TestEntity{Name: "TestGetByID"}
+// ------------------- Integration tests for GetByIDHandler -------------------
+
+func TestGetByIDHandlerIntegration(t *testing.T) {
+	h, db := newTestHandler(t)
+
+	// Pre-create an entity
+	entity := TestEntity{Name: "getByID test"}
 	if err := db.Create(&entity).Error; err != nil {
 		t.Fatalf("failed to create entity: %v", err)
 	}
-	req := httptest.NewRequest(http.MethodGet, "/get?id="+strconv.Itoa(entity.ID), nil)
-	w := httptest.NewRecorder()
-	h.GetByIDHandler().ServeHTTP(w, req)
-	if w.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d", w.Code)
+
+	urlStr := fmt.Sprintf("/get?id=%d", entity.ID)
+	req := httptest.NewRequest(http.MethodGet, urlStr, nil)
+	rec := httptest.NewRecorder()
+
+	h.GetByIDHandler()(rec, req)
+	res := rec.Result()
+	if res.StatusCode != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", res.StatusCode)
 	}
-	var fetched TestEntity
-	if err := json.Unmarshal(w.Body.Bytes(), &fetched); err != nil {
-		t.Fatalf("error unmarshalling response: %v", err)
+
+	var result TestEntity
+	if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
 	}
-	if fetched.ID != entity.ID {
-		t.Fatalf("expected ID %d, got %d", entity.ID, fetched.ID)
+	if result.ID != entity.ID || result.Name != entity.Name {
+		t.Errorf("unexpected result: %+v", result)
 	}
 }
 
-// TestUpdateHandler tests the UpdateHandler endpoint.
-func TestUpdateHandler(t *testing.T) {
-	h, db := setupHandler(t)
-	// Create entity.
-	entity := TestEntity{Name: "Original"}
+// ------------------- Integration tests for UpdateHandler -------------------
+
+func TestUpdateHandlerIntegration(t *testing.T) {
+	h, db := newTestHandler(t)
+
+	// Create an entity
+	entity := TestEntity{Name: "original"}
 	if err := db.Create(&entity).Error; err != nil {
 		t.Fatalf("failed to create entity: %v", err)
 	}
-	// Update entity.
-	entity.Name = "Updated"
-	body, _ := json.Marshal(entity)
-	req := httptest.NewRequest(http.MethodPut, "/update", bytes.NewReader(body))
-	w := httptest.NewRecorder()
-	h.UpdateHandler().ServeHTTP(w, req)
-	if w.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d", w.Code)
+
+	// Update the entity via HTTP
+	updatedBody := fmt.Sprintf(`{"id": %d, "name": "updated"}`, entity.ID)
+	req := httptest.NewRequest(http.MethodPut, "/update", bytes.NewBufferString(updatedBody))
+	rec := httptest.NewRecorder()
+
+	h.UpdateHandler()(rec, req)
+	res := rec.Result()
+	if res.StatusCode != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", res.StatusCode)
 	}
-	var updated TestEntity
-	if err := json.Unmarshal(w.Body.Bytes(), &updated); err != nil {
-		t.Fatalf("error unmarshalling response: %v", err)
+	var updatedEntity TestEntity
+	if err := json.NewDecoder(res.Body).Decode(&updatedEntity); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
 	}
-	if updated.Name != "Updated" {
-		t.Fatalf("expected name Updated, got %s", updated.Name)
+	if updatedEntity.Name != "updated" {
+		t.Errorf("expected name 'updated', got '%s'", updatedEntity.Name)
+	}
+
+	// Check in the database
+	var dbEntity TestEntity
+	if err := db.First(&dbEntity, entity.ID).Error; err != nil {
+		t.Fatalf("failed to find updated entity: %v", err)
+	}
+	if dbEntity.Name != "updated" {
+		t.Errorf("DB not updated: got '%s'", dbEntity.Name)
 	}
 }
 
-// TestDeleteHandler tests the DeleteHandler endpoint.
-func TestDeleteHandler(t *testing.T) {
-	h, db := setupHandler(t)
-	// Create entity.
-	entity := TestEntity{Name: "ToDelete"}
+// ------------------- Integration tests for DeleteHandler -------------------
+
+func TestDeleteHandlerIntegration(t *testing.T) {
+	h, db := newTestHandler(t)
+
+	// Create an entity
+	entity := TestEntity{Name: "to delete"}
 	if err := db.Create(&entity).Error; err != nil {
 		t.Fatalf("failed to create entity: %v", err)
 	}
-	req := httptest.NewRequest(http.MethodDelete, "/delete?id="+strconv.Itoa(entity.ID), nil)
-	w := httptest.NewRecorder()
-	h.DeleteHandler().ServeHTTP(w, req)
-	if w.Code != http.StatusNoContent {
-		t.Fatalf("expected status 204, got %d", w.Code)
+
+	urlStr := fmt.Sprintf("/delete?id=%d", entity.ID)
+	req := httptest.NewRequest(http.MethodDelete, urlStr, nil)
+	rec := httptest.NewRecorder()
+
+	h.DeleteHandler()(rec, req)
+	res := rec.Result()
+	if res.StatusCode != http.StatusNoContent {
+		t.Fatalf("expected status 204, got %d", res.StatusCode)
 	}
-	// Verify that entity is deleted.
-	var count int64
-	db.Model(&TestEntity{}).Where("id = ?", entity.ID).Count(&count)
-	if count != 0 {
-		t.Fatalf("expected entity to be deleted, count %d", count)
+
+	// Check deletion from the database
+	var dbEntity TestEntity
+	err := db.First(&dbEntity, entity.ID).Error
+	if err == nil {
+		t.Errorf("entity still exists in DB after deletion")
 	}
 }
 
-// TestGetAllHandler tests the GetAllHandler endpoint.
-func TestGetAllHandler(t *testing.T) {
-	h, db := setupHandler(t)
-	// Create multiple entities.
+// ------------------- Integration tests for GetAllHandler -------------------
+
+func TestGetAllHandlerIntegration(t *testing.T) {
+	h, db := newTestHandler(t)
+
+	// Create several entities
 	entities := []TestEntity{
-		{Name: "Entity1"},
-		{Name: "Entity2"},
+		{Name: "A"},
+		{Name: "B"},
 	}
 	for _, e := range entities {
 		if err := db.Create(&e).Error; err != nil {
 			t.Fatalf("failed to create entity: %v", err)
 		}
 	}
+
 	req := httptest.NewRequest(http.MethodGet, "/all", nil)
-	w := httptest.NewRecorder()
-	h.GetAllHandler().ServeHTTP(w, req)
-	if w.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d", w.Code)
+	rec := httptest.NewRecorder()
+
+	h.GetAllHandler()(rec, req)
+	res := rec.Result()
+	if res.StatusCode != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", res.StatusCode)
 	}
-	var fetched []TestEntity
-	if err := json.Unmarshal(w.Body.Bytes(), &fetched); err != nil {
-		t.Fatalf("error unmarshalling response: %v", err)
+
+	var results []TestEntity
+	if err := json.NewDecoder(res.Body).Decode(&results); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
 	}
-	if len(fetched) != 2 {
-		t.Fatalf("expected 2 entities, got %d", len(fetched))
+	if len(results) < 2 {
+		t.Errorf("expected at least 2 entities, got %d", len(results))
 	}
 }
 
-// TestDeleteWhereHandler tests the DeleteWhereHandler endpoint.
-func TestDeleteWhereHandler(t *testing.T) {
-	h, db := setupHandler(t)
-	// Create entities: 2 with name "DeleteTest" and 1 with "KeepTest".
+// ------------------- Integration tests for DeleteWhereHandler -------------------
+
+func TestDeleteWhereHandlerIntegration(t *testing.T) {
+	h, db := newTestHandler(t)
+
+	// Create entities with different Name values
 	entities := []TestEntity{
-		{Name: "DeleteTest"},
-		{Name: "DeleteTest"},
-		{Name: "KeepTest"},
+		{Name: "delete"},
+		{Name: "keep"},
+		{Name: "delete"},
 	}
 	for _, e := range entities {
 		if err := db.Create(&e).Error; err != nil {
 			t.Fatalf("failed to create entity: %v", err)
 		}
 	}
-	// Delete where name = "DeleteTest".
-	reqBody := map[string]interface{}{
-		"condition": "name = ?",
-		"args":      []interface{}{"DeleteTest"},
+
+	// Delete records where name = "delete"
+	q := url.Values{}
+	q.Set("name", "delete")
+	req := httptest.NewRequest(http.MethodDelete, "/deleteWhere?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+
+	h.DeleteWhereHandler()(rec, req)
+	res := rec.Result()
+	if res.StatusCode != http.StatusNoContent {
+		t.Fatalf("expected status 204, got %d", res.StatusCode)
 	}
-	body, _ := json.Marshal(reqBody)
-	req := httptest.NewRequest(http.MethodDelete, "/deletewhere", bytes.NewReader(body))
-	w := httptest.NewRecorder()
-	h.DeleteWhereHandler().ServeHTTP(w, req)
-	if w.Code != http.StatusNoContent {
-		t.Fatalf("expected status 204, got %d", w.Code)
-	}
-	// Verify that only the entity with "KeepTest" remains.
+
+	// Check the remaining records
 	var remaining []TestEntity
 	if err := db.Find(&remaining).Error; err != nil {
-		t.Fatalf("failed to fetch entities: %v", err)
+		t.Fatalf("failed to query DB: %v", err)
 	}
-	if len(remaining) != 1 || remaining[0].Name != "KeepTest" {
-		t.Fatalf("unexpected remaining entities: %+v", remaining)
+	for _, r := range remaining {
+		if r.Name == "delete" {
+			t.Errorf("entity with name 'delete' still exists")
+		}
 	}
 }
 
-// TestFindHandler tests the FindHandler endpoint.
-func TestFindHandler(t *testing.T) {
-	h, db := setupHandler(t)
-	// Create entities.
+// ------------------- Integration tests for FindHandler -------------------
+
+func TestFindHandlerIntegration(t *testing.T) {
+	h, db := newTestHandler(t)
+
+	// Create entities
 	entities := []TestEntity{
-		{Name: "FindTest"},
-		{Name: "FindTest"},
-		{Name: "OtherTest"},
+		{Name: "findme"},
+		{Name: "other"},
+		{Name: "findme"},
 	}
 	for _, e := range entities {
 		if err := db.Create(&e).Error; err != nil {
 			t.Fatalf("failed to create entity: %v", err)
 		}
 	}
-	reqBody := map[string]interface{}{
-		"condition": "name = ?",
-		"args":      []interface{}{"FindTest"},
+
+	q := url.Values{}
+	q.Set("name", "findme")
+	req := httptest.NewRequest(http.MethodGet, "/find?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+
+	h.FindHandler()(rec, req)
+	res := rec.Result()
+	if res.StatusCode != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", res.StatusCode)
 	}
-	body, _ := json.Marshal(reqBody)
-	req := httptest.NewRequest(http.MethodGet, "/find", bytes.NewReader(body))
-	w := httptest.NewRecorder()
-	h.FindHandler().ServeHTTP(w, req)
-	if w.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d", w.Code)
+	var results []TestEntity
+	if err := json.NewDecoder(res.Body).Decode(&results); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
 	}
-	var found []TestEntity
-	if err := json.Unmarshal(w.Body.Bytes(), &found); err != nil {
-		t.Fatalf("error unmarshalling response: %v", err)
-	}
-	if len(found) != 2 {
-		t.Fatalf("expected 2 entities, got %d", len(found))
+	if len(results) != 2 {
+		t.Errorf("expected 2 results, got %d", len(results))
 	}
 }
 
-// TestFindFirstHandler tests the FindFirstHandler endpoint.
-func TestFindFirstHandler(t *testing.T) {
-	h, db := setupHandler(t)
-	// Create several entities with the same name.
-	entities := []TestEntity{
-		{Name: "FirstTest"},
-		{Name: "FirstTest"},
+// ------------------- Integration tests for FindFirstHandler -------------------
+
+func TestFindFirstHandlerIntegration(t *testing.T) {
+	h, db := newTestHandler(t)
+
+	// Create an entity
+	entity := TestEntity{Name: "first"}
+	if err := db.Create(&entity).Error; err != nil {
+		t.Fatalf("failed to create entity: %v", err)
 	}
-	for _, e := range entities {
-		if err := db.Create(&e).Error; err != nil {
+	// Create another entity with the same name
+	_ = db.Create(&TestEntity{Name: "first"})
+
+	q := url.Values{}
+	q.Set("name", "first")
+	req := httptest.NewRequest(http.MethodGet, "/findFirst?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+
+	h.FindFirstHandler()(rec, req)
+	res := rec.Result()
+	if res.StatusCode != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", res.StatusCode)
+	}
+	var result TestEntity
+	if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
+	if result.Name != "first" {
+		t.Errorf("expected name 'first', got '%s'", result.Name)
+	}
+}
+
+// ------------------- Integration tests for CountHandler -------------------
+
+func TestCountHandlerIntegration(t *testing.T) {
+	h, db := newTestHandler(t)
+
+	// Create 5 entities with the same name
+	for i := 0; i < 5; i++ {
+		if err := db.Create(&TestEntity{Name: "count"}).Error; err != nil {
 			t.Fatalf("failed to create entity: %v", err)
 		}
 	}
-	reqBody := map[string]interface{}{
-		"condition": "name = ?",
-		"args":      []interface{}{"FirstTest"},
+
+	q := url.Values{}
+	q.Set("name", "count")
+	req := httptest.NewRequest(http.MethodGet, "/count?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+
+	h.CountHandler()(rec, req)
+	res := rec.Result()
+	if res.StatusCode != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", res.StatusCode)
 	}
-	body, _ := json.Marshal(reqBody)
-	req := httptest.NewRequest(http.MethodGet, "/findfirst", bytes.NewReader(body))
-	w := httptest.NewRecorder()
-	h.FindFirstHandler().ServeHTTP(w, req)
-	if w.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d", w.Code)
+	var result map[string]int64
+	if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
 	}
-	var found TestEntity
-	if err := json.Unmarshal(w.Body.Bytes(), &found); err != nil {
-		t.Fatalf("error unmarshalling response: %v", err)
-	}
-	if found.Name != "FirstTest" {
-		t.Fatalf("expected name FirstTest, got %s", found.Name)
+	count, ok := result["count"]
+	if !ok || count != 5 {
+		t.Errorf("expected count 5, got %v", result)
 	}
 }
 
-// TestCountHandler tests the CountHandler endpoint.
-func TestCountHandler(t *testing.T) {
-	h, db := setupHandler(t)
-	// Create entities.
-	entities := []TestEntity{
-		{Name: "CountTest"},
-		{Name: "CountTest"},
-		{Name: "OtherTest"},
-	}
-	for _, e := range entities {
-		if err := db.Create(&e).Error; err != nil {
+// ------------------- Integration tests for GetPageHandler -------------------
+
+func TestGetPageHandlerIntegration(t *testing.T) {
+	h, db := newTestHandler(t)
+
+	// Create 15 entities with the same name
+	for i := 0; i < 15; i++ {
+		if err := db.Create(&TestEntity{Name: "page"}).Error; err != nil {
 			t.Fatalf("failed to create entity: %v", err)
 		}
 	}
-	reqBody := map[string]interface{}{
-		"condition": "name = ?",
-		"args":      []interface{}{"CountTest"},
+
+	q := url.Values{}
+	q.Set("page", "2")
+	q.Set("pageSize", "5")
+	q.Set("name", "page")
+	req := httptest.NewRequest(http.MethodGet, "/page?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+
+	h.GetPageHandler()(rec, req)
+	res := rec.Result()
+	if res.StatusCode != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", res.StatusCode)
 	}
-	body, _ := json.Marshal(reqBody)
-	req := httptest.NewRequest(http.MethodGet, "/count", bytes.NewReader(body))
-	w := httptest.NewRecorder()
-	h.CountHandler().ServeHTTP(w, req)
-	if w.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d", w.Code)
+	var results []TestEntity
+	if err := json.NewDecoder(res.Body).Decode(&results); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
 	}
-	var resp map[string]int64
-	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
-		t.Fatalf("error unmarshalling response: %v", err)
-	}
-	if count, ok := resp["count"]; !ok || count != 2 {
-		t.Fatalf("expected count 2, got %v", resp)
+	if len(results) != 5 {
+		t.Errorf("expected 5 entities, got %d", len(results))
 	}
 }
 
-// TestGetPageHandler tests the GetPageHandler endpoint.
-func TestGetPageHandler(t *testing.T) {
-	h, db := setupHandler(t)
-	// Create 5 entities.
-	for i := 1; i <= 5; i++ {
-		e := TestEntity{Name: "PageTest" + strconv.Itoa(i)}
-		if err := db.Create(&e).Error; err != nil {
-			t.Fatalf("failed to create entity: %v", err)
-		}
-	}
-	reqBody := map[string]interface{}{
-		"page":      1,
-		"pageSize":  2,
-		"condition": "name LIKE ?",
-		"args":      []interface{}{"PageTest%"},
-	}
-	body, _ := json.Marshal(reqBody)
-	req := httptest.NewRequest(http.MethodGet, "/getpage", bytes.NewReader(body))
-	w := httptest.NewRecorder()
-	h.GetPageHandler().ServeHTTP(w, req)
-	if w.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d", w.Code)
-	}
-	var page []TestEntity
-	if err := json.Unmarshal(w.Body.Bytes(), &page); err != nil {
-		t.Fatalf("error unmarshalling response: %v", err)
-	}
-	if len(page) != 2 {
-		t.Fatalf("expected 2 entities, got %d", len(page))
-	}
-}
+// ------------------- Integration tests for BulkInsertHandler -------------------
 
-// TestBulkInsertHandler tests the BulkInsertHandler endpoint.
-func TestBulkInsertHandler(t *testing.T) {
-	h, db := setupHandler(t)
-	entities := []TestEntity{
-		{Name: "Bulk1"},
-		{Name: "Bulk2"},
+func TestBulkInsertHandlerIntegration(t *testing.T) {
+	h, db := newTestHandler(t)
+
+	reqBody := `[{"name": "bulk1"}, {"name": "bulk2"}]`
+	req := httptest.NewRequest(http.MethodPost, "/bulkInsert", bytes.NewBufferString(reqBody))
+	rec := httptest.NewRecorder()
+
+	h.BulkInsertHandler()(rec, req)
+	res := rec.Result()
+	if res.StatusCode != http.StatusCreated {
+		t.Fatalf("expected status 201, got %d", res.StatusCode)
 	}
-	body, _ := json.Marshal(entities)
-	req := httptest.NewRequest(http.MethodPost, "/bulkinsert", bytes.NewReader(body))
-	w := httptest.NewRecorder()
-	h.BulkInsertHandler().ServeHTTP(w, req)
-	if w.Code != http.StatusCreated {
-		t.Fatalf("expected status 201, got %d", w.Code)
+	body, _ := io.ReadAll(res.Body)
+	if string(body) != "Bulk insert successful" {
+		t.Errorf("unexpected response body: %s", string(body))
 	}
+
+	// Check the number of records in the DB
 	var count int64
-	db.Model(&TestEntity{}).Count(&count)
+	if err := db.Model(&TestEntity{}).Count(&count).Error; err != nil {
+		t.Fatalf("failed to count entities: %v", err)
+	}
 	if count != 2 {
-		t.Fatalf("expected 2 entities, got %d", count)
+		t.Errorf("expected 2 entities, got %d", count)
 	}
 }
 
-// TestBulkUpdateHandler tests the BulkUpdateHandler endpoint.
-func TestBulkUpdateHandler(t *testing.T) {
-	h, db := setupHandler(t)
-	// Create entities.
-	entities := []TestEntity{
-		{Name: "BulkUpdateTest"},
-		{Name: "BulkUpdateTest"},
-		{Name: "Other"},
-	}
-	for _, e := range entities {
-		if err := db.Create(&e).Error; err != nil {
+// ------------------- Integration tests for BulkUpdateHandler -------------------
+
+func TestBulkUpdateHandlerIntegration(t *testing.T) {
+	h, db := newTestHandler(t)
+
+	// Create 3 entities with the name "old"
+	for i := 0; i < 3; i++ {
+		if err := db.Create(&TestEntity{Name: "old"}).Error; err != nil {
 			t.Fatalf("failed to create entity: %v", err)
 		}
 	}
-	reqBody := map[string]interface{}{
-		"condition":  "name = ?",
-		"args":       []interface{}{"BulkUpdateTest"},
-		"updateData": map[string]interface{}{"name": "UpdatedBulk"},
+
+	reqBody := `{"condition": "name = ?", "args": ["old"], "updateData": {"name": "new"}}`
+	req := httptest.NewRequest(http.MethodPut, "/bulkUpdate", bytes.NewBufferString(reqBody))
+	rec := httptest.NewRecorder()
+
+	h.BulkUpdateHandler()(rec, req)
+	res := rec.Result()
+	if res.StatusCode != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", res.StatusCode)
 	}
-	body, _ := json.Marshal(reqBody)
-	req := httptest.NewRequest(http.MethodPut, "/bulkupdate", bytes.NewReader(body))
-	w := httptest.NewRecorder()
-	h.BulkUpdateHandler().ServeHTTP(w, req)
-	if w.Code != http.StatusOK {
-		t.Fatalf("expected status 200, got %d", w.Code)
+	body, _ := io.ReadAll(res.Body)
+	if string(body) != "Bulk update successful" {
+		t.Errorf("unexpected response body: %s", string(body))
 	}
-	var count int64
-	db.Model(&TestEntity{}).Where("name = ?", "UpdatedBulk").Count(&count)
-	if count != 2 {
-		t.Fatalf("expected 2 updated entities, got %d", count)
+
+	// Check the updated records in the DB
+	var entities []TestEntity
+	if err := db.Where("name = ?", "new").Find(&entities).Error; err != nil {
+		t.Fatalf("failed to query updated entities: %v", err)
+	}
+	if len(entities) != 3 {
+		t.Errorf("expected 3 updated entities, got %d", len(entities))
 	}
 }
 

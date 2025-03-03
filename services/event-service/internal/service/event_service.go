@@ -3,24 +3,25 @@ package service
 import (
 	"event-service/internal/models"
 	"event-service/internal/repository"
-	"fmt"
 
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/auth"
+	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/service"
 )
 
+// EventService specializes in handling business logic for Event entities.
+// It embeds GenericService for basic CRUD operations and adds additional dependencies (e.g., a verifier).
 type EventService struct {
-    verifier *auth.Verifier
-    eventRepo *repository.EventRepository
+	*service.GenericService[models.Event]
+	verifier *auth.Verifier
 }
 
-func NewEventService (verifier *auth.Verifier, eventRepo *repository.EventRepository) (*EventService, error) {
-    if verifier == nil || eventRepo == nil {
-        return nil, fmt.Errorf("failed to create EventService, arguments can not be nil")
-    }
-    return &EventService{
-        verifier: verifier,
-        eventRepo: eventRepo,
-    }, nil
+// NewEventService creates a new instance of EventService using the provided verifier and repository.
+// It initializes the underlying GenericService using the given repository.
+func NewEventService(verifier *auth.Verifier, repo *repository.EventRepository) *EventService {
+	return &EventService{
+		GenericService: service.NewGenericService[models.Event](repo),
+		verifier:       verifier,
+	}
 }
 
 func (es *EventService) CreateEvent(accessToken string, event *models.Event) (*models.Event, error) {
@@ -28,5 +29,10 @@ func (es *EventService) CreateEvent(accessToken string, event *models.Event) (*m
     if err != nil {
         return nil, err
     }
-    return nil, nil
+    created, err := es.Create(event)
+    if err != nil {
+        return nil, err
+    }
+
+    return created, nil
 }

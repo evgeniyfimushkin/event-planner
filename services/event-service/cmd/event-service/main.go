@@ -1,6 +1,7 @@
 package main
 
 import (
+	"event-service/internal/handler"
 	"event-service/internal/models"
 	"event-service/internal/repository"
 	"event-service/internal/service"
@@ -11,6 +12,12 @@ import (
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/config"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/db"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/logger"
+    "github.com/evgeniyfimushkin/event-planner/services/common/pkg/middlewarelogger"
+
+    "github.com/go-chi/chi/v5"
+    "github.com/go-chi/chi/v5/middleware"
+
+
 )
 
 
@@ -30,15 +37,20 @@ func main(){
         panic("failed to init JWT verifier")
     }
 
-    eventService, err := service.NewEventService(verifier, eventRepo)
-    if err != nil {
-        log.Error("failed to init EventService: ", logger.Err(err))
-        panic("failed to init EventService: ")
-    }
+    eventService := service.NewEventService(verifier, eventRepo)
 
-    _ = eventService
+    handler := handler.NewEventHandler(eventService)
 
-    // configure handlers and routers
+    router := chi.NewRouter()
+    router.Use(middleware.RequestID)
+    router.Use(middleware.RealIP)
+    router.Use(middlewarelogger.New(log))
+    router.Use(middleware.Recoverer)
+    router.Use(middleware.URLFormat)
+    
+    api := "/api/v1/events"
+    
+    _, _ = api, handler
 
     // start server
    

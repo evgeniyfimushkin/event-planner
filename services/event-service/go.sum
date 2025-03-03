@@ -9,8 +9,12 @@ github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250302022054-
 github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250302022054-5d9d63421612/go.mod h1:aLsA9ue6kYr8Sew85aYJ8NlEW7XMXoMtBCDMYoUuPZA=
 github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250302034008-12412f21b920 h1:Qg44m+9+Tz7AeS0u2CY3E29poi59Oc+C6BORrLiJt1s=
 github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250302034008-12412f21b920/go.mod h1:aLsA9ue6kYr8Sew85aYJ8NlEW7XMXoMtBCDMYoUuPZA=
+github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250303035603-d704ffd84a42 h1:xEkk5CQeplxY6+djrtVWL1OwRUefMVByPEFoAJEEr/I=
+github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250303035603-d704ffd84a42/go.mod h1:aLsA9ue6kYr8Sew85aYJ8NlEW7XMXoMtBCDMYoUuPZA=
 github.com/fatih/color v1.18.0 h1:S8gINlzdQ840/4pfAwic/ZE0djQEH3wM94VfqLTZcOM=
 github.com/fatih/color v1.18.0/go.mod h1:4FelSpRwEGDpQ12mAdzqdOukCy4u8WUtOY6lkT/6HfU=
+github.com/go-chi/chi/v5 v5.2.1 h1:KOIHODQj58PmL80G2Eak4WdvUzjSJSm0vG72crDCqb8=
+github.com/go-chi/chi/v5 v5.2.1/go.mod h1:L2yAIGWB3H+phAw1NxKwWM+7eUH/lU8pOMm5hHcoops=
 github.com/golang-jwt/jwt/v5 v5.2.1 h1:OuVbFODueb089Lh128TAcimifWaLhJwVflnrgM17wHk=
 github.com/golang-jwt/jwt/v5 v5.2.1/go.mod h1:pqrtFR0X4osieyHYxtmOUWsAWrfe1Q5UVIyoH402zdk=
 github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsIM=

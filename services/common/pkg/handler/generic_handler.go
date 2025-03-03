@@ -2,7 +2,9 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/service"
@@ -13,12 +15,63 @@ type GenericHandler[T any] struct {
 	Service service.Interface[T]
 }
 
-// NewGenericHandler creates a new GenericHandler using the provided GenericRepository.
-// It constructs the underlying GenericService from the repository.
-func NewGenericHandler[T any](service service.Interface[T]) *GenericHandler[T] {
+// NewGenericHandler creates a new GenericHandler using the provided service.
+func NewGenericHandler[T any](srv service.Interface[T]) *GenericHandler[T] {
 	return &GenericHandler[T]{
-		Service: service,
+		Service: srv,
 	}
+}
+
+// parseQueryCondition parses query parameters into a SQL-like condition string and corresponding arguments.
+// It ignores reserved keys (such as "id", "page", "pageSize").
+// For each query parameter, if the value begins with an operator (<=, >=, !=, <, >), that operator is used;
+// otherwise, "=" is assumed.
+func parseQueryCondition(q url.Values, reserved []string) (string, []interface{}, error) {
+	var conditions []string
+	var args []interface{}
+
+	// isReserved returns true if key is in the reserved list.
+	isReserved := func(key string) bool {
+		for _, r := range reserved {
+			if key == r {
+				return true
+			}
+		}
+		return false
+	}
+
+	for key, values := range q {
+		if isReserved(key) {
+			continue
+		}
+		if len(values) == 0 {
+			continue
+		}
+		val := values[0]
+		op := "="
+		// Check for multi-character operators first.
+		if len(val) >= 2 && (val[:2] == "<=" || val[:2] == ">=" || val[:2] == "!=") {
+			op = val[:2]
+			val = val[2:]
+		} else if len(val) > 0 && (val[0] == '<' || val[0] == '>') {
+			op = string(val[0])
+			val = val[1:]
+		}
+		conditions = append(conditions, fmt.Sprintf("%s %s ?", key, op))
+		args = append(args, val)
+	}
+
+	if len(conditions) == 0 {
+		return "", nil, fmt.Errorf("no valid condition parameters provided")
+	}
+
+	// Join conditions with " AND ".
+	condStr := conditions[0]
+	for i := 1; i < len(conditions); i++ {
+		condStr += " AND " + conditions[i]
+	}
+
+	return condStr, args, nil
 }
 
 // CreateHandler handles HTTP POST requests to create a new entity.
@@ -38,9 +91,7 @@ func (h *GenericHandler[T]) CreateHandler() http.HandlerFunc {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(created); err != nil {
-			http.Error(w, "Error encoding response: "+err.Error(), http.StatusInternalServerError)
-		}
+		json.NewEncoder(w).Encode(created)
 	}
 }
 
@@ -67,9 +118,7 @@ func (h *GenericHandler[T]) GetByIDHandler() http.HandlerFunc {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(entity); err != nil {
-			http.Error(w, "Error encoding response: "+err.Error(), http.StatusInternalServerError)
-		}
+		json.NewEncoder(w).Encode(entity)
 	}
 }
 
@@ -90,9 +139,7 @@ func (h *GenericHandler[T]) UpdateHandler() http.HandlerFunc {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(updated); err != nil {
-			http.Error(w, "Error encoding response: "+err.Error(), http.StatusInternalServerError)
-		}
+		json.NewEncoder(w).Encode(updated)
 	}
 }
 
@@ -132,26 +179,22 @@ func (h *GenericHandler[T]) GetAllHandler() http.HandlerFunc {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(entities); err != nil {
-			http.Error(w, "Error encoding response: "+err.Error(), http.StatusInternalServerError)
-		}
+		json.NewEncoder(w).Encode(entities)
 	}
 }
 
 // DeleteWhereHandler handles HTTP DELETE requests to delete entities matching a condition.
-// It expects a JSON body with "condition" and "args".
+// The condition is constructed from query parameters (excluding reserved keys such as "id", "page", "pageSize").
+// If query-to-condition parsing fails, an error is returned.
 func (h *GenericHandler[T]) DeleteWhereHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		type DeleteWhereRequest struct {
-			Condition string        `json:"condition"`
-			Args      []interface{} `json:"args"`
-		}
-		var req DeleteWhereRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
+		reserved := []string{"id", "page", "pageSize"}
+		condition, args, err := parseQueryCondition(r.URL.Query(), reserved)
+		if err != nil {
+			http.Error(w, "Invalid query parameters: "+err.Error(), http.StatusBadRequest)
 			return
 		}
-		if err := h.Service.DeleteWhere(req.Condition, req.Args...); err != nil {
+		if err := h.Service.DeleteWhere(condition, args...); err != nil {
 			http.Error(w, "Error deleting entities: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -160,110 +203,109 @@ func (h *GenericHandler[T]) DeleteWhereHandler() http.HandlerFunc {
 }
 
 // FindHandler handles HTTP GET requests to find entities matching a condition.
-// It expects a JSON body with "condition" and "args", and returns a JSON array of matching entities.
+// The condition is constructed from query parameters (excluding reserved keys), and returns a JSON array of matching entities.
 func (h *GenericHandler[T]) FindHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		type FindRequest struct {
-			Condition string        `json:"condition"`
-			Args      []interface{} `json:"args"`
-		}
-		var req FindRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
+		reserved := []string{"id", "page", "pageSize"}
+		condition, args, err := parseQueryCondition(r.URL.Query(), reserved)
+		if err != nil {
+			http.Error(w, "Invalid query parameters: "+err.Error(), http.StatusBadRequest)
 			return
 		}
-		entities, err := h.Service.Find(req.Condition, req.Args...)
+		entities, err := h.Service.Find(condition, args...)
 		if err != nil {
 			http.Error(w, "Error finding entities: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(entities); err != nil {
-			http.Error(w, "Error encoding response: "+err.Error(), http.StatusInternalServerError)
-		}
+		json.NewEncoder(w).Encode(entities)
 	}
 }
 
 // FindFirstHandler handles HTTP GET requests to find the first entity matching a condition.
-// It expects a JSON body with "condition" and "args", and returns the matching entity as JSON.
+// The condition is constructed from query parameters (excluding reserved keys), and returns the matching entity as JSON.
 func (h *GenericHandler[T]) FindFirstHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		type FindRequest struct {
-			Condition string        `json:"condition"`
-			Args      []interface{} `json:"args"`
-		}
-		var req FindRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
+		reserved := []string{"id", "page", "pageSize"}
+		condition, args, err := parseQueryCondition(r.URL.Query(), reserved)
+		if err != nil {
+			http.Error(w, "Invalid query parameters: "+err.Error(), http.StatusBadRequest)
 			return
 		}
-		entity, err := h.Service.FindFirst(req.Condition, req.Args...)
+		entity, err := h.Service.FindFirst(condition, args...)
 		if err != nil {
 			http.Error(w, "Error finding entity: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(entity); err != nil {
-			http.Error(w, "Error encoding response: "+err.Error(), http.StatusInternalServerError)
-		}
+		json.NewEncoder(w).Encode(entity)
 	}
 }
 
 // CountHandler handles HTTP GET requests to count entities matching a condition.
-// It expects a JSON body with "condition" and "args", and returns the count as JSON.
+// The condition is constructed from query parameters (excluding reserved keys), and returns the count as JSON.
 func (h *GenericHandler[T]) CountHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		type CountRequest struct {
-			Condition string        `json:"condition"`
-			Args      []interface{} `json:"args"`
-		}
-		var req CountRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
+		reserved := []string{"id", "page", "pageSize"}
+		condition, args, err := parseQueryCondition(r.URL.Query(), reserved)
+		if err != nil {
+			http.Error(w, "Invalid query parameters: "+err.Error(), http.StatusBadRequest)
 			return
 		}
-		count, err := h.Service.Count(req.Condition, req.Args...)
+		count, err := h.Service.Count(condition, args...)
 		if err != nil {
 			http.Error(w, "Error counting entities: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		resp := map[string]int64{"count": count}
-		if err := json.NewEncoder(w).Encode(resp); err != nil {
-			http.Error(w, "Error encoding response: "+err.Error(), http.StatusInternalServerError)
-		}
+		json.NewEncoder(w).Encode(map[string]int64{"count": count})
 	}
 }
 
-// GetPageHandler handles HTTP GET requests to retrieve a paginated list of entities.
-// It expects a JSON body with "page", "pageSize", "condition", and "args", and returns a JSON array of entities.
+// GetPageHandler handles HTTP GET requests to retrieve a paginated list of entities matching a condition.
+// It expects "page" and "pageSize" query parameters along with additional parameters for conditions.
 func (h *GenericHandler[T]) GetPageHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		type GetPageRequest struct {
-			Page      int           `json:"page"`
-			PageSize  int           `json:"pageSize"`
-			Condition string        `json:"condition"`
-			Args      []interface{} `json:"args"`
-		}
-		var req GetPageRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
+		q := r.URL.Query()
+
+		pageStr := q.Get("page")
+		pageSizeStr := q.Get("pageSize")
+		if pageStr == "" || pageSizeStr == "" {
+			http.Error(w, "Missing page or pageSize parameters", http.StatusBadRequest)
 			return
 		}
-		entities, err := h.Service.GetPage(req.Page, req.PageSize, req.Condition, req.Args...)
+
+		page, err := strconv.Atoi(pageStr)
+		if err != nil {
+			http.Error(w, "Invalid page parameter", http.StatusBadRequest)
+			return
+		}
+		pageSize, err := strconv.Atoi(pageSizeStr)
+		if err != nil {
+			http.Error(w, "Invalid pageSize parameter", http.StatusBadRequest)
+			return
+		}
+
+		reserved := []string{"id", "page", "pageSize"}
+		condition, args, err := parseQueryCondition(q, reserved)
+		if err != nil {
+			http.Error(w, "Invalid query parameters: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		entities, err := h.Service.GetPage(page, pageSize, condition, args...)
 		if err != nil {
 			http.Error(w, "Error retrieving page of entities: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
+
 		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(entities); err != nil {
-			http.Error(w, "Error encoding response: "+err.Error(), http.StatusInternalServerError)
-		}
+		json.NewEncoder(w).Encode(entities)
 	}
 }
 
 // BulkInsertHandler handles HTTP POST requests to bulk insert multiple entities.
-// It expects a JSON array of entities and returns a success message on completion.
+// It expects a JSON array of entities in the request body and returns a success message on completion.
 func (h *GenericHandler[T]) BulkInsertHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var entities []T
@@ -271,7 +313,7 @@ func (h *GenericHandler[T]) BulkInsertHandler() http.HandlerFunc {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		// Convert []T to []*T
+		// Convert []T to []*T.
 		var entityPtrs []*T
 		for i := range entities {
 			entityPtrs = append(entityPtrs, &entities[i])
