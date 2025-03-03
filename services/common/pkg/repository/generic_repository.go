@@ -5,10 +5,13 @@ import (
 	"gorm.io/gorm"
 )
 
+// GenericRepository - generic struct, that provides all necessary method to work with gorm
 type GenericRepository[T any] struct {
 	Db *gorm.DB
 }
 
+// NewGenericRepository - constructor for NewGenericRepository
+// Return *GenericRepository using *gorm.DB 
 func NewGenericRepository[T any](db *gorm.DB) *GenericRepository[T] {
 	return &GenericRepository[T]{Db: db}
 }
