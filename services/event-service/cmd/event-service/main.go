@@ -36,9 +36,9 @@ func main(){
         panic("failed to init JWT verifier")
     }
 
-    eventService := service.NewEventService(verifier, eventRepo)
+    eventService := service.NewEventService(eventRepo)
 
-    handler := handler.NewEventHandler(eventService)
+    handler := handler.NewEventHandler(eventService, verifier)
 
     router := chi.NewRouter()
     router.Use(middleware.RequestID)
