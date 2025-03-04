@@ -37,7 +37,7 @@ type Event struct {
 //   "description": "Играем баскет на улице",
 //   "category": "Спорт",
 //   "max_participants": 30,
-//   "image_data": [80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82], 
+//   "image_data": "asflkjsdnvoiuwekjiou3289u4s=vasdf", 
 //   "city": "Новосибирск",
 //   "address": "Карла Маркса 37",
 //   "latitude": 54.989688,
