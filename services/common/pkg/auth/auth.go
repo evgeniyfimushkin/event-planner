@@ -13,7 +13,14 @@ import (
 )
 
 
-var ErrTokenExpired = errors.New("token is expired")
+var (
+	ErrMissingToken = errors.New("access token is missing")
+	ErrUnexpectedSigningMethod = errors.New("unexpected signing method")
+	ErrInvalidToken = errors.New("invalid access token")
+	ErrInvalidClaims = errors.New("cannot parse token claims")
+	ErrInvalidExpClaim = errors.New("invalid exp claim in access token")
+	ErrTokenExpired = errors.New("token is expired")
+)
 
 // Verifier - sevice, that contains publicKey and verifys jwt tokens
 type Verifier struct {
@@ -50,34 +57,41 @@ func NewVerifier (publicKeyString string) (*Verifier, error) {
 }
 
 // VerifyJWTToken takes accessToken as string and verified the signature
-func (a *Verifier) VerifyJWTToken(accessToken string) (error) {
-    token, err := jwt.Parse(accessToken, func (token *jwt.Token) (interface{}, error) {
-        if _, ok := token.Method.(*jwt.SigningMethodECDSA); !ok {
-            return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-        }
-        return a.publicKey, nil
-    })
-    if err != nil {
-        return  fmt.Errorf("invalid access token: %w", err)
-    }
+func (v *Verifier) VerifyJWTToken(accessToken string) (jwt.MapClaims, error) {
+	if accessToken == "" {
+		return nil, ErrMissingToken
+	}
 
-    if !token.Valid {
-        return  errors.New("invalid access token")
-    }
+	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodECDSA); !ok {
+			return nil, fmt.Errorf("%w: %v", ErrUnexpectedSigningMethod, token.Header["alg"])
+		}
+		return v.publicKey, nil
+	})
+	if err != nil {
+		// Если ошибка вызвана просроченностью токена, возвращаем ErrTokenExpired
+		if errors.Is(err, jwt.ErrTokenExpired) {
+			return nil, ErrTokenExpired
+		}
+		return nil, fmt.Errorf("failed to parse token: %w", err)
+	}
+	if !token.Valid {
+		return nil, ErrInvalidToken
+	}
 
-    claims, ok := token.Claims.(jwt.MapClaims)
-    if !ok {
-        return  errors.New("cannot parse token claims")
-    }
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, ErrInvalidClaims
+	}
 
-    exp, ok := claims["exp"].(float64)
-    if !ok {
-        return  errors.New("invalid exp claim in access token")
-    }
+	exp, ok := claims["exp"].(float64)
+	if !ok {
+		return nil, ErrInvalidExpClaim
+	}
+	if time.Now().Unix() > int64(exp) {
+		return nil, ErrTokenExpired
+	}
 
-    if time.Now().Unix() > int64(exp) {
-        return ErrTokenExpired
-    }
-    return  nil
+	return claims, nil
 }
 

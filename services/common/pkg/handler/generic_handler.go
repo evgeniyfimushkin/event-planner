@@ -7,30 +7,44 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/auth"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/service"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 // GenericHandler provides HTTP handlers for generic service operations.
 type GenericHandler[T any] struct {
-	Service service.Interface[T]
+	Service  service.Interface[T]
+	Verifier *auth.Verifier
 }
 
-// NewGenericHandler creates a new GenericHandler using the provided service.
-func NewGenericHandler[T any](srv service.Interface[T]) *GenericHandler[T] {
+// NewGenericHandler creates a new GenericHandler with the provided service and verifier.
+func NewGenericHandler[T any](srv service.Interface[T], verif *auth.Verifier) *GenericHandler[T] {
 	return &GenericHandler[T]{
-		Service: srv,
+		Service:  srv,
+		Verifier: verif,
 	}
 }
 
-// parseQueryCondition parses query parameters into a SQL-like condition string and corresponding arguments.
-// It ignores reserved keys (such as "id", "page", "pageSize").
-// For each query parameter, if the value begins with an operator (<=, >=, !=, <, >), that operator is used;
-// otherwise, "=" is assumed.
+// checkToken extracts the JWT token from the "access_token" cookie and verifies it.
+func (h *GenericHandler[T]) checkToken(r *http.Request) (jwt.MapClaims, error) {
+	cookie, err := r.Cookie("access_token")
+	if err != nil {
+		return nil, fmt.Errorf("missing access_token cookie: %w", err)
+	}
+	claims, err := h.Verifier.VerifyJWTToken(cookie.Value)
+	if err != nil {
+		return nil, err
+	}
+	return claims, nil
+}
+
+// parseQueryCondition converts query parameters into an SQL-like condition and arguments.
 func parseQueryCondition(q url.Values, reserved []string) (string, []interface{}, error) {
 	var conditions []string
 	var args []interface{}
 
-	// isReserved returns true if key is in the reserved list.
+	// isReserved returns true if the key is in the reserved list.
 	isReserved := func(key string) bool {
 		for _, r := range reserved {
 			if key == r {
@@ -65,7 +79,6 @@ func parseQueryCondition(q url.Values, reserved []string) (string, []interface{}
 		return "", nil, fmt.Errorf("no valid condition parameters provided")
 	}
 
-	// Join conditions with " AND ".
 	condStr := conditions[0]
 	for i := 1; i < len(conditions); i++ {
 		condStr += " AND " + conditions[i]
@@ -75,16 +88,23 @@ func parseQueryCondition(q url.Values, reserved []string) (string, []interface{}
 }
 
 // CreateHandler handles HTTP POST requests to create a new entity.
-// It decodes the request body into an entity and returns the created entity as JSON.
 func (h *GenericHandler[T]) CreateHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Verify the JWT token and get claims.
+		claims, err := h.checkToken(r)
+		if err != nil {
+			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+			return
+		}
+
 		var entity T
 		if err := json.NewDecoder(r.Body).Decode(&entity); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
 
-		created, err := h.Service.Create(&entity)
+		// Pass the claims to the service.
+		created, err := h.Service.Create(claims, &entity)
 		if err != nil {
 			http.Error(w, "Error creating entity: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -96,9 +116,15 @@ func (h *GenericHandler[T]) CreateHandler() http.HandlerFunc {
 }
 
 // GetByIDHandler handles HTTP GET requests to retrieve an entity by its ID.
-// The entity ID is expected as a query parameter "id".
 func (h *GenericHandler[T]) GetByIDHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Verify the JWT token and get claims.
+		claims, err := h.checkToken(r)
+		if err != nil {
+			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+			return
+		}
+
 		idParam := r.URL.Query().Get("id")
 		if idParam == "" {
 			http.Error(w, "Missing id parameter", http.StatusBadRequest)
@@ -111,7 +137,8 @@ func (h *GenericHandler[T]) GetByIDHandler() http.HandlerFunc {
 			return
 		}
 
-		entity, err := h.Service.GetByID(id)
+		// Pass the claims to the service.
+		entity, err := h.Service.GetByID(claims, id)
 		if err != nil {
 			http.Error(w, "Entity not found: "+err.Error(), http.StatusNotFound)
 			return
@@ -123,16 +150,23 @@ func (h *GenericHandler[T]) GetByIDHandler() http.HandlerFunc {
 }
 
 // UpdateHandler handles HTTP PUT/PATCH requests to update an existing entity.
-// It decodes the request body into an entity and returns the updated entity as JSON.
 func (h *GenericHandler[T]) UpdateHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Verify the JWT token and get claims.
+		claims, err := h.checkToken(r)
+		if err != nil {
+			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+			return
+		}
+
 		var entity T
 		if err := json.NewDecoder(r.Body).Decode(&entity); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
 
-		updated, err := h.Service.Update(&entity)
+		// Pass the claims to the service.
+		updated, err := h.Service.Update(claims, &entity)
 		if err != nil {
 			http.Error(w, "Error updating entity: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -144,9 +178,15 @@ func (h *GenericHandler[T]) UpdateHandler() http.HandlerFunc {
 }
 
 // DeleteHandler handles HTTP DELETE requests to delete an entity by its ID.
-// The entity ID is expected as a query parameter "id". On success, it returns a No Content status.
 func (h *GenericHandler[T]) DeleteHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Verify the JWT token and get claims.
+		claims, err := h.checkToken(r)
+		if err != nil {
+			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+			return
+		}
+
 		idParam := r.URL.Query().Get("id")
 		if idParam == "" {
 			http.Error(w, "Missing id parameter", http.StatusBadRequest)
@@ -159,7 +199,8 @@ func (h *GenericHandler[T]) DeleteHandler() http.HandlerFunc {
 			return
 		}
 
-		if err := h.Service.Delete(id); err != nil {
+		// Pass the claims to the service.
+		if err := h.Service.Delete(claims, id); err != nil {
 			http.Error(w, "Error deleting entity: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -169,10 +210,17 @@ func (h *GenericHandler[T]) DeleteHandler() http.HandlerFunc {
 }
 
 // GetAllHandler handles HTTP GET requests to retrieve all entities.
-// It returns a JSON array of all entities.
 func (h *GenericHandler[T]) GetAllHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		entities, err := h.Service.GetAll()
+		// Verify the JWT token and get claims.
+		claims, err := h.checkToken(r)
+		if err != nil {
+			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+			return
+		}
+
+		// Pass the claims to the service.
+		entities, err := h.Service.GetAll(claims)
 		if err != nil {
 			http.Error(w, "Error retrieving entities: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -184,17 +232,24 @@ func (h *GenericHandler[T]) GetAllHandler() http.HandlerFunc {
 }
 
 // DeleteWhereHandler handles HTTP DELETE requests to delete entities matching a condition.
-// The condition is constructed from query parameters (excluding reserved keys such as "id", "page", "pageSize").
-// If query-to-condition parsing fails, an error is returned.
 func (h *GenericHandler[T]) DeleteWhereHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		reserved := []string{"id", "page", "pageSize"}
+		// Verify the JWT token and get claims.
+		claims, err := h.checkToken(r)
+		if err != nil {
+			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+			return
+		}
+
+		reserved := []string{"page", "pageSize"}
 		condition, args, err := parseQueryCondition(r.URL.Query(), reserved)
 		if err != nil {
 			http.Error(w, "Invalid query parameters: "+err.Error(), http.StatusBadRequest)
 			return
 		}
-		if err := h.Service.DeleteWhere(condition, args...); err != nil {
+
+		// Pass the claims to the service.
+		if err := h.Service.DeleteWhere(claims, condition, args...); err != nil {
 			http.Error(w, "Error deleting entities: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -203,71 +258,103 @@ func (h *GenericHandler[T]) DeleteWhereHandler() http.HandlerFunc {
 }
 
 // FindHandler handles HTTP GET requests to find entities matching a condition.
-// The condition is constructed from query parameters (excluding reserved keys), and returns a JSON array of matching entities.
 func (h *GenericHandler[T]) FindHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		reserved := []string{"id", "page", "pageSize"}
+		// Verify the JWT token and get claims.
+		claims, err := h.checkToken(r)
+		if err != nil {
+			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+			return
+		}
+
+		reserved := []string{"page", "pageSize"}
 		condition, args, err := parseQueryCondition(r.URL.Query(), reserved)
 		if err != nil {
 			http.Error(w, "Invalid query parameters: "+err.Error(), http.StatusBadRequest)
 			return
 		}
-		entities, err := h.Service.Find(condition, args...)
+
+		// Pass the claims to the service.
+		entities, err := h.Service.Find(claims, condition, args...)
 		if err != nil {
 			http.Error(w, "Error finding entities: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
+
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(entities)
 	}
 }
 
 // FindFirstHandler handles HTTP GET requests to find the first entity matching a condition.
-// The condition is constructed from query parameters (excluding reserved keys), and returns the matching entity as JSON.
 func (h *GenericHandler[T]) FindFirstHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		reserved := []string{"id", "page", "pageSize"}
+		// Verify the JWT token and get claims.
+		claims, err := h.checkToken(r)
+		if err != nil {
+			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+			return
+		}
+
+		reserved := []string{"page", "pageSize"}
 		condition, args, err := parseQueryCondition(r.URL.Query(), reserved)
 		if err != nil {
 			http.Error(w, "Invalid query parameters: "+err.Error(), http.StatusBadRequest)
 			return
 		}
-		entity, err := h.Service.FindFirst(condition, args...)
+
+		// Pass the claims to the service.
+		entity, err := h.Service.FindFirst(claims, condition, args...)
 		if err != nil {
 			http.Error(w, "Error finding entity: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
+
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(entity)
 	}
 }
 
 // CountHandler handles HTTP GET requests to count entities matching a condition.
-// The condition is constructed from query parameters (excluding reserved keys), and returns the count as JSON.
 func (h *GenericHandler[T]) CountHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		reserved := []string{"id", "page", "pageSize"}
+		// Verify the JWT token and get claims.
+		claims, err := h.checkToken(r)
+		if err != nil {
+			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+			return
+		}
+
+		reserved := []string{"page", "pageSize"}
 		condition, args, err := parseQueryCondition(r.URL.Query(), reserved)
 		if err != nil {
 			http.Error(w, "Invalid query parameters: "+err.Error(), http.StatusBadRequest)
 			return
 		}
-		count, err := h.Service.Count(condition, args...)
+
+		// Pass the claims to the service.
+		count, err := h.Service.Count(claims, condition, args...)
 		if err != nil {
 			http.Error(w, "Error counting entities: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
+
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]int64{"count": count})
 	}
 }
 
-// GetPageHandler handles HTTP GET requests to retrieve a paginated list of entities matching a condition.
-// It expects "page" and "pageSize" query parameters along with additional parameters for conditions.
+// GetPageHandler handles HTTP GET requests to retrieve a paginated list of entities.
 func (h *GenericHandler[T]) GetPageHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		q := r.URL.Query()
+		// Verify the JWT token and get claims.
+		claims, err := h.checkToken(r)
+		if err != nil {
+			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+			return
+		}
 
+		q := r.URL.Query()
 		pageStr := q.Get("page")
 		pageSizeStr := q.Get("pageSize")
 		if pageStr == "" || pageSizeStr == "" {
@@ -280,20 +367,22 @@ func (h *GenericHandler[T]) GetPageHandler() http.HandlerFunc {
 			http.Error(w, "Invalid page parameter", http.StatusBadRequest)
 			return
 		}
+
 		pageSize, err := strconv.Atoi(pageSizeStr)
 		if err != nil {
 			http.Error(w, "Invalid pageSize parameter", http.StatusBadRequest)
 			return
 		}
 
-		reserved := []string{"id", "page", "pageSize"}
+		reserved := []string{"page", "pageSize"}
 		condition, args, err := parseQueryCondition(q, reserved)
 		if err != nil {
 			http.Error(w, "Invalid query parameters: "+err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		entities, err := h.Service.GetPage(page, pageSize, condition, args...)
+		// Pass the claims to the service.
+		entities, err := h.Service.GetPage(claims, page, pageSize, condition, args...)
 		if err != nil {
 			http.Error(w, "Error retrieving page of entities: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -305,20 +394,29 @@ func (h *GenericHandler[T]) GetPageHandler() http.HandlerFunc {
 }
 
 // BulkInsertHandler handles HTTP POST requests to bulk insert multiple entities.
-// It expects a JSON array of entities in the request body and returns a success message on completion.
 func (h *GenericHandler[T]) BulkInsertHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Verify the JWT token and get claims.
+		claims, err := h.checkToken(r)
+		if err != nil {
+			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+			return
+		}
+
 		var entities []T
 		if err := json.NewDecoder(r.Body).Decode(&entities); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
+
 		// Convert []T to []*T.
 		var entityPtrs []*T
 		for i := range entities {
 			entityPtrs = append(entityPtrs, &entities[i])
 		}
-		if err := h.Service.BulkInsert(entityPtrs); err != nil {
+
+		// Pass the claims to the service.
+		if err := h.Service.BulkInsert(claims, entityPtrs); err != nil {
 			http.Error(w, "Error bulk inserting entities: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -328,9 +426,15 @@ func (h *GenericHandler[T]) BulkInsertHandler() http.HandlerFunc {
 }
 
 // BulkUpdateHandler handles HTTP PUT requests to bulk update entities matching a condition.
-// It expects a JSON body with "condition", "args", and "updateData", and returns a success message.
 func (h *GenericHandler[T]) BulkUpdateHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Verify the JWT token and get claims.
+		claims, err := h.checkToken(r)
+		if err != nil {
+			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+			return
+		}
+
 		type BulkUpdateRequest struct {
 			Condition  string                 `json:"condition"`
 			Args       []interface{}          `json:"args"`
@@ -341,12 +445,14 @@ func (h *GenericHandler[T]) BulkUpdateHandler() http.HandlerFunc {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		if err := h.Service.BulkUpdate(req.Condition, req.Args, req.UpdateData); err != nil {
+
+		// Pass the claims to the service.
+		if err := h.Service.BulkUpdate(claims, req.Condition, req.Args, req.UpdateData); err != nil {
 			http.Error(w, "Error bulk updating entities: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
+
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Bulk update successful"))
 	}
 }
-

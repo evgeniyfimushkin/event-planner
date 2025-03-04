@@ -24,7 +24,7 @@ func NewEventService(verifier *auth.Verifier, repo *repository.EventRepository) 
 	}
 }
 
-func (es *EventService) CreateEvent(accessToken string, event *models.Event) (*models.Event, error) {
+func (es *EventService) Create(accessToken string, event *models.Event) (*models.Event, error) {
     err := es.verifier.VerifyJWTToken(accessToken)
     if err != nil {
         return nil, err

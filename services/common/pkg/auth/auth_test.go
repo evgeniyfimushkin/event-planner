@@ -7,106 +7,151 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
+	"errors"
 	"testing"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/stretchr/testify/assert"
 )
 
-func generateTestKeys() (string, string, error) {
-	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+// generateECDSAKeys генерирует пару ключей и возвращает приватный, публичный ключ и строку с Base64-encoded PEM представлением публичного ключа.
+func generateECDSAKeys(t *testing.T) (*ecdsa.PrivateKey, *ecdsa.PublicKey, string) {
+	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
-		return "", "", err
+		t.Fatalf("failed to generate ECDSA key: %v", err)
 	}
+	pub := &priv.PublicKey
 
-	privateBytes, err := x509.MarshalECPrivateKey(privateKey)
+	pubBytes, err := x509.MarshalPKIXPublicKey(pub)
 	if err != nil {
-		return "", "", err
+		t.Fatalf("failed to marshal public key: %v", err)
 	}
+	pemBlock := pem.EncodeToMemory(&pem.Block{
+		Type:  "PUBLIC KEY",
+		Bytes: pubBytes,
+	})
+	encoded := base64.StdEncoding.EncodeToString(pemBlock)
+	return priv, pub, encoded
+}
 
-	privatePem := pem.EncodeToMemory(&pem.Block{Type: "EC PRIVATE KEY", Bytes: privateBytes})
-	privateBase64 := base64.StdEncoding.EncodeToString(privatePem)
-
-	publicBytes, err := x509.MarshalPKIXPublicKey(&privateKey.PublicKey)
+// createToken создаёт JWT токен с заданными claims, используя указанный метод подписи.
+func createToken(t *testing.T, priv *ecdsa.PrivateKey, claims jwt.MapClaims, method jwt.SigningMethod) string {
+	token := jwt.NewWithClaims(method, claims)
+	tokenString, err := token.SignedString(priv)
 	if err != nil {
-		return "", "", err
+		t.Fatalf("failed to sign token: %v", err)
 	}
-
-	publicPem := pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: publicBytes})
-	publicBase64 := base64.StdEncoding.EncodeToString(publicPem)
-
-	return privateBase64, publicBase64, nil
+	return tokenString
 }
 
-func generateTestToken(privateKey *ecdsa.PrivateKey) (string, error) {
-	claims := jwt.MapClaims{
-		"exp":    time.Now().Add(5 * time.Minute).Unix(),
-		"userID": 123,
+// TestNewVerifier_Valid проверяет успешное создание Verifier с корректным публичным ключом.
+func TestNewVerifier_Valid(t *testing.T) {
+	_, _, pubKeyStr := generateECDSAKeys(t)
+	verif, err := NewVerifier(pubKeyStr)
+	if err != nil {
+		t.Fatalf("expected valid verifier, got error: %v", err)
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
-	return token.SignedString(privateKey)
+	if verif == nil {
+		t.Fatal("expected non-nil verifier")
+	}
 }
 
-func TestNewVerifier(t *testing.T) {
-	_, publicKeyBase64, err := generateTestKeys()
-	assert.NoError(t, err)
-
-	authService, err := NewVerifier(publicKeyBase64)
-	assert.NoError(t, err)
-	assert.NotNil(t, authService)
+// TestNewVerifier_Invalid проверяет создание Verifier с некорректной строкой публичного ключа.
+func TestNewVerifier_Invalid(t *testing.T) {
+	_, err := NewVerifier("invalid-base64")
+	if err == nil {
+		t.Fatal("expected error for invalid base64 input")
+	}
 }
 
-func TestVerifyJWTToken(t *testing.T) {
-	privateBase64, publicBase64, err := generateTestKeys()
-	assert.NoError(t, err)
-
-	authService, err := NewVerifier(publicBase64)
-	assert.NoError(t, err)
-
-	privateKeyBytes, err := base64.StdEncoding.DecodeString(privateBase64)
-	assert.NoError(t, err)
-
-	privateBlock, _ := pem.Decode(privateKeyBytes)
-	assert.NotNil(t, privateBlock)
-
-	privateKey, err := x509.ParseECPrivateKey(privateBlock.Bytes)
-	assert.NoError(t, err)
-
-	token, err := generateTestToken(privateKey)
-	assert.NoError(t, err)
-
-	valid, err := authService.VerifyJWTToken(token)
-	assert.NoError(t, err)
-	assert.True(t, valid)
+// TestVerifyJWTToken_EmptyToken проверяет, что при отсутствии токена возвращается ErrMissingToken.
+func TestVerifyJWTToken_EmptyToken(t *testing.T) {
+	_, _, pubKeyStr := generateECDSAKeys(t)
+	verif, err := NewVerifier(pubKeyStr)
+	if err != nil {
+		t.Fatalf("failed to create verifier: %v", err)
+	}
+	_, err = verif.VerifyJWTToken("")
+	if !errors.Is(err, ErrMissingToken) {
+		t.Fatalf("expected ErrMissingToken, got %v", err)
+	}
 }
 
-func TestVerifyExpiredJWTToken(t *testing.T) {
-	privateBase64, publicBase64, err := generateTestKeys()
-	assert.NoError(t, err)
-
-	authService, err := NewVerifier(publicBase64)
-	assert.NoError(t, err)
-
-	privateKeyBytes, err := base64.StdEncoding.DecodeString(privateBase64)
-	assert.NoError(t, err)
-
-	privateBlock, _ := pem.Decode(privateKeyBytes)
-	assert.NotNil(t, privateBlock)
-
-	privateKey, err := x509.ParseECPrivateKey(privateBlock.Bytes)
-	assert.NoError(t, err)
+// TestVerifyJWTToken_InvalidSigningMethod проверяет обработку токена с неподходящим методом подписи.
+func TestVerifyJWTToken_InvalidSigningMethod(t *testing.T) {
+	_, _, pubKeyStr := generateECDSAKeys(t)
+	verif, err := NewVerifier(pubKeyStr)
+	if err != nil {
+		t.Fatalf("failed to create verifier: %v", err)
+	}
 
 	claims := jwt.MapClaims{
-		"exp":    time.Now().Add(-5 * time.Minute).Unix(), // Токен уже истёк
-		"userID": 123,
+		"exp": time.Now().Add(1 * time.Hour).Unix(),
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
-	signedToken, err := token.SignedString(privateKey)
-	assert.NoError(t, err)
+	// Создаём токен с неподходящим методом подписи (HS256 вместо ECDSA)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte("secret"))
+	if err != nil {
+		t.Fatalf("failed to sign token: %v", err)
+	}
+	_, err = verif.VerifyJWTToken(tokenString)
+	if err == nil || !errors.Is(err, ErrUnexpectedSigningMethod) {
+		t.Fatalf("expected ErrUnexpectedSigningMethod, got %v", err)
+	}
+}
 
-	valid, err := authService.VerifyJWTToken(signedToken)
-	assert.Error(t, err)
-	assert.False(t, valid)
+// TestVerifyJWTToken_ExpiredToken проверяет, что при истёкшем сроке действия токена возвращается ErrTokenExpired.
+func TestVerifyJWTToken_ExpiredToken(t *testing.T) {
+	priv, _, pubKeyStr := generateECDSAKeys(t)
+	verif, err := NewVerifier(pubKeyStr)
+	if err != nil {
+		t.Fatalf("failed to create verifier: %v", err)
+	}
+
+	claims := jwt.MapClaims{
+		"exp": time.Now().Add(-1 * time.Hour).Unix(), // токен просрочен
+	}
+	tokenString := createToken(t, priv, claims, jwt.SigningMethodES256)
+	_, err = verif.VerifyJWTToken(tokenString)
+	if !errors.Is(err, ErrTokenExpired) {
+		t.Fatalf("expected ErrTokenExpired, got %v", err)
+	}
+}
+
+// TestVerifyJWTToken_Valid проверяет успешную валидацию корректного токена и извлечение claims.
+func TestVerifyJWTToken_Valid(t *testing.T) {
+	priv, _, pubKeyStr := generateECDSAKeys(t)
+	verif, err := NewVerifier(pubKeyStr)
+	if err != nil {
+		t.Fatalf("failed to create verifier: %v", err)
+	}
+
+	expectedValue := "test-value"
+	claims := jwt.MapClaims{
+		"exp":    time.Now().Add(1 * time.Hour).Unix(),
+		"custom": expectedValue,
+	}
+	tokenString := createToken(t, priv, claims, jwt.SigningMethodES256)
+	retClaims, err := verif.VerifyJWTToken(tokenString)
+	if err != nil {
+		t.Fatalf("expected valid token, got error: %v", err)
+	}
+	if retClaims["custom"] != expectedValue {
+		t.Fatalf("expected custom claim %v, got %v", expectedValue, retClaims["custom"])
+	}
+}
+
+// TestVerifyJWTToken_InvalidTokenFormat проверяет обработку токена с некорректной структурой.
+func TestVerifyJWTToken_InvalidTokenFormat(t *testing.T) {
+	_, _, pubKeyStr := generateECDSAKeys(t)
+	verif, err := NewVerifier(pubKeyStr)
+	if err != nil {
+		t.Fatalf("failed to create verifier: %v", err)
+	}
+
+	_, err = verif.VerifyJWTToken("not-a-valid-token")
+	if err == nil {
+		t.Fatal("expected error for malformed token")
+	}
 }
 

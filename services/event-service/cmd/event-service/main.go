@@ -7,17 +7,16 @@ import (
 	"event-service/internal/service"
 	"fmt"
 	"log/slog"
+	"net/http"
 
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/auth"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/config"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/db"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/logger"
-    "github.com/evgeniyfimushkin/event-planner/services/common/pkg/middlewarelogger"
+	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/middlewarelogger"
 
-    "github.com/go-chi/chi/v5"
-    "github.com/go-chi/chi/v5/middleware"
-
-
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 
@@ -47,11 +46,34 @@ func main(){
     router.Use(middlewarelogger.New(log))
     router.Use(middleware.Recoverer)
     router.Use(middleware.URLFormat)
-    
-    api := "/api/v1/events"
-    
-    _, _ = api, handler
 
-    // start server
+    router.Post("/api/v1/events", handler.CreateHandler())
+    router.Get("/api/v1/events", handler.GetAllHandler())
+    router.Get("/api/v1/events/{id}", handler.GetByIDHandler())
+    router.Put("/api/v1/events", handler.UpdateHandler())
+    router.Delete("/api/v1/events/{id}", handler.DeleteHandler())
+    router.Delete("/api/v1/events", handler.DeleteWhereHandler())
+    router.Get("/api/v1/events/search", handler.FindHandler())
+    router.Get("/api/v1/events/search/first", handler.FindFirstHandler())
+    router.Get("/api/v1/events/count", handler.CountHandler())
+    router.Get("/api/v1/events/page", handler.GetPageHandler())
+    router.Post("/api/v1/events/bulk", handler.BulkInsertHandler())
+    router.Put("/api/v1/events/bulk", handler.BulkUpdateHandler())
+
+
+
+    srv := &http.Server{
+        Addr: fmt.Sprintf("%s:%d",cfg.Server.Addr, cfg.Server.Port),
+        Handler: router,
+        ReadTimeout: cfg.Server.ReadTimeout,
+        WriteTimeout: cfg.Server.WriteTimeout,
+        IdleTimeout: cfg.Server.IdleTimeout,
+    }
+
+    log.Info(fmt.Sprintf("Server listening on port %d", cfg.Server.Port))
+    if err := srv.ListenAndServe(); err != nil {
+        log.Error("failed to start server", logger.Err(err))
+    }
+    log.Info("server stopped")
    
 }
