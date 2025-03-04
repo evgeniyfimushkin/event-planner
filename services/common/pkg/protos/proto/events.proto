@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package events;
 
-option go_package = "github.com/evgeniyfimushkin/event-planner/services/common/pkg/protos/gen/event;event";
+option go_package = "github.com/evgeniyfimushkin/event-planner/services/common/pkg/protos/gen/events;events";
 
 // Request message for checking event availability and reserving a participant spot.
 message CheckAndReserveRequest {
