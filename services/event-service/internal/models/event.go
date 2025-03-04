@@ -10,11 +10,11 @@ type Event struct {
     Name            string    `gorm:"type:varchar(255);not null;index" json:"name"`
     Description     string    `gorm:"type:text" json:"description"`
     Category        string    `gorm:"type:varchar(100);index" json:"category"`
-    Participants    int       `gorm:"default:0;check:_participants >= 0" json:"participants"`
+    Participants    int       `gorm:"default:0;check:participants >= 0" json:"participants"`
     MaxParticipants int       `gorm:"default:100;check:max_participants >= 1" json:"max_participants"`
 
     // Base64 image
-    ImageData       []byte    `gorm:"type:bytea" json:"image_data"`
+    ImageData       string    `gorm:"type:text" json:"image_data"`
 
     City            string    `gorm:"type:varchar(100);not null;index" json:"city"`
     Address         string    `gorm:"type:varchar(255)" json:"address"`
