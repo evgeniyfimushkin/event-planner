@@ -32,11 +32,11 @@ type Event struct {
 // JSON EXAMPLE
 
 // {
-//   "name": "Баскетбол",
+//   "name": "Баскетбол1",
 //   "description": "Играем баскет на улице",
 //   "category": "Спорт",
 //   "max_participants": 30,
-//   "image_data": "iVBORw0KGgoAAAANSUhEUgAAA...", 
+//   "image_data": [80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82], 
 //   "city": "Новосибирск",
 //   "address": "Карла Маркса 37",
 //   "latitude": 54.989688,
@@ -46,4 +46,5 @@ type Event struct {
 //   "status": "active",
 //   "created_by": "evgeniyfimushkin"
 // }
+
 

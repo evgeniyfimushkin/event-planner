@@ -101,27 +101,3 @@ services:
         max-file: "3"
         tag: "db|{{.Name}}|{{.ID}}"
     restart: always
-
-  registration-service:
-    container_name: registration-service
-    image: evgeniyfimushkin/registration-service
-    build: ./registration-service
-    environment:
-      - SERVER_PORT=8083
-      - EVENT_SERVICE_HOST=event-service
-      - EVENT_SERVICE_PORT=8082
-      - DB_NAME=registrations_db
-      - DB_USER=${POSTGRES_USER}
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - DB_HOST=${POSTGRES_HOST}
-      - DB_PORT=${POSTGRES_PORT}
-      - PUBLIC_KEY=${PUBLIC_KEY}
-    ports:
-      - "8083:8083"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-        tag: "db|{{.Name}}|{{.ID}}"
- 
