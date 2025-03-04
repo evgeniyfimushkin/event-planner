@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-
+    
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/auth"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/config"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/db"
@@ -21,9 +21,9 @@ import (
 
 
 func main(){
+
     cfg := config.MustLoadConfig()
     log := logger.SetupLogger(cfg.Env)
-
     log.Info("Connecting to db with params")
     log.Info("Database: ", slog.String("host", cfg.Database.Host), slog.String("port", cfg.Database.Port))
 
