@@ -48,6 +48,7 @@ func NewEventClient(
     }
     return &EventClient{
         api: events.NewEventServiceClient(cc),
+        log: log,
     }, nil
 }
 

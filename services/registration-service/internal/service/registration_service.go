@@ -35,7 +35,7 @@ func (s *RegistrationService) Create(claims jwt.MapClaims, entity *models.Regist
         return nil, fmt.Errorf("UserID is not a number")
     }
 
-    entity.EventID = uint(userIDFloat) 
+    entity.UserID = uint(userIDFloat) 
 
     existing, err := s.FindFirst(claims, "event_id = ? AND user_id = ?", entity.EventID, entity.UserID)
     if err == nil && existing != nil {
@@ -62,6 +62,7 @@ func (s *RegistrationService) Create(claims jwt.MapClaims, entity *models.Regist
         return nil, fmt.Errorf("Internal error")
     }
 
+    fmt.Println("HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEELO")
     updatedRegistration , err := s.GenericService.Create(claims, entity)
     if err != nil {
         return nil, err
