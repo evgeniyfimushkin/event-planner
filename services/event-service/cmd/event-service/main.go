@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	grpcserver "event-service/internal/grpc-server"
 	"event-service/internal/handler"
 	"event-service/internal/models"
@@ -9,6 +10,10 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/auth"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/config"
@@ -39,12 +44,14 @@ func main(){
     eventService := service.NewEventService(eventRepo)
 
 
+    // ---------------GRPC SERVER------------------------
 
-    application := grpcserver.New(eventService, log, 9090) 
+    grpcApp := grpcserver.New(eventService, log, cfg.GRPC.Port) 
 
-    go application.MustRun()
+    go grpcApp.MustRun()
     
 
+   // -----------------HTTP SERVER------------------------ 
 
     handler := handler.NewEventHandler(eventService, verifier)
 
@@ -78,10 +85,27 @@ func main(){
         IdleTimeout: cfg.Server.IdleTimeout,
     }
 
-    log.Info(fmt.Sprintf("Server listening on port %d", cfg.Server.Port))
-    if err := srv.ListenAndServe(); err != nil {
-        log.Error("failed to start server", logger.Err(err))
-    }
-    log.Info("server stopped")
+    go func() {
+        log.Info(fmt.Sprintf("Server listening on port %d", cfg.Server.Port))
+        if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+            log.Error("failed to start server", logger.Err(err))
+        }
+    }()
+
+    // ----------- STOP PROGRAM ---------------
+
+    stop := make(chan os.Signal, 1)
+    signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
+    <-stop
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Error("HTTP server Shutdown error", logger.Err(err))
+	} else {
+		log.Info("HTTP server gracefully stopped")
+	}
+
+	grpcApp.Stop()
+	log.Info("gRPC server gracefully stopped")
    
 }
