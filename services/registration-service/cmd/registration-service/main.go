@@ -1,13 +1,16 @@
 package main
 
 import (
+	"context"
+	"fmt"
+	"log/slog"
+	"net/http"
+	"os"
+	grpcclient "registration-service/internal/client/grpc-client"
 	"registration-service/internal/handler"
 	"registration-service/internal/models"
 	"registration-service/internal/repository"
 	"registration-service/internal/service"
-	"fmt"
-	"log/slog"
-	"net/http"
 
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/auth"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/config"
@@ -36,7 +39,26 @@ func main(){
         panic("failed to init JWT verifier")
     }
 
-    registrationservice := service.NewRegistrationService(registrationRepo)
+
+
+    // ----------------INIT GRPC CLIENT---------------------
+
+    eventClient, err := grpcclient.NewEventClient(
+        context.Background(),
+        log,
+        fmt.Sprintf("%s:%d", cfg.GRPC.Client.Host, cfg.GRPC.Client.Port),
+        cfg.GRPC.Client.RetryTimeout,
+        cfg.GRPC.Client.RetryCount,
+    )
+    if err != nil {
+        log.Error("failed to init event client", logger.Err(err))
+        os.Exit(1)
+    }
+    
+    registrationservice := service.NewRegistrationService(registrationRepo, eventClient)
+
+
+    // -------------------INIT HTTP SERVER---------------
 
     handler := handler.NewRegistrationHandler(registrationservice, verifier)
 

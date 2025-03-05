@@ -13,18 +13,18 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type Client struct {
+type EventClient struct {
     api events.EventServiceClient
     log *slog.Logger
 }
 
-func New(
+func NewEventClient(
     ctx context.Context,
     log *slog.Logger,
     addr string,
     timeout time.Duration,
     retriesCount int,
-) (*Client, error) {
+) (*EventClient, error) {
 
     retryOpts := []retry.CallOption{
         retry.WithCodes(codes.NotFound, codes.Aborted, codes.DeadlineExceeded),
@@ -46,7 +46,7 @@ func New(
     if err != nil {
         return nil, err
     }
-    return &Client{
+    return &EventClient{
         api: events.NewEventServiceClient(cc),
     }, nil
 }
@@ -57,7 +57,7 @@ func InterceptorLogger(l *slog.Logger) logging.Logger {
     })
 }
 
-func (c *Client) CheckAndReserve(ctx context.Context, eventID uint32) (*events.CheckAndReserveResponse, error) {
+func (c *EventClient) CheckAndReserve(ctx context.Context, eventID uint32) (*events.CheckAndReserveResponse, error) {
     resp, err := c.api.CheckAndReserve(ctx, &events.CheckAndReserveRequest{
         EventId: eventID,
     })

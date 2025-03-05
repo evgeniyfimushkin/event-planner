@@ -5,13 +5,12 @@ import (
 	"gorm.io/gorm"
 )
 
-// GenericRepository - generic struct, that provides all necessary method to work with gorm
+// GenericRepository - generic struct, that provides all necessary methods to work with GORM
 type GenericRepository[T any] struct {
 	Db *gorm.DB
 }
 
 // NewGenericRepository - constructor for NewGenericRepository
-// Return *GenericRepository using *gorm.DB 
 func NewGenericRepository[T any](db *gorm.DB) *GenericRepository[T] {
 	return &GenericRepository[T]{Db: db}
 }
@@ -20,7 +19,7 @@ func NewGenericRepository[T any](db *gorm.DB) *GenericRepository[T] {
 func (repo *GenericRepository[T]) Create(entity *T) (*T, error) {
 	result := repo.Db.Create(entity)
 	if result.Error != nil {
-		return nil, fmt.Errorf("unable to create entity: %w", result.Error)
+		return nil, fmt.Errorf("%w: %v", ErrCreateEntity, result.Error)
 	}
 	return entity, nil
 }
@@ -31,9 +30,9 @@ func (repo *GenericRepository[T]) GetByID(id int) (*T, error) {
 	result := repo.Db.First(&entity, id)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
-			return nil, result.Error
+			return nil, gorm.ErrRecordNotFound
 		}
-		return nil, fmt.Errorf("unable to get entity by id: %w", result.Error)
+		return nil, fmt.Errorf("%w: %v", ErrGetEntityByID, result.Error)
 	}
 	return &entity, nil
 }
@@ -42,7 +41,7 @@ func (repo *GenericRepository[T]) GetByID(id int) (*T, error) {
 func (repo *GenericRepository[T]) Update(entity *T) (*T, error) {
 	result := repo.Db.Save(entity)
 	if result.Error != nil {
-		return nil, fmt.Errorf("unable to update entity: %w", result.Error)
+		return nil, fmt.Errorf("%w: %v", ErrUpdateEntity, result.Error)
 	}
 	return entity, nil
 }
@@ -51,7 +50,7 @@ func (repo *GenericRepository[T]) Update(entity *T) (*T, error) {
 func (repo *GenericRepository[T]) Delete(id int) error {
 	result := repo.Db.Delete(new(T), id)
 	if result.Error != nil {
-		return fmt.Errorf("unable to delete entity: %w", result.Error)
+		return fmt.Errorf("%w: %v", ErrDeleteEntity, result.Error)
 	}
 	return nil
 }
@@ -61,7 +60,7 @@ func (repo *GenericRepository[T]) GetAll() ([]T, error) {
 	var entities []T
 	result := repo.Db.Find(&entities)
 	if result.Error != nil {
-		return nil, fmt.Errorf("unable to fetch entities: %w", result.Error)
+		return nil, fmt.Errorf("%w: %v", ErrFetchEntities, result.Error)
 	}
 	return entities, nil
 }
@@ -70,106 +69,78 @@ func (repo *GenericRepository[T]) GetAll() ([]T, error) {
 func (repo *GenericRepository[T]) DeleteWhere(condition interface{}, args ...interface{}) error {
 	result := repo.Db.Where(condition, args...).Delete(new(T))
 	if result.Error != nil {
-		return fmt.Errorf("unable to delete entities with condition: %w", result.Error)
+		return fmt.Errorf("%w: %v", ErrDeleteWithCond, result.Error)
 	}
 	return nil
 }
 
 // Find returns all entities matching the given condition.
-// Example: events, err := eventRepo.Find("category = ?", "Conference")
-// Example: found, err := repo.Find("name LIKE ?", "Entity%")
 func (repo *GenericRepository[T]) Find(condition interface{}, args ...interface{}) ([]T, error) {
 	var entities []T
 	result := repo.Db.Where(condition, args...).Find(&entities)
 	if result.Error != nil {
-		return nil, fmt.Errorf("unable to find entities: %w", result.Error)
+		return nil, fmt.Errorf("%w: %v", ErrFindEntities, result.Error)
 	}
 	return entities, nil
 }
 
 // FindFirst returns a single entity matching the given condition.
-// Example: oneEntity, err := repo.FindFirst("name = ?", "Updated Entity")
 func (repo *GenericRepository[T]) FindFirst(condition interface{}, args ...interface{}) (*T, error) {
 	var entity T
 	result := repo.Db.Where(condition, args...).First(&entity)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
-			return nil, result.Error
+			return nil, gorm.ErrRecordNotFound
 		}
-		return nil, fmt.Errorf("unable to find entity: %w", result.Error)
+		return nil, fmt.Errorf("%w: %v", ErrFindEntity, result.Error)
 	}
 	return &entity, nil
 }
 
 // Count returns the count of entities matching the given condition.
-// Example: count, err := eventRepo.Count("status = ? AND created_by = ?", "active", "john_doe")
-// Example: count2, err := repo.Count("name = ? OR name = ?", "CountTest", "Other")
 func (repo *GenericRepository[T]) Count(condition interface{}, args ...interface{}) (int64, error) {
 	var count int64
 	result := repo.Db.Model(new(T)).Where(condition, args...).Count(&count)
 	if result.Error != nil {
-		return 0, fmt.Errorf("unable to count entities: %w", result.Error)
+		return 0, fmt.Errorf("%w: %v", ErrCountEntities, result.Error)
 	}
 	return count, nil
 }
 
 // GetPage returns a paginated list of entities matching the given condition.
-// Example: pageEvents, err := eventRepo.GetPage(1, 10, "city = ?", "San Francisco")
 func (repo *GenericRepository[T]) GetPage(page int, pageSize int, condition interface{}, args ...interface{}) ([]T, error) {
 	var entities []T
 	offset := (page - 1) * pageSize
 	result := repo.Db.Where(condition, args...).Offset(offset).Limit(pageSize).Find(&entities)
 	if result.Error != nil {
-		return nil, fmt.Errorf("unable to get page of entities: %w", result.Error)
+		return nil, fmt.Errorf("%w: %v", ErrGetPageEntities, result.Error)
 	}
 	return entities, nil
 }
 
 // BulkInsert inserts multiple entities at once.
-// Example: eventRepo.BulkInsert(bulkEvents)
 func (repo *GenericRepository[T]) BulkInsert(entities []*T) error {
 	result := repo.Db.Create(&entities)
 	if result.Error != nil {
-		return fmt.Errorf("unable to bulk insert entities: %w", result.Error)
+		return fmt.Errorf("%w: %v", ErrBulkInsert, result.Error)
 	}
 	return nil
 }
 
 // BulkUpdate updates multiple entities based on the given condition with provided update data.
-// err := eventRepo.BulkUpdate(
-//     "category = ? AND created_by = ?",
-//     []interface{}{"Conference", "john_doe"},
-//     map[string]interface{}{"status": "inactive"},
-// )
 func (repo *GenericRepository[T]) BulkUpdate(condition interface{}, args []interface{}, updateData interface{}) error {
 	result := repo.Db.Model(new(T)).Where(condition, args...).Updates(updateData)
 	if result.Error != nil {
-		return fmt.Errorf("unable to bulk update entities: %w", result.Error)
+		return fmt.Errorf("%w: %v", ErrBulkUpdate, result.Error)
 	}
 	return nil
 }
 
-
 // ExecuteInTransaction executes the provided function within a transaction.
-// If the function returns an error, the transaction is rolled back; otherwise, it is committed.
-// Example:
-// err := repo.ExecuteInTransaction(func(tx *gorm.DB) error {
-// 		txRepo := NewGenericRepository[TestEntity](tx)
-// 		entity, err := txRepo.Create(&TestEntity{Name: "Entity1"})
-// 		if err != nil {
-// 			return err
-// 		}
-// 		entity.Name = "Entity1 Updated"
-// 		_, err = txRepo.Update(entity)
-// 		if err != nil {
-// 			return err
-// 		}
-//     }
-
 func (repo *GenericRepository[T]) ExecuteInTransaction(fn func(tx *gorm.DB) error) error {
 	tx := repo.Db.Begin()
 	if tx.Error != nil {
-		return tx.Error
+		return fmt.Errorf("%w: %v", ErrTransaction, tx.Error)
 	}
 
 	defer func() {

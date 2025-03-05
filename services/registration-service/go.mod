@@ -3,15 +3,16 @@ module registration-service
 go 1.23.6
 
 require (
-	github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250304061406-53805ecb9793
+	github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250305040423-636411b7886c
 	github.com/go-chi/chi/v5 v5.2.1
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.0
+	google.golang.org/grpc v1.70.0
 	gorm.io/gorm v1.25.12
 )
 
 require (
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgx/v5 v5.5.5 // indirect
@@ -27,7 +28,6 @@ require (
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241202173237-19429a94021a // indirect
-	google.golang.org/grpc v1.70.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	gorm.io/driver/postgres v1.5.11 // indirect
 )
