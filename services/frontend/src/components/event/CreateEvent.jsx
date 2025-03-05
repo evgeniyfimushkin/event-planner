@@ -30,8 +30,8 @@ export default function CreateEvent({}) {
                 address,
                 latitude: +latitude,
                 longitude: +longitude,
-                // start_time: startTime,
-                // end_time: endTime,
+                start_time: new Date(startTime).toISOString(),
+                end_time: new Date(endTime).toISOString(),
             };
             console.log(pack);
             const res = await axios.post("http://localhost/api/v1/events", pack);
@@ -95,14 +95,14 @@ export default function CreateEvent({}) {
                     <label for="longitude">Longitude:</label>
                     <input id="longitude" type="number" value={longitude} min="-180" max="180" onChange={e=>setLongitude(e.target.value)} />
                 </div>
-                {/* <div>
+                <div>
                     <label for="startTime">Start time:</label>
                     <input id="startTime" type="datetime-local" value={startTime} onChange={e=>setStartTime(e.target.value)} />
                 </div>
                 <div>
                     <label for="endTime">End time:</label>
                     <input id="endTime" type="datetime-local" value={endTime} onChange={e=>setEndTime(e.target.value)} />
-                </div> */}
+                </div>
                 <button type="submit">Add event</button>
             </form>
         </div>

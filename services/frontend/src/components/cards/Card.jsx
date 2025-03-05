@@ -27,8 +27,8 @@ export default function Card({event}) {
             {fullAddress && (
                 <p>Местоположение: {fullAddress}</p>
             )}
-            {start_time && <p className="startTime">Начало: {start_time}</p>}
-            {end_time && <p className="endTime">Окончание: {end_time}</p>}
+            {start_time && <p className="startTime">Начало: {new Date(start_time).toLocaleString()}</p>}
+            {end_time && <p className="endTime">Окончание: {new Date(end_time).toLocaleString()}</p>}
             {category && <p className="category">{category}</p>}
         </div>
     )
