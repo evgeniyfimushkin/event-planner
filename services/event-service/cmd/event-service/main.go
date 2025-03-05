@@ -46,7 +46,7 @@ func main(){
 
     // ---------------GRPC SERVER------------------------
 
-    grpcApp := grpcserver.New(eventService, log, cfg.GRPC.Port) 
+    grpcApp := grpcserver.New(eventService, log, cfg.GRPC.Server.Port) 
 
     go grpcApp.MustRun()
     

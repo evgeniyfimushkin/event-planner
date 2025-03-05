@@ -21,7 +21,7 @@ type Config struct {
     GRPC struct {
         Server struct {
             Host     string        `yaml:"host" envconfig:"GRPC_SERVER_HOST" default:"0.0.0.0"`
-            Port     int           `yaml:"port" envconfig:"GRPC_SERVER_PORT" default:"9090"`
+            Port     int           `yaml:"port" envconfig:"GRPC_SERVER_PORT" default:"9091"`
             UseTLS   bool          `yaml:"use_tls" envconfig:"GRPC_SERVER_USE_TLS" default:"true"`
             CertFile string        `yaml:"cert_file" envconfig:"GRPC_SERVER_CERT_FILE" default:"certs/server.crt"`
             KeyFile  string        `yaml:"key_file" envconfig:"GRPC_SERVER_KEY_FILE" default:"certs/server.key"`
@@ -30,7 +30,7 @@ type Config struct {
         }
         Client struct {
             Host         string        `yaml:"host" envconfig:"GRPC_CLIENT_HOST" default:"localhost"`
-            Port         int           `yaml:"port" envconfig:"GRPC_CLIENT_PORT" default:"9090"`
+            Port         int           `yaml:"port" envconfig:"GRPC_CLIENT_PORT" default:"9091"`
             UseTLS       bool          `yaml:"use_tls" envconfig:"GRPC_CLIENT_USE_TLS" default:"true"`
             CertFile     string        `yaml:"cert_file" envconfig:"GRPC_CLIENT_CERT_FILE" default:"certs/client.crt"`
             KeyFile      string        `yaml:"key_file" envconfig:"GRPC_CLIENT_KEY_FILE" default:"certs/client.key"`
