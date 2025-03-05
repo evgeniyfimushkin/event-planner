@@ -17,6 +17,12 @@ type Config struct {
     	WriteTimeout  time.Duration    `yaml:"write_timeout" envconfig:"SERVER_WRITE_TIMEOUT" default:"10s"`
         IdleTimeout  time.Duration    `yaml:"idle_timeout" envconfig:"SERVER_IDLE_TIMEOUT" default:"60s"`
 	}
+    GRPC struct {
+        Host     string        `yaml:"host" envconfig:"GRPC_HOST" default:"0.0.0.0"`
+        Port     int           `yaml:"port" envconfig:"GRPC_PORT" default:"9090"`
+        Timeout  time.Duration `yaml:"timeout" envconfig:"GRPC_TIMEOUT" default:"5s"`
+    }
+
 	Database struct {
         User     string `yaml:"user" envconfig:"DB_USER" default:"postgres"`
         Password string `yaml:"password" envconfig:"DB_PASSWORD" default:"postgres"`

@@ -1,6 +1,7 @@
 package main
 
 import (
+	grpcserver "event-service/internal/grpc-server"
 	"event-service/internal/handler"
 	"event-service/internal/models"
 	"event-service/internal/repository"
@@ -8,7 +9,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-    
+
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/auth"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/config"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/db"
@@ -21,7 +22,6 @@ import (
 
 
 func main(){
-
     cfg := config.MustLoadConfig()
     log := logger.SetupLogger(cfg.Env)
     log.Info("Connecting to db with params")
@@ -37,6 +37,14 @@ func main(){
     }
 
     eventService := service.NewEventService(eventRepo)
+
+
+
+    application := grpcserver.New(eventService, log, 9090) 
+
+    go application.MustRun()
+    
+
 
     handler := handler.NewEventHandler(eventService, verifier)
 

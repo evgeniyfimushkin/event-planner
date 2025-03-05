@@ -1,0 +1,11 @@
+# See: https://taskfile.dev/api/
+
+version: "3"
+
+tasks:
+  generate:
+    aliases:
+      - gen
+    desc: "Generate code from proto files"
+    cmds:
+      - protoc -I=. --go_out=paths=source_relative:. --go-grpc_out=paths=source_relative:. events/*.proto
