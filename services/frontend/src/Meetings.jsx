@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./services/AuthContext.jsx";
 import Register from './components/auth/Register.jsx';
 import PrivateRoute from './services/PrivateRoute.jsx';
+import CreateEvent from './components/event/CreateEvent.jsx';
 
 function App() {
   return (
@@ -18,6 +19,11 @@ function App() {
             <PrivateRoute>
               <Bar />
               <Grid />
+            </PrivateRoute>
+          }/>
+          <Route path="/events" element={
+            <PrivateRoute>
+              <CreateEvent />
             </PrivateRoute>
           }/>
           <Route path="/register" element={<Register />}/>
