@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
     const [cookies, setCookie, removeCookie] = useCookies(["access_token", "refresh_token"]);
     // const [setAccessToken] = useState(cookies?.access_token || null);
     // const [setRefreshToken] = useState(cookies?.refresh_token || null);
-    const [loggedIn, setLoggedIn] = useState(false);
+    const [loggedIn, setLoggedIn] = useState(localStorage.getItem("loggedIn") || false);
 
     const login = () => {
         // setToken(newToken);
@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }) => {
         // setCookie("access_token", newTokens.access_token, {path: "/"});
         // setCookie("refresh_token", newTokens.refresh_token, {path: "/"});
         setLoggedIn(true);
+        localStorage.setItem("loggedIn", true);
     };
 
     const logout = () => {
@@ -31,6 +32,7 @@ export const AuthProvider = ({ children }) => {
         removeCookie("access_token");
         removeCookie("refresh_token");
         setLoggedIn(false);
+        localStorage.removeItem("loggedIn");
     };
 
     return (
