@@ -17,10 +17,28 @@ type Config struct {
     	WriteTimeout  time.Duration    `yaml:"write_timeout" envconfig:"SERVER_WRITE_TIMEOUT" default:"10s"`
         IdleTimeout  time.Duration    `yaml:"idle_timeout" envconfig:"SERVER_IDLE_TIMEOUT" default:"60s"`
 	}
+
     GRPC struct {
-        Host     string        `yaml:"host" envconfig:"GRPC_HOST" default:"0.0.0.0"`
-        Port     int           `yaml:"port" envconfig:"GRPC_PORT" default:"9090"`
-        Timeout  time.Duration `yaml:"timeout" envconfig:"GRPC_TIMEOUT" default:"5s"`
+        Server struct {
+            Host     string        `yaml:"host" envconfig:"GRPC_SERVER_HOST" default:"0.0.0.0"`
+            Port     int           `yaml:"port" envconfig:"GRPC_SERVER_PORT" default:"9090"`
+            UseTLS   bool          `yaml:"use_tls" envconfig:"GRPC_SERVER_USE_TLS" default:"true"`
+            CertFile string        `yaml:"cert_file" envconfig:"GRPC_SERVER_CERT_FILE" default:"certs/server.crt"`
+            KeyFile  string        `yaml:"key_file" envconfig:"GRPC_SERVER_KEY_FILE" default:"certs/server.key"`
+            CAFile   string        `yaml:"ca_file" envconfig:"GRPC_SERVER_CA_FILE" default:"certs/ca.crt"`
+            Timeout  time.Duration `yaml:"timeout" envconfig:"GRPC_SERVER_TIMEOUT" default:"5s"`
+        }
+        Client struct {
+            Host         string        `yaml:"host" envconfig:"GRPC_CLIENT_HOST" default:"localhost"`
+            Port         int           `yaml:"port" envconfig:"GRPC_CLIENT_PORT" default:"9090"`
+            UseTLS       bool          `yaml:"use_tls" envconfig:"GRPC_CLIENT_USE_TLS" default:"true"`
+            CertFile     string        `yaml:"cert_file" envconfig:"GRPC_CLIENT_CERT_FILE" default:"certs/client.crt"`
+            KeyFile      string        `yaml:"key_file" envconfig:"GRPC_CLIENT_KEY_FILE" default:"certs/client.key"`
+            CAFile       string        `yaml:"ca_file" envconfig:"GRPC_CLIENT_CA_FILE" default:"certs/ca.crt"`
+            Timeout      time.Duration `yaml:"timeout" envconfig:"GRPC_CLIENT_TIMEOUT" default:"5s"`
+            RetryCount   int           `yaml:"retry_count" envconfig:"GRPC_CLIENT_RETRY_COUNT" default:"3"`
+            RetryTimeout time.Duration `yaml:"retry_timeout" envconfig:"GRPC_CLIENT_RETRY_TIMEOUT" default:"2s"`
+        }
     }
 
 	Database struct {
