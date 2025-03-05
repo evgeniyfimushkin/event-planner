@@ -8,6 +8,7 @@ import { AuthProvider } from "./services/AuthContext.jsx";
 import Register from './components/auth/Register.jsx';
 import PrivateRoute from './services/PrivateRoute.jsx';
 import CreateEvent from './components/event/CreateEvent.jsx';
+import Events from './components/tabs/Events.jsx';
 
 function App() {
   return (
@@ -18,7 +19,7 @@ function App() {
           <Route path="/" element={
             <PrivateRoute>
               <Bar />
-              <Grid />
+              <Events />
             </PrivateRoute>
           }/>
           <Route path="/events" element={

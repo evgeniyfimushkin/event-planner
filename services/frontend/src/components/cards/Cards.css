@@ -18,6 +18,25 @@
     border: 1px dashed;
 }
 
+.card * {
+    text-align: left;
+    margin: 0.25em;
+}
+
 .card p {
     font-size: 1.5em;
+}
+
+.card img {
+    float: left;
+    margin: 0 1em 0 0;
+}
+
+.card .description {
+    font-style: italic;
+}
+
+.card .category {
+    float: right;
+    font-size: 1em;
 }

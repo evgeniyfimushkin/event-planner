@@ -19,16 +19,17 @@ export default function CreateEvent({}) {
     const createEvent = async (e) => {
         e.preventDefault();
         try {
+            await axios.get("/api/v1/auth/refresh");
             const pack = {
                 name,
                 description,
                 category,
-                max_participants: maxParticipants,
+                max_participants: +maxParticipants,
                 image_data: imageData,
                 city,
                 address,
-                latitude,
-                longitude,
+                latitude: +latitude,
+                longitude: +longitude,
                 // start_time: startTime,
                 // end_time: endTime,
             };
