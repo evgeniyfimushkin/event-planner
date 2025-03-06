@@ -49,6 +49,7 @@ export default function Login({}) {
                 <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 <button type="submit">Log in</button>
             </form>
+            <a href="/register">First time here?</a>
         </div>
     )
 }
