@@ -1,4 +1,4 @@
-import Card from "./Card.jsx"
+import Minicard from "./Minicard.jsx"
 import "./Cards.css"
 
 export default function Grid({cards=[{title: "Мероприятие 1"},{description: "Описание мероприятия 2"}, {}, {}]}) {
@@ -6,7 +6,7 @@ export default function Grid({cards=[{title: "Мероприятие 1"},{descri
         <div className="container">
             <div className="grid">
                 {cards.map((card,index) => (
-                    <Card key={card.id} event={card} />
+                    <Minicard key={card.id} event={card} />
                 ))}
             </div>
         </div>

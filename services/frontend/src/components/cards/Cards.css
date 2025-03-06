@@ -23,6 +23,10 @@
     margin: 0.25em;
 }
 
+.card h1 {
+    margin: 0;
+}
+
 .card p {
     font-size: 1.5em;
 }
@@ -32,6 +36,7 @@
     margin: 0 1em 0 0;
     width: 8em;
     height: 8em;
+    object-fit: cover;
 }
 
 .card .description {
@@ -39,6 +44,11 @@
 }
 
 .card .category {
-    float: right;
+    /* float: right; */
+    text-align: right;
     font-size: 1em;
+}
+
+.modal .card {
+    /* min-width: 50%; */
 }

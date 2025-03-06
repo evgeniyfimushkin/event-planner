@@ -1,6 +1,10 @@
+import { createPortal } from "react-dom";
 import "./Cards.css"
+import { useState } from "react";
+import ModalWindow from "../misc/ModalWindow";
 
 export default function Card({event}) {
+    const [showModal, setShowModal] = useState(false);
     const {
         name,
         description,
@@ -17,7 +21,8 @@ export default function Card({event}) {
     const coords = (latitude && longitude) && "координаты " + latitude + " " + longitude;
     const fullAddress = [city, address, coords].filter(e=>e).join(", ");
     return (
-        <div className="card">
+        <>
+        <div className="card" onClick={()=>setShowModal(true)}>
             <div className="line">
                 {image_data && <img src={image_data || null}/>}
                 <h1 className="title">{name}</h1>
@@ -31,5 +36,6 @@ export default function Card({event}) {
             {end_time && <p className="endTime">Окончание: {new Date(end_time).toLocaleString()}</p>}
             {category && <p className="category">{category}</p>}
         </div>
+        </>
     )
 }
