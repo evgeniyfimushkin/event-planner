@@ -26,7 +26,7 @@ func NewGenericHandler[T any](srv service.Interface[T], verif *auth.Verifier) *G
 	}
 }
 
-// checkToken extracts the JWT token from the "access_token" cookie and verifies it.
+// CheckToken extracts the JWT token from the "access_token" cookie and verifies it.
 func (h *GenericHandler[T]) CheckToken(r *http.Request) (jwt.MapClaims, error) {
 	cookie, err := r.Cookie("access_token")
 	if err != nil {
@@ -91,7 +91,7 @@ func parseQueryCondition(q url.Values, reserved []string) (string, []interface{}
 func (h *GenericHandler[T]) CreateHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Verify the JWT token and get claims.
-		claims, err := h.checkToken(r)
+		claims, err := h.CheckToken(r)
 		if err != nil {
 			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
 			return
@@ -119,7 +119,7 @@ func (h *GenericHandler[T]) CreateHandler() http.HandlerFunc {
 func (h *GenericHandler[T]) GetByIDHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Verify the JWT token and get claims.
-		claims, err := h.checkToken(r)
+		claims, err := h.CheckToken(r)
 		if err != nil {
 			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
 			return
@@ -153,7 +153,7 @@ func (h *GenericHandler[T]) GetByIDHandler() http.HandlerFunc {
 func (h *GenericHandler[T]) UpdateHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Verify the JWT token and get claims.
-		claims, err := h.checkToken(r)
+		claims, err := h.CheckToken(r)
 		if err != nil {
 			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
 			return
@@ -181,7 +181,7 @@ func (h *GenericHandler[T]) UpdateHandler() http.HandlerFunc {
 func (h *GenericHandler[T]) DeleteHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Verify the JWT token and get claims.
-		claims, err := h.checkToken(r)
+		claims, err := h.CheckToken(r)
 		if err != nil {
 			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
 			return
@@ -213,7 +213,7 @@ func (h *GenericHandler[T]) DeleteHandler() http.HandlerFunc {
 func (h *GenericHandler[T]) GetAllHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Verify the JWT token and get claims.
-		claims, err := h.checkToken(r)
+		claims, err := h.CheckToken(r)
 		if err != nil {
 			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
 			return
@@ -235,7 +235,7 @@ func (h *GenericHandler[T]) GetAllHandler() http.HandlerFunc {
 func (h *GenericHandler[T]) DeleteWhereHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Verify the JWT token and get claims.
-		claims, err := h.checkToken(r)
+		claims, err := h.CheckToken(r)
 		if err != nil {
 			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
 			return
@@ -261,7 +261,7 @@ func (h *GenericHandler[T]) DeleteWhereHandler() http.HandlerFunc {
 func (h *GenericHandler[T]) FindHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Verify the JWT token and get claims.
-		claims, err := h.checkToken(r)
+		claims, err := h.CheckToken(r)
 		if err != nil {
 			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
 			return
@@ -290,7 +290,7 @@ func (h *GenericHandler[T]) FindHandler() http.HandlerFunc {
 func (h *GenericHandler[T]) FindFirstHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Verify the JWT token and get claims.
-		claims, err := h.checkToken(r)
+		claims, err := h.CheckToken(r)
 		if err != nil {
 			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
 			return
@@ -319,7 +319,7 @@ func (h *GenericHandler[T]) FindFirstHandler() http.HandlerFunc {
 func (h *GenericHandler[T]) CountHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Verify the JWT token and get claims.
-		claims, err := h.checkToken(r)
+		claims, err := h.CheckToken(r)
 		if err != nil {
 			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
 			return
@@ -348,7 +348,7 @@ func (h *GenericHandler[T]) CountHandler() http.HandlerFunc {
 func (h *GenericHandler[T]) GetPageHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Verify the JWT token and get claims.
-		claims, err := h.checkToken(r)
+		claims, err := h.CheckToken(r)
 		if err != nil {
 			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
 			return
@@ -397,7 +397,7 @@ func (h *GenericHandler[T]) GetPageHandler() http.HandlerFunc {
 func (h *GenericHandler[T]) BulkInsertHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Verify the JWT token and get claims.
-		claims, err := h.checkToken(r)
+		claims, err := h.CheckToken(r)
 		if err != nil {
 			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
 			return
@@ -429,7 +429,7 @@ func (h *GenericHandler[T]) BulkInsertHandler() http.HandlerFunc {
 func (h *GenericHandler[T]) BulkUpdateHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Verify the JWT token and get claims.
-		claims, err := h.checkToken(r)
+		claims, err := h.CheckToken(r)
 		if err != nil {
 			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
 			return

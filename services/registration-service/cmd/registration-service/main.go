@@ -76,6 +76,7 @@ func main(){
     router.Delete("/api/v1/registrations/{id}", handler.DeleteHandler())
     router.Delete("/api/v1/registrations", handler.DeleteWhereHandler())
     router.Get("/api/v1/registrations/search", handler.FindHandler())
+    router.Get("/api/v1/registrations/my", handler.GetMyHandler())
     router.Get("/api/v1/registrations/search/first", handler.FindFirstHandler())
     router.Get("/api/v1/registrations/count", handler.CountHandler())
     router.Get("/api/v1/registrations/page", handler.GetPageHandler())
