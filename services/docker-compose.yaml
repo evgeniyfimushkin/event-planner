@@ -23,6 +23,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:z
+      - pg-events-data:/var/lib/postgresql/data:z
     ports:
       - "5432:5432"
     logging:
@@ -127,3 +128,6 @@ services:
         max-file: "3"
         tag: "registration-service|{{.Name}}|{{.ID}}"
     restart: always
+
+volumes:
+  pg-events-data:
