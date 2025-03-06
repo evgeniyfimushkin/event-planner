@@ -62,7 +62,6 @@ func (s *RegistrationService) Create(claims jwt.MapClaims, entity *models.Regist
         return nil, fmt.Errorf("Internal error")
     }
 
-    fmt.Println("HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEELO")
     updatedRegistration , err := s.GenericService.Create(claims, entity)
     if err != nil {
         return nil, err

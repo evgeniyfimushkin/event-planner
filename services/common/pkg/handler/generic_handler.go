@@ -27,7 +27,7 @@ func NewGenericHandler[T any](srv service.Interface[T], verif *auth.Verifier) *G
 }
 
 // checkToken extracts the JWT token from the "access_token" cookie and verifies it.
-func (h *GenericHandler[T]) checkToken(r *http.Request) (jwt.MapClaims, error) {
+func (h *GenericHandler[T]) CheckToken(r *http.Request) (jwt.MapClaims, error) {
 	cookie, err := r.Cookie("access_token")
 	if err != nil {
 		return nil, fmt.Errorf("missing access_token cookie: %w", err)

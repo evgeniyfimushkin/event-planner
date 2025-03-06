@@ -54,7 +54,7 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-        tag: "db|{{.Name}}|{{.ID}}"
+        tag: "front|{{.Name}}|{{.ID}}"
     restart: always
   
   auth-service:
@@ -77,7 +77,7 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-        tag: "db|{{.Name}}|{{.ID}}"
+        tag: "auth-service|{{.Name}}|{{.ID}}"
     restart: always
  
   event-service:
@@ -101,7 +101,7 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-        tag: "db|{{.Name}}|{{.ID}}"
+        tag: "event-service|{{.Name}}|{{.ID}}"
     restart: always
 
   registration-service:
@@ -125,5 +125,5 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-        tag: "db|{{.Name}}|{{.ID}}"
+        tag: "registration-service|{{.Name}}|{{.ID}}"
     restart: always
