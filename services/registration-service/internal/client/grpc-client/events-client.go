@@ -58,12 +58,24 @@ func InterceptorLogger(l *slog.Logger) logging.Logger {
     })
 }
 
-func (c *EventClient) CheckAndReserve(ctx context.Context, eventID uint32) (*events.CheckAndReserveResponse, error) {
+func (c *EventClient) CheckAndReserve(ctx context.Context, eventID uint32, username string) (*events.CheckAndReserveResponse, error) {
     resp, err := c.api.CheckAndReserve(ctx, &events.CheckAndReserveRequest{
         EventId: eventID,
+        Username: username,
     })
     if err != nil {
         c.log.Error("failed to call CheckAndReserve", "error", err)
+        return nil, err
+    }
+    return resp, nil
+}
+func (c *EventClient) RemoveRegistration(ctx context.Context, eventID uint32, username string) (*events.RemoveRegistrationResponse, error) {
+    resp, err := c.api.RemoveRegistration(ctx, &events.RemoveRegistrationRequest{
+        EventId: eventID,
+        Username: username,
+    })
+    if err != nil {
+        c.log.Error("failed to call RemoveRegistration", "error", err)
         return nil, err
     }
     return resp, nil

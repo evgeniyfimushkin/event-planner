@@ -72,16 +72,16 @@ func main(){
     router.Post("/api/v1/registrations", handler.CreateHandler())
     router.Get("/api/v1/registrations", handler.GetAllHandler())
     router.Get("/api/v1/registrations/{id}", handler.GetByIDHandler())
-    router.Put("/api/v1/registrations", handler.UpdateHandler())
-    router.Delete("/api/v1/registrations/{id}", handler.DeleteHandler())
-    router.Delete("/api/v1/registrations", handler.DeleteWhereHandler())
+    //router.Put("/api/v1/registrations", handler.UpdateHandler())
+    router.Delete("/api/v1/registrations", handler.DeleteHandler())
+    //router.Delete("/api/v1/registrations/where", handler.DeleteWhereHandler())
     router.Get("/api/v1/registrations/search", handler.FindHandler())
     router.Get("/api/v1/registrations/my", handler.GetMyHandler())
     router.Get("/api/v1/registrations/search/first", handler.FindFirstHandler())
     router.Get("/api/v1/registrations/count", handler.CountHandler())
     router.Get("/api/v1/registrations/page", handler.GetPageHandler())
-    router.Post("/api/v1/registrations/bulk", handler.BulkInsertHandler())
-    router.Put("/api/v1/registrations/bulk", handler.BulkUpdateHandler())
+    //router.Post("/api/v1/registrations/bulk", handler.BulkInsertHandler())
+    //router.Put("/api/v1/registrations/bulk", handler.BulkUpdateHandler())
 
 
 

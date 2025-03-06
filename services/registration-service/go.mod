@@ -3,7 +3,7 @@ module registration-service
 go 1.23.6
 
 require (
-	github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250306021532-3546dd2e1af0
+	github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250306113400-6370ddb86146
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.0

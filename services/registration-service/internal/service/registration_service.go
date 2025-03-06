@@ -42,14 +42,23 @@ func (s *RegistrationService) Create(claims jwt.MapClaims, entity *models.Regist
         return nil, fmt.Errorf("user is already registered for this event")
     }
     
+    username, ok := claims["username"].(string)
+    if !ok {
+        return nil, fmt.Errorf("invalid token: username not found or not a string")
+    }
+
     if err != nil && err != gorm.ErrRecordNotFound {
         return nil, fmt.Errorf("error checking existing registration: %w", err)
     }
     
-    resp, err := s.eventClient.CheckAndReserve(context.Background(), uint32(entity.EventID))
+    resp, err := s.eventClient.CheckAndReserve(context.Background(), uint32(entity.EventID), username)
     if err != nil {
         return nil, err
     }
+    if resp.Status == events.ReserveStatus_RESERVE_STATUS_UNSPECIFIED {
+        return nil, fmt.Errorf("Event creator cannot register for their own event")
+    }
+
     if resp.Status == events.ReserveStatus_EVENT_NOT_FOUND {
         return nil, fmt.Errorf("Event with id %d not found",entity.EventID)
     }
@@ -68,5 +77,49 @@ func (s *RegistrationService) Create(claims jwt.MapClaims, entity *models.Regist
     }
 
     return updatedRegistration, nil
+}
+
+func (s *RegistrationService) Delete(claims jwt.MapClaims, id int) error {
+
+    userIDFloat, ok := claims["userID"].(float64)
+    if !ok {
+        return fmt.Errorf("UserID is not a number")
+    }
+
+    userID := uint(userIDFloat) 
+    username, ok := claims["username"].(string)
+    if !ok {
+        return fmt.Errorf("invalid token: username not found or not a string")
+    }
+ 
+
+    existing, err := s.FindFirst(claims, "event_id = ? AND user_id = ?", id, userID)
+    if err != nil || existing == nil {
+        return fmt.Errorf("You're not registrated")
+    }
+
+    if existing.UserID != userID {
+        return fmt.Errorf("It's not your registration!")
+    }
+
+       
+    resp, err := s.eventClient.RemoveRegistration(context.Background(), uint32(id), username)
+    if err != nil {
+        return err
+    }
+    if resp.Status == events.ReserveStatus_EVENT_NOT_FOUND {
+        return fmt.Errorf("Event with id %d not found", id)
+    }
+
+    if resp.Status == events.ReserveStatus_INTERNAL_ERROR {
+        return fmt.Errorf("Internal error")
+    }
+
+    err = s.GenericService.Delete(claims, int(existing.ID))
+    if err != nil {
+        return err
+    }
+
+    return nil
 }
 

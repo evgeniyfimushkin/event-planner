@@ -1,12 +1,15 @@
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/evgeniyfimushkin/event-planner v0.0.0-20250306113400-6370ddb86146 h1:Awq1bbzItbWQMcvqJR9Vg/znTWttt2UdS5pAbUw5wqI=
 github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250305043129-a341a0ca8747 h1:IdzihiJkWPHSyw+fIUe9cMQm1Ta5AUIne9vsjOYgLb8=
 github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250305043129-a341a0ca8747/go.mod h1:Un6EepM9ioxiB1Ir7Rze926D6i0sYxVBfzbHS5FOSYs=
 github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250306020153-676c4d0366ad h1:UcxV/wcyUgissqpp6X1CQt6xEfTAbI0CgXYskn3mOuA=
 github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250306020153-676c4d0366ad/go.mod h1:Un6EepM9ioxiB1Ir7Rze926D6i0sYxVBfzbHS5FOSYs=
 github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250306021532-3546dd2e1af0 h1:rE/fsNr/kI0Mob1HQMJEWOOlODyjuv5I+PXqWoB3Y3Q=
 github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250306021532-3546dd2e1af0/go.mod h1:Un6EepM9ioxiB1Ir7Rze926D6i0sYxVBfzbHS5FOSYs=
+github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250306113400-6370ddb86146 h1:3WRm4OP64rbqGobxAr2FT3kvED0UoQNqO+iMSFLfdd8=
+github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250306113400-6370ddb86146/go.mod h1:Un6EepM9ioxiB1Ir7Rze926D6i0sYxVBfzbHS5FOSYs=
 github.com/fatih/color v1.18.0 h1:S8gINlzdQ840/4pfAwic/ZE0djQEH3wM94VfqLTZcOM=
 github.com/fatih/color v1.18.0/go.mod h1:4FelSpRwEGDpQ12mAdzqdOukCy4u8WUtOY6lkT/6HfU=
 github.com/go-chi/chi/v5 v5.2.1 h1:KOIHODQj58PmL80G2Eak4WdvUzjSJSm0vG72crDCqb8=

@@ -52,3 +52,30 @@ func (h *RegistrationHandler) GetMyHandler() http.HandlerFunc {
 	}
 }
 
+func (h *RegistrationHandler) DeleteHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		claims, err := h.CheckToken(r)
+		if err != nil {
+			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+			return
+		}
+
+		var req struct {
+			EventID uint `json:"event_id"`
+		}
+
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		err = h.Service.Delete(claims, int(req.EventID))
+		if err != nil {
+			http.Error(w, "Failed to delete registration: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
