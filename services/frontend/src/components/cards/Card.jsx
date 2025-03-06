@@ -2,6 +2,7 @@ import { createPortal } from "react-dom";
 import "./Cards.css"
 import { useState } from "react";
 import ModalWindow from "../misc/ModalWindow";
+import { localDate } from "../../services/Utilities";
 
 export default function Card({event}) {
     const [showModal, setShowModal] = useState(false);
@@ -32,8 +33,8 @@ export default function Card({event}) {
             {fullAddress && (
                 <p>Местоположение: {fullAddress}</p>
             )}
-            {start_time && <p className="startTime">Начало: {new Date(start_time).toLocaleString()}</p>}
-            {end_time && <p className="endTime">Окончание: {new Date(end_time).toLocaleString()}</p>}
+            {start_time && <p className="startTime">Начало: {localDate(new Date(start_time))}</p>}
+            {end_time && <p className="endTime">Окончание: {localDate(new Date(end_time))}</p>}
             {category && <p className="category">{category}</p>}
         </div>
         </>
