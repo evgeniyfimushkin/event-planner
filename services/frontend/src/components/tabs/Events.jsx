@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Grid from "../cards/Grid";
 import FloatingButton from "../misc/FloatingButton";
@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import ModalWindow from "../misc/ModalWindow";
 import CreateEvent from "../event/CreateEvent";
+import { authCall } from "../../services/Utilities";
+import AuthContext from "../../services/AuthContext";
 
 export default function Events() {
     const [events, setEvents] = useState([]);
@@ -13,25 +15,29 @@ export default function Events() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showCreateEvent, setShowCreateEvent] = useState(false);
-
+    const { logout } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const fetchData = async () => {
         try {
-            setLoading(true);
-            await axios.get("/api/v1/auth/refresh");
-            const responseEvents = await axios.get("/api/v1/events");
-            const responseSubscriptions = await axios.get("api/v1/registrations/my");
-            setEvents(responseEvents.data);
-            setSubscriptions(responseSubscriptions.data);
-            // console.log(response.data);
+            await authCall(async () => { // success
+                setLoading(true);
+                const responseEvents = await axios.get("/api/v1/events");
+                const responseSubscriptions = await axios.get("/api/v1/registrations/my");
+                setEvents(responseEvents.data);
+                setSubscriptions(responseSubscriptions.data);
+                // console.log(response.data);
+            }, (err) => { // unauthorized
+                logout();
+                navigate("/login");
+            });
         } catch (err) {
             setError("Can't receive events");
             console.error(err);
         } finally {
             setLoading(false);
         }
-    };
+    }
 
     useEffect(() => {
         fetchData();
