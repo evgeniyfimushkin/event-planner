@@ -39,8 +39,8 @@ func (h *GenericHandler[T]) CheckToken(r *http.Request) (jwt.MapClaims, error) {
 	return claims, nil
 }
 
-// parseQueryCondition converts query parameters into an SQL-like condition and arguments.
-func parseQueryCondition(q url.Values, reserved []string) (string, []interface{}, error) {
+// ParseQueryCondition converts query parameters into an SQL-like condition and arguments.
+func ParseQueryCondition(q url.Values, reserved []string) (string, []interface{}, error) {
 	var conditions []string
 	var args []interface{}
 
@@ -242,7 +242,7 @@ func (h *GenericHandler[T]) DeleteWhereHandler() http.HandlerFunc {
 		}
 
 		reserved := []string{"page", "pageSize"}
-		condition, args, err := parseQueryCondition(r.URL.Query(), reserved)
+		condition, args, err := ParseQueryCondition(r.URL.Query(), reserved)
 		if err != nil {
 			http.Error(w, "Invalid query parameters: "+err.Error(), http.StatusBadRequest)
 			return
@@ -268,7 +268,7 @@ func (h *GenericHandler[T]) FindHandler() http.HandlerFunc {
 		}
 
 		reserved := []string{"page", "pageSize"}
-		condition, args, err := parseQueryCondition(r.URL.Query(), reserved)
+		condition, args, err := ParseQueryCondition(r.URL.Query(), reserved)
 		if err != nil {
 			http.Error(w, "Invalid query parameters: "+err.Error(), http.StatusBadRequest)
 			return
@@ -297,7 +297,7 @@ func (h *GenericHandler[T]) FindFirstHandler() http.HandlerFunc {
 		}
 
 		reserved := []string{"page", "pageSize"}
-		condition, args, err := parseQueryCondition(r.URL.Query(), reserved)
+		condition, args, err := ParseQueryCondition(r.URL.Query(), reserved)
 		if err != nil {
 			http.Error(w, "Invalid query parameters: "+err.Error(), http.StatusBadRequest)
 			return
@@ -326,7 +326,7 @@ func (h *GenericHandler[T]) CountHandler() http.HandlerFunc {
 		}
 
 		reserved := []string{"page", "pageSize"}
-		condition, args, err := parseQueryCondition(r.URL.Query(), reserved)
+		condition, args, err := ParseQueryCondition(r.URL.Query(), reserved)
 		if err != nil {
 			http.Error(w, "Invalid query parameters: "+err.Error(), http.StatusBadRequest)
 			return
@@ -375,7 +375,7 @@ func (h *GenericHandler[T]) GetPageHandler() http.HandlerFunc {
 		}
 
 		reserved := []string{"page", "pageSize"}
-		condition, args, err := parseQueryCondition(q, reserved)
+		condition, args, err := ParseQueryCondition(q, reserved)
 		if err != nil {
 			http.Error(w, "Invalid query parameters: "+err.Error(), http.StatusBadRequest)
 			return
