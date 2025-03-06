@@ -21,8 +21,8 @@ export default function Card({event}) {
             <div className="line">
                 {image_data && <img src={image_data || null}/>}
                 <h1 className="title">{name}</h1>
+                {description && <p className="description">{description}</p>}
             </div>
-            {description && <p className="description">{description}</p>}
             {max_participants && <p className="maxParticipants">{max_participants} мест</p>}
             {fullAddress && (
                 <p>Местоположение: {fullAddress}</p>

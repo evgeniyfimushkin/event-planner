@@ -61,19 +61,19 @@ export default function CreateEvent({}) {
             <form onSubmit={createEvent} className="form">
                 <div>
                     <label for="name">Name:</label>
-                    <input id="name" type="text" value={name} onChange={e=>setName(e.target.value)} />
+                    <input id="name" type="text" value={name} onChange={e=>setName(e.target.value)} required />
                 </div>
                 <div>
                     <label for="desctiption">Description:</label>
-                    <input id="description" type="text" value={description} onChange={e=>setDescription(e.target.value)} />
+                    <textarea id="description" type="text" value={description} onChange={e=>setDescription(e.target.value)} required />
                 </div>
                 <div>
                     <label for="category">Category:</label>
-                    <input id="category" type="text" value={category} onChange={e=>setCategory(e.target.value)} />
+                    <input id="category" type="text" value={category} onChange={e=>setCategory(e.target.value)} required />
                 </div>
                 <div>
                     <label for="maxParticipants">Participants:</label>
-                    <input id="maxParticipants" type="number" min="1" value={maxParticipants} onChange={e=>setMaxParticipants(e.target.value)} />
+                    <input id="maxParticipants" type="number" min="1" value={maxParticipants} onChange={e=>setMaxParticipants(e.target.value)} required />
                 </div>
                 <div>
                     <label for="imageData">Icon:</label>
@@ -97,7 +97,7 @@ export default function CreateEvent({}) {
                 </div>
                 <div>
                     <label for="startTime">Start time:</label>
-                    <input id="startTime" type="datetime-local" value={startTime} onChange={e=>setStartTime(e.target.value)} />
+                    <input id="startTime" type="datetime-local" value={startTime} onChange={e=>setStartTime(e.target.value)} required />
                 </div>
                 <div>
                     <label for="endTime">End time:</label>

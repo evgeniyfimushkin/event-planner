@@ -15,6 +15,7 @@
     /* left: center; */
     text-align: center;
     transform: translate(-50%, -50%);
+    font-weight: bold;
     /* margin: auto; */
 }
 .floatingButton:hover {
