@@ -4,19 +4,11 @@ package events;
 
 option go_package = "github.com/evgeniyfimushkin/event-planner/services/common/pkg/protos/gen/events;events";
 
-enum ActionType {
-  ACTION_TYPE_UNSPECIFIED = 0;
-  RESERVE = 1; 
-  CANCEL = 2;  
-}
-
-// Request message for checking event availability and reserving a participant spot.
 message CheckAndReserveRequest {
   uint32 event_id = 1;
-  ActionType action = 2; 
+  string username = 2;
 }
 
-// Enum with possible response statuses.
 enum ReserveStatus {
   RESERVE_STATUS_UNSPECIFIED = 0;
   SUCCESS = 1;         
@@ -27,15 +19,24 @@ enum ReserveStatus {
   NOT_REGISTERED = 6;  
 }
 
-// Response message containing the outcome of the reservation.
 message CheckAndReserveResponse {
   ReserveStatus status = 1;
   string message = 2;
   uint32 current_participants = 3;
 }
 
-// EventService defines gRPC methods for working with events.
-service EventService {
-  // Check event availability and reserve a spot if available.
-  rpc CheckAndReserve(CheckAndReserveRequest) returns (CheckAndReserveResponse);
+message RemoveRegistrationRequest {
+  uint32 event_id = 1;
+  string username = 2;
 }
+
+message RemoveRegistrationResponse {
+  ReserveStatus status = 1;
+  string message = 2;
+}
+
+service EventService {
+  rpc CheckAndReserve(CheckAndReserveRequest) returns (CheckAndReserveResponse);
+  rpc RemoveRegistration(RemoveRegistrationRequest) returns (RemoveRegistrationResponse);
+}
+

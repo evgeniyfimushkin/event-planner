@@ -3,7 +3,7 @@ module event-service
 go 1.23.6
 
 require (
-	github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250305040423-636411b7886c
+	github.com/evgeniyfimushkin/event-planner/services/common v0.0.0-20250306112121-07940e3b3bbe
 	github.com/go-chi/chi/v5 v5.2.1
 	google.golang.org/grpc v1.70.0
 	gorm.io/gorm v1.25.12

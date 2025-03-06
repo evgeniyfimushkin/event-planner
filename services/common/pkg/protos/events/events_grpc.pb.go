@@ -19,17 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	EventService_CheckAndReserve_FullMethodName = "/events.EventService/CheckAndReserve"
+	EventService_CheckAndReserve_FullMethodName    = "/events.EventService/CheckAndReserve"
+	EventService_RemoveRegistration_FullMethodName = "/events.EventService/RemoveRegistration"
 )
 
 // EventServiceClient is the client API for EventService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// EventService defines gRPC methods for working with events.
 type EventServiceClient interface {
-	// Check event availability and reserve a spot if available.
 	CheckAndReserve(ctx context.Context, in *CheckAndReserveRequest, opts ...grpc.CallOption) (*CheckAndReserveResponse, error)
+	RemoveRegistration(ctx context.Context, in *RemoveRegistrationRequest, opts ...grpc.CallOption) (*RemoveRegistrationResponse, error)
 }
 
 type eventServiceClient struct {
@@ -50,14 +49,22 @@ func (c *eventServiceClient) CheckAndReserve(ctx context.Context, in *CheckAndRe
 	return out, nil
 }
 
+func (c *eventServiceClient) RemoveRegistration(ctx context.Context, in *RemoveRegistrationRequest, opts ...grpc.CallOption) (*RemoveRegistrationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RemoveRegistrationResponse)
+	err := c.cc.Invoke(ctx, EventService_RemoveRegistration_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EventServiceServer is the server API for EventService service.
 // All implementations must embed UnimplementedEventServiceServer
 // for forward compatibility.
-//
-// EventService defines gRPC methods for working with events.
 type EventServiceServer interface {
-	// Check event availability and reserve a spot if available.
 	CheckAndReserve(context.Context, *CheckAndReserveRequest) (*CheckAndReserveResponse, error)
+	RemoveRegistration(context.Context, *RemoveRegistrationRequest) (*RemoveRegistrationResponse, error)
 	mustEmbedUnimplementedEventServiceServer()
 }
 
@@ -70,6 +77,9 @@ type UnimplementedEventServiceServer struct{}
 
 func (UnimplementedEventServiceServer) CheckAndReserve(context.Context, *CheckAndReserveRequest) (*CheckAndReserveResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckAndReserve not implemented")
+}
+func (UnimplementedEventServiceServer) RemoveRegistration(context.Context, *RemoveRegistrationRequest) (*RemoveRegistrationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveRegistration not implemented")
 }
 func (UnimplementedEventServiceServer) mustEmbedUnimplementedEventServiceServer() {}
 func (UnimplementedEventServiceServer) testEmbeddedByValue()                      {}
@@ -110,6 +120,24 @@ func _EventService_CheckAndReserve_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EventService_RemoveRegistration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveRegistrationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventServiceServer).RemoveRegistration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EventService_RemoveRegistration_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventServiceServer).RemoveRegistration(ctx, req.(*RemoveRegistrationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // EventService_ServiceDesc is the grpc.ServiceDesc for EventService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -120,6 +148,10 @@ var EventService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CheckAndReserve",
 			Handler:    _EventService_CheckAndReserve_Handler,
+		},
+		{
+			MethodName: "RemoveRegistration",
+			Handler:    _EventService_RemoveRegistration_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
