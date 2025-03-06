@@ -3,10 +3,14 @@ import "./Cards.css"
 import { useState } from "react";
 import ModalWindow from "../misc/ModalWindow";
 import { localDate } from "../../services/Utilities";
+import axios from "axios";
 
-export default function Card({event}) {
+export default function Card({event, subscribedInitially}) {
     const [showModal, setShowModal] = useState(false);
+    const [subscribed, setSubscribed] = useState(subscribedInitially);
+    
     const {
+        id,
         name,
         description,
         category,
@@ -21,6 +25,28 @@ export default function Card({event}) {
     } = event;
     const coords = (latitude && longitude) && "координаты " + latitude + " " + longitude;
     const fullAddress = [city, address, coords].filter(e=>e).join(", ");
+
+    const subscribe = async (e) => {
+        try {
+            const refresh = await axios.get("/api/v1/auth/refresh");
+            const res = await axios.post("/api/v1/registrations", { event_id: id });
+            alert("Вы подписаны на событие!");
+            setSubscribed(true);
+        } catch (error) {
+            alert("Не удалось подписаться!\n"+error.message);
+        }
+    }
+    const unsubscribe = async (e) => {
+        try {
+            const refresh = await axios.get("/api/v1/auth/refresh");
+            const res = await axios.delete("/api/v1/registrations", { params: {event_id: id} });
+            alert("Вы отписаны от события!");
+            setSubscribed(false);
+        } catch (error) {
+            alert("Не удалось отписаться!\n"+error.message);
+        }
+    }
+
     return (
         <>
         <div className="card" onClick={()=>setShowModal(true)}>
@@ -36,6 +62,12 @@ export default function Card({event}) {
             {start_time && <p className="startTime">Начало: {localDate(new Date(start_time))}</p>}
             {end_time && <p className="endTime">Окончание: {localDate(new Date(end_time))}</p>}
             {category && <p className="category">{category}</p>}
+            {/* todo refresh */}
+            {subscribed && <>
+                <input type="button" value="Отписаться" onClick={unsubscribe} />
+            </> || <>
+                <input type="button" value="Записаться" onClick={subscribe} />
+            </>}
         </div>
         </>
     )

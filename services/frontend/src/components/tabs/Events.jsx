@@ -5,7 +5,8 @@ import FloatingButton from "../misc/FloatingButton";
 import { useNavigate } from "react-router-dom";
 
 export default function Events() {
-    const [data, setData] = useState([]);
+    const [events, setEvents] = useState([]);
+    const [subscriptions, setSubscriptions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -15,9 +16,11 @@ export default function Events() {
         const fetchData = async () => {
             try {
                 await axios.get("/api/v1/auth/refresh");
-                const response = await axios.get("/api/v1/events");
-                setData(response.data);
-                console.log(response.data);
+                const responseEvents = await axios.get("/api/v1/events");
+                const responseSubscriptions = await axios.get("api/v1/registrations");
+                setEvents(responseEvents.data);
+                setSubscriptions(responseSubscriptions.data);
+                // console.log(response.data);
             } catch (err) {
                 setError("Can't receive events");
                 console.error(err);
@@ -34,7 +37,7 @@ export default function Events() {
 
     return (
         <>
-            <Grid cards={data} />
+            <Grid cards={events} subscriptions={subscriptions} />
             <FloatingButton text="Добавить мероприятие" target={"/events"} />
         </>
     );
