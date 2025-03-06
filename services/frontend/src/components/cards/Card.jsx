@@ -8,12 +8,13 @@ import axios from "axios";
 export default function Card({event, subscribedInitially}) {
     const [showModal, setShowModal] = useState(false);
     const [subscribed, setSubscribed] = useState(subscribedInitially);
-    
+
     const {
         id,
         name,
         description,
         category,
+        participants,
         max_participants,
         image_data,
         city,
@@ -55,7 +56,7 @@ export default function Card({event, subscribedInitially}) {
                 <h1 className="title">{name}</h1>
                 {description && <p className="description">{description}</p>}
             </div>
-            {max_participants && <p className="maxParticipants">{max_participants} мест</p>}
+            {max_participants && <p className="maxParticipants">{participants}/{max_participants} участников записаны</p>}
             {fullAddress && (
                 <p>Местоположение: {fullAddress}</p>
             )}
