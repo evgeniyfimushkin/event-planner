@@ -16,23 +16,23 @@ export default function Register({}) {
         try {
             const passhash = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
             const res = await axios.post("http://localhost/api/v1/auth/register", { username, email, passhash });
-            alert("Registered!")
+            alert("Зарегистрировано!")
             navigate("/login");
         } catch (error) {
-            alert("Cannot register!\n"+e);
+            alert("Ошибка регистрации!\n"+e);
         }
     };
 
     return (
         <div>
-            <h1>Register</h1>
+            <h1>Регистрация</h1>
             <form onSubmit={handleRegister} className="form">
-                <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-                <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <input type="text" placeholder="Имя пользователя" value={username} onChange={(e) => setUsername(e.target.value)} />
+                <input type="email" placeholder="Почта" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <input type="password" placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} />
                 <button type="submit">Register</button>
             </form>
-            <a href="/">Already registered?</a>
+            <a href="/">Уже зарегистрированы?</a>
         </div>
     )
 }

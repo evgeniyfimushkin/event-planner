@@ -31,25 +31,24 @@ export default function Login({}) {
             //     "refresh_token": res.data.refresh_token,
             // });
             login();
-            alert("Connected!");
+            alert("Подключено!");
             const refresh = await axios.get("http://localhost/api/v1/auth/refresh");
-            alert("Got token!\n"+refresh);
             navigate("/");
             // console.log(res.headers);
         } catch (error) {
-            alert("Connection error!\n"+e.message);
+            alert("Ошибка подключения!\n"+e.message);
         }
     };
 
     return (
         <div>
-            <h1>Log in</h1>
+            <h1>Вход</h1>
             <form onSubmit={handleLogin} className="form">
-                <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-                <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <input type="text" placeholder="Имя пользователя" value={username} onChange={(e) => setUsername(e.target.value)} />
+                <input type="password" placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} />
                 <button type="submit">Log in</button>
             </form>
-            <a href="/register">First time here?</a>
+            <a href="/register">Впервые здесь?</a>
         </div>
     )
 }

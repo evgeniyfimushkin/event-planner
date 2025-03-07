@@ -4,8 +4,8 @@ import { useState, useContext } from "react";
 import axios from "axios";
 
 export default function CreateEvent({}) {
-    const [name, setName] = useState("Untitled");
-    const [description, setDescription] = useState("No description");
+    const [name, setName] = useState("Без названия");
+    const [description, setDescription] = useState("Нет описания");
     const [category, setCategory] = useState("");
     const [maxParticipants, setMaxParticipants] = useState(100);
     const [imageData, setImageData] = useState("");
@@ -35,9 +35,10 @@ export default function CreateEvent({}) {
             };
             console.log(pack);
             const res = await axios.post("http://localhost/api/v1/events", pack);
-            alert("Event created!");
+            alert("Мероприятие создано!");
         } catch (error) {
-            console.error("Error adding event",e);
+            alert("Ошибка создания мероприятия!\n"+error.message);
+            console.error(error);
         }
     };
 
@@ -51,59 +52,60 @@ export default function CreateEvent({}) {
             setImageData(reader.result);
         };
         reader.onerror = (error) => {
-            console.error("Unable to load image!", error);
+            alert("Невозможно загрузить изображение!\n"+error.message)
+            console.error(error);
         };
     };
 
     return (
         <div>
-            <h1>Create event</h1>
+            <h1>Создать мероприятие</h1>
             <form onSubmit={createEvent} className="form">
                 <div>
-                    <label for="name">Name:</label>
+                    <label for="name">Название:</label>
                     <input id="name" type="text" value={name} onChange={e=>setName(e.target.value)} required />
                 </div>
                 <div>
-                    <label for="desctiption">Description:</label>
+                    <label for="desctiption">Описание:</label>
                     <textarea id="description" type="text" value={description} onChange={e=>setDescription(e.target.value)} required />
                 </div>
                 <div>
-                    <label for="category">Category:</label>
+                    <label for="category">Категория:</label>
                     <input id="category" type="text" value={category} onChange={e=>setCategory(e.target.value)} required />
                 </div>
                 <div>
-                    <label for="maxParticipants">Participants:</label>
+                    <label for="maxParticipants">Участники:</label>
                     <input id="maxParticipants" type="number" min="1" value={maxParticipants} onChange={e=>setMaxParticipants(e.target.value)} required />
                 </div>
                 <div>
-                    <label for="imageData">Icon:</label>
+                    <label for="imageData">Иконка:</label>
                     <input id="imageData" type="file" accept="image/*" onChange={e=>handleImageData(e)} />
                 </div>
                 <div>
-                    <label for="city">City:</label>
+                    <label for="city">Город:</label>
                     <input id="city" type="text" value={city} onChange={e=>setCity(e.target.value)} />
                 </div>
                 <div>
-                    <label for="address">Address:</label>
+                    <label for="address">Адрес:</label>
                     <input id="address" type="text" value={address} onChange={e=>setAddress(e.target.value)} />
                 </div>
                 <div>
-                    <label for="latitude">Latitude:</label>
+                    <label for="latitude">Широта:</label>
                     <input id="latitude" type="number" min="-90" max="90" value={latitude} onChange={e=>setLatitude(e.target.value)} />
                 </div>
                 <div>
-                    <label for="longitude">Longitude:</label>
+                    <label for="longitude">Долгота:</label>
                     <input id="longitude" type="number" value={longitude} min="-180" max="180" onChange={e=>setLongitude(e.target.value)} />
                 </div>
                 <div>
-                    <label for="startTime">Start time:</label>
+                    <label for="startTime">Время начала:</label>
                     <input id="startTime" type="datetime-local" value={startTime} onChange={e=>setStartTime(e.target.value)} required />
                 </div>
                 <div>
-                    <label for="endTime">End time:</label>
+                    <label for="endTime">Время окончания:</label>
                     <input id="endTime" type="datetime-local" value={endTime} onChange={e=>setEndTime(e.target.value)} />
                 </div>
-                <button type="submit">Add event</button>
+                <button type="submit">Создать мероприятие</button>
             </form>
         </div>
     )

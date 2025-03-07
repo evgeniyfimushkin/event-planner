@@ -32,7 +32,7 @@ export default function Events() {
                 navigate("/login");
             });
         } catch (err) {
-            setError("Can't receive events");
+            setError("Не удалось загрузить мероприятия");
             console.error(err);
         } finally {
             setLoading(false);
@@ -43,7 +43,7 @@ export default function Events() {
         fetchData();
     }, []);
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) return <p>Загрузка...</p>;
     if (error) return <p>{error}</p>;
 
     return (
