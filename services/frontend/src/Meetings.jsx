@@ -9,6 +9,7 @@ import Register from './components/auth/Register.jsx';
 import PrivateRoute from './services/PrivateRoute.jsx';
 import CreateEvent from './components/event/CreateEvent.jsx';
 import Events from './components/tabs/Events.jsx';
+import Calendar from './components/tabs/Calendar.jsx';
 
 function App() {
   return (
@@ -20,6 +21,12 @@ function App() {
             <PrivateRoute>
               <Bar />
               <Events />
+            </PrivateRoute>
+          }/>
+          <Route path="/calendar" element={
+            <PrivateRoute>
+              <Bar />
+              <Calendar />
             </PrivateRoute>
           }/>
           <Route path="/events" element={

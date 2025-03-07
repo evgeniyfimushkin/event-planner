@@ -1,9 +1,9 @@
 import "./Menu.css"
 
-export default function Tab({title}) {
+export default function Tab({title, target}) {
     return (
         <div className="tab">
-            {title}
+            <a href={target}>{title}</a>
         </div>
     )
 }
