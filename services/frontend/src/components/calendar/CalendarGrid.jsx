@@ -15,6 +15,14 @@ export default function CalendarGrid({events=[]}) {
         const isNow = eventDate > start && eventDate < end;
         return isNow
     }
+    const isToday = (day) => {
+        const date = getCurrentDate();
+        return date.getDate() === day;
+    }
+    const isNow = (hour) => {
+        const date = getCurrentDate();
+        return date.getHours() === hour;
+    }
 
     const currentDate = getCurrentDate();
     const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
@@ -32,6 +40,7 @@ export default function CalendarGrid({events=[]}) {
 
     const grid = <div className="calendar">
         <table className="calendar">
+            <caption>{getCurrentDate().toLocaleString("ru", {month: "long", year: "numeric"})}</caption>
             <thead>
                 <tr>
                     <td>\</td>
@@ -41,7 +50,7 @@ export default function CalendarGrid({events=[]}) {
             <tbody>
                 {rangeHour.map((hour,hi) => <tr key={hi}>
                     <td>{hour}:00</td>
-                    {rangeDate.map((day,di) => <td key={di}>
+                    {rangeDate.map((day,di) => <td key={di} className={(isToday(day) && "today" || "") + " " + (isNow(hour) && "now" || "")}>
                         {events.filter(e=>isEventNow(e,day,hour)).map(e=><Minicard event={e} subscribed={true} />)}
                     </td>)}
                 </tr>)}
