@@ -42,7 +42,7 @@ jobs:
           ssh -i <(${{ secrets.SSH_PRIVATE_KEY }}) ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "mkdir -p ~/event-planner"
           scp -r -i <(${{ secrets.SSH_PRIVATE_KEY }}) ./services ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner
 
-      -name: Start containers
+      - name: Start containers
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.REMOTE_HOST }}
