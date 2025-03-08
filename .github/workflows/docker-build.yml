@@ -36,9 +36,10 @@ jobs:
       - uses: actions/checkout@v4
 
 
-      - name: Setup SSH key
+      - name: Copy docker-compose
         run: |
           mkdir -p ~/.ssh
+          ssh -i ~/.ssh/id_rsa ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "mkdir -p ~/event-planner"
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
