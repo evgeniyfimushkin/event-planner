@@ -53,7 +53,7 @@ jobs:
           local: ./services
           remote: ./event-planner
           host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
+          username: root
           privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
 
 
