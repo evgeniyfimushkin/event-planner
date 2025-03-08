@@ -55,4 +55,4 @@ jobs:
           remote: ./event-planner/docker-compose.yml
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
-          privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
+          privateKey: ~/.ssh/id_rsa
