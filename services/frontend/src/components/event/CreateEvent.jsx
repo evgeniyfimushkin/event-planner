@@ -34,7 +34,7 @@ export default function CreateEvent({}) {
                 end_time: new Date(endTime).toISOString(),
             };
             console.log(pack);
-            const res = await axios.post("http://localhost/api/v1/events", pack);
+            const res = await axios.post("/api/v1/events", pack);
             alert("Мероприятие создано!");
         } catch (error) {
             alert("Ошибка создания мероприятия!\n"+error.message);
