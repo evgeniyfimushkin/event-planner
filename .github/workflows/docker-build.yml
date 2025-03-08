@@ -5,7 +5,7 @@ on:
     branches:
       - backend
 
-#jobs:
+jobs:
 #  publish:
 #    runs-on: ubuntu-latest
 #
