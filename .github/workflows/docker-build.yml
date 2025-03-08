@@ -6,7 +6,7 @@ on:
       - backend
 
 jobs:
-  build_and_push:
+  publish:
     runs-on: ubuntu-latest
 
     strategy:
@@ -29,3 +29,17 @@ jobs:
 
       - name: Push docker image for ${{ matrix.service }}
         run: docker push evgeniyfimushkin/${{ matrix.service }}:latest
+  deploy:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy docker-compose-yaml
+        uses: garygrossgarten/github-action-scp@release
+        with:
+          local: services/docker-compose.yaml
+          remote: ./event-planner/docker-compose.yml
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
