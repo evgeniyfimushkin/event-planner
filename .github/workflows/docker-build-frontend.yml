@@ -6,7 +6,7 @@ on:
       - frontend
 
 jobs:
-  build_and_push:
+  publish:
     runs-on: ubuntu-latest
 
     strategy:
@@ -27,3 +27,27 @@ jobs:
 
       - name: Push docker image for ${{ matrix.service }}
         run: docker push evgeniyfimushkin/${{ matrix.service }}:latest
+
+  deploy:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start application containers
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd event-planner
+            export PUBLIC_KEY=${{ secrets.PUBLIC_KEY }}
+            export PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}
+            export POSTGRES_HOST=db
+            export POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
+            export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+            export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            docker-compose pull
+            docker-compose down
+            docker-compose up -d
