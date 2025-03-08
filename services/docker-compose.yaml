@@ -46,7 +46,7 @@ services:
       - ./swagger:/swagger:z
 
 
-  front:
+  frontend:
     container_name: front
     image: evgeniyfimushkin/frontend
     build: ./frontend

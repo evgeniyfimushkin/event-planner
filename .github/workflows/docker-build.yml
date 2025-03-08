@@ -41,10 +41,16 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          cat ./services/docker-compose.yaml
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
           ssh -i ~/.ssh/id_rsa ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "mkdir -p ~/event-planner"
+<<<<<<< HEAD
           scp -r -i ~/.ssh/id_rsa ./services ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner 
         
+=======
+          rsync -vz -e "ssh -i ~/.ssh/id_rsa" ./services ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner
+
+>>>>>>> backend
 
       - name: Start application containers
         uses: appleboy/ssh-action@master
