@@ -15,7 +15,7 @@ export default function Register({}) {
         e.preventDefault();
         try {
             const passhash = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
-            const res = await axios.post("http://localhost/api/v1/auth/register", { username, email, passhash });
+            const res = await axios.post("/api/v1/auth/register", { username, email, passhash });
             alert("Зарегистрировано!")
             navigate("/login");
         } catch (error) {

@@ -16,7 +16,7 @@ export default function Login({}) {
         e.preventDefault();
         try {
             const passhash = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
-            const res = await axios.post("http://localhost/api/v1/auth/login", { username, passhash });
+            const res = await axios.post("/api/v1/auth/login", { username, passhash });
 
             // const fr = await fetch("http://localhost/api/v1/auth/login", {
             //     method: "POST",
@@ -32,7 +32,7 @@ export default function Login({}) {
             // });
             login();
             alert("Подключено!");
-            const refresh = await axios.get("http://localhost/api/v1/auth/refresh");
+            const refresh = await axios.get("/api/v1/auth/refresh");
             navigate("/");
             // console.log(res.headers);
         } catch (error) {
