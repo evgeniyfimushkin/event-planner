@@ -40,5 +40,5 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        scp -i <(${{ secrets.SSH_PRIVATE_KEY }}) ./services/docker-compose.yaml ${{ REMOTE_USER }}@${{ REMOTE_HOST }}:docker-compose.yaml
           chmod 600 ~/.ssh/id_rsa
-          ls ./services
