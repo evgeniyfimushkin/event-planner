@@ -4,6 +4,7 @@ import { useState, useContext } from "react";
 import axios from "axios";
 import CryptoJS from "crypto-js";
 import { useNavigate } from "react-router-dom";
+import { explainRequestError } from "../../services/Utilities";
 
 export default function Register({}) {
     const [username, setUsername] = useState("");
@@ -19,7 +20,8 @@ export default function Register({}) {
             alert("Зарегистрировано!")
             navigate("/login");
         } catch (error) {
-            alert("Ошибка регистрации!\n"+e);
+            alert("Ошибка регистрации!\n"+explainRequestError(error));
+            console.error(error);
         }
     };
 

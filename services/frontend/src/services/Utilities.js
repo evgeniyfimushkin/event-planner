@@ -33,3 +33,9 @@ export async function authCall(request, handler401) {
         return;
     }
 };
+
+export function explainRequestError(error) {
+    return (error.response)
+        ? `Статус ответа: ${error.response.status}\nСообщение:\n${error.response.data}`
+        : `Сообщение библиотеки:\n${error.message}`;
+}

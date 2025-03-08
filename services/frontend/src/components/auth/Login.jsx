@@ -5,6 +5,7 @@ import axios from "axios";
 import AuthContext from "../../services/AuthContext";
 import { useNavigate } from "react-router-dom";
 import CryptoJS from "crypto-js";
+import { explainRequestError } from "../../services/Utilities";
 
 export default function Login({}) {
     const [username, setUsername] = useState("");
@@ -36,7 +37,8 @@ export default function Login({}) {
             navigate("/");
             // console.log(res.headers);
         } catch (error) {
-            alert("Ошибка подключения!\n"+e.message);
+            alert("Ошибка подключения!\n"+explainRequestError(error));
+            console.error(error);
         }
     };
 

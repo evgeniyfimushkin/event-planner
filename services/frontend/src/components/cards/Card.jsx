@@ -2,7 +2,7 @@ import { createPortal } from "react-dom";
 import "./Cards.css"
 import { useState } from "react";
 import ModalWindow from "../misc/ModalWindow";
-import { localDate } from "../../services/Utilities";
+import { explainRequestError, localDate } from "../../services/Utilities";
 import axios from "axios";
 
 export default function Card({event, subscribedInitially}) {
@@ -34,7 +34,8 @@ export default function Card({event, subscribedInitially}) {
             alert("Вы подписаны на событие!");
             setSubscribed(true);
         } catch (error) {
-            alert("Не удалось подписаться!\n"+error.message);
+            alert("Не удалось подписаться!\n"+explainRequestError(error));
+            console.error(error);
         }
     }
     const unsubscribe = async (e) => {
@@ -44,7 +45,8 @@ export default function Card({event, subscribedInitially}) {
             alert("Вы отписаны от события!");
             setSubscribed(false);
         } catch (error) {
-            alert("Не удалось отписаться!\n"+error.message);
+            alert("Не удалось отписаться!\n"+explainRequestError(error));
+            console.error(error);
         }
     }
 

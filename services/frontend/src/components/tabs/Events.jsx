@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import ModalWindow from "../misc/ModalWindow";
 import CreateEvent from "../event/CreateEvent";
-import { authCall } from "../../services/Utilities";
+import { authCall, explainRequestError } from "../../services/Utilities";
 import AuthContext from "../../services/AuthContext";
 
 export default function Events() {
@@ -32,7 +32,7 @@ export default function Events() {
                 navigate("/login");
             });
         } catch (err) {
-            setError("Не удалось загрузить мероприятия");
+            setError("Не удалось загрузить мероприятия!\n"+explainRequestError(err));
             console.error(err);
         } finally {
             setLoading(false);

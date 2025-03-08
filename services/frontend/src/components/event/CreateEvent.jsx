@@ -2,6 +2,7 @@ import "./Event.css"
 
 import { useState, useContext } from "react";
 import axios from "axios";
+import { explainRequestError } from "../../services/Utilities";
 
 export default function CreateEvent({}) {
     const [name, setName] = useState("Без названия");
@@ -37,8 +38,8 @@ export default function CreateEvent({}) {
             const res = await axios.post("/api/v1/events", pack);
             alert("Мероприятие создано!");
         } catch (error) {
-            alert("Ошибка создания мероприятия!\n"+error.message);
-            console.error(error);
+            alert("Ошибка создания мероприятия!\n" + explainRequestError(error));
+            console.error(error)
         }
     };
 

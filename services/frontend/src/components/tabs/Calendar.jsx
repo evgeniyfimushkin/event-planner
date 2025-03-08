@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import ModalWindow from "../misc/ModalWindow";
-import { authCall } from "../../services/Utilities";
+import { authCall, explainRequestError } from "../../services/Utilities";
 import AuthContext from "../../services/AuthContext";
 import CalendarGrid from "../calendar/CalendarGrid";
 
@@ -29,7 +29,7 @@ export default function Calendar() {
                 navigate("/login");
             });
         } catch (err) {
-            setError("Не удалось загрузить мероприятия");
+            setError("Не удалось загрузить мероприятия!\n"+explainRequestError(err));
             console.error(err);
         } finally {
             setLoading(false);
