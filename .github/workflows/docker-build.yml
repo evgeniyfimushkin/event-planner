@@ -41,19 +41,4 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ls *
-
-      - name: Add known hosts
-        run: ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Test SSH connection
-        run: ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "echo 'Connected successfully'"
-
-      - name: Copy docker-compose.yaml
-        uses: garygrossgarten/github-action-scp@release
-        with:
-          local: services/docker-compose.yaml
-          remote: ./event-planner/docker-compose.yaml
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
+          ls ./services
