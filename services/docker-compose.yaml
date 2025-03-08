@@ -1,6 +1,4 @@
 services:
-  #Salam aleykum
-
   nginx:
     container_name: nginx
     image: nginx:latest
@@ -16,6 +14,7 @@ services:
         max-size: "10m"
         max-file: "3"
         tag: "nginx|{{.Name}}|{{.ID}}"
+    restart: always
 
 
   db:
@@ -27,8 +26,8 @@ services:
     volumes:
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:z
       - pg-events-data:/var/lib/postgresql/data:z
-      #ports:
-      #  - "5432:5432"
+    ports:
+      - "5432:5432"
     logging:
       driver: "json-file"
       options:
@@ -39,8 +38,8 @@ services:
 
   swagger-ui:
     image: swaggerapi/swagger-ui
-    #ports:
-    #  - "3333:8080"
+    ports:
+      - "3333:8080"
     environment:
       SWAGGER_JSON: /swagger/openapi.yaml
     volumes:
@@ -74,8 +73,8 @@ services:
       - DB_PORT=${POSTGRES_PORT}
       - PRIVATE_KEY=${PRIVATE_KEY}
       - PUBLIC_KEY=${PUBLIC_KEY}
-      #ports:
-      #  - "8081:8081"
+    ports:
+      - "8081:8081"
     logging:
       driver: "json-file"
       options:
@@ -97,9 +96,9 @@ services:
       - DB_HOST=${POSTGRES_HOST}
       - DB_PORT=${POSTGRES_PORT}
       - PUBLIC_KEY=${PUBLIC_KEY}
-      #ports:
-      #  - "9091:9091"
-      #  - "8082:8082"
+    ports:
+      - "9091:9091"
+      - "8082:8082"
     logging:
       driver: "json-file"
       options:
@@ -122,8 +121,8 @@ services:
       - DB_HOST=${POSTGRES_HOST}
       - DB_PORT=${POSTGRES_PORT}
       - PUBLIC_KEY=${PUBLIC_KEY}
-      #ports:
-      #  - "8083:8083"
+    ports:
+      - "8083:8083"
     logging:
       driver: "json-file"
       options:
