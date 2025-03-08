@@ -38,17 +38,11 @@ jobs:
 
       - name: Copy docker-compose
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
           ssh -i <(${{ secrets.SSH_PRIVATE_KEY }}) ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "mkdir -p ~/event-planner"
-          scp -i ~/.ssh/id_rsa ./services/docker-compose.yaml ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner/docker-compose.yaml 
-          scp -r -i ~/.ssh/id_rsa ./services/nginx ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner/nginx 
-          scp -r -i ~/.ssh/id_rsa ./services/database ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner/database 
-          scp -r -i ~/.ssh/id_rsa ./services/swagger ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner/swagger 
+          scp -r -i <(${{ secrets.SSH_PRIVATE_KEY }}) ./services ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner
 
-      - name: Start using docker-compose
+      -name: Start containers
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.REMOTE_HOST }}
@@ -58,6 +52,6 @@ jobs:
             cd event-planner
             export PUBLIC_KEY=${{ secrets.PUBLIC_KEY }}
             export PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}
-            docker-compose down
             docker-compose pull
+            docker-compose down
             docker-compose up -d
