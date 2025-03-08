@@ -1,14 +1,77 @@
+.menu {
+    width: 100%;
+}
+
 .bar {
     display: flex;
-    border-bottom: 3px solid #ccc;
-    width: 100%;
 }
 
 .tab {
     font-weight: bold;
     font-size: 2em;
-    flex: 1;
     text-align: center;
     padding: 10px 0;
+    margin: 0;
+    border-bottom: 3px solid #ccc;
+}
+
+.tab a {
     cursor: pointer;
+}
+
+.bar .tab {
+    flex: 1;
+}
+
+/* .dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown :not(:first-child) {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown:active .tab {
+    display: block;
+} */
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    background-color: white;
+}
+
+.dropdown-content {
+    /* display: none; */
+    position: absolute;
+    background-color: #f1f1f1;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    width: 100%;
+}
+
+/* .dropdown:focus .dropdown-content {
+    display: block;
+} */
+
+.open {
+    text-decoration: underline;
+}
+
+@media screen and (orientation: landscape) {
+    .dropdown {
+        display: none;
+    }
+}
+
+@media screen and (orientation: portrait) {
+    .bar {
+        display: none;
+    }
 }

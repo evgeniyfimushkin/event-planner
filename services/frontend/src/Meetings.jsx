@@ -10,6 +10,8 @@ import PrivateRoute from './services/PrivateRoute.jsx';
 import CreateEvent from './components/event/CreateEvent.jsx';
 import Events from './components/tabs/Events.jsx';
 import Calendar from './components/tabs/Calendar.jsx';
+import Dropdown from './components/menu/Dropdown.jsx';
+import Menu from './components/menu/Menu.jsx';
 
 function App() {
   return (
@@ -19,13 +21,13 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/" element={
             <PrivateRoute>
-              <Bar />
+              <Menu />
               <Events />
             </PrivateRoute>
           }/>
           <Route path="/calendar" element={
             <PrivateRoute>
-              <Bar />
+              <Menu />
               <Calendar />
             </PrivateRoute>
           }/>
