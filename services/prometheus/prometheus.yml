@@ -8,10 +8,20 @@ scrape_configs:
     static_configs:
       - targets: ['node-exporter:9100']
 
-
-
   - job_name: 'auth-service'
     metrics_path: '/metrics'
     scrape_interval: 15s
     static_configs:
       - targets: ['auth-service:9100']
+ 
+  - job_name: 'event-service'
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['event-service:9100']
+
+  - job_name: 'registration-service'
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['registration-service:9100'] 
