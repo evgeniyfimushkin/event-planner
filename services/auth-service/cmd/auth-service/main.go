@@ -9,7 +9,7 @@ import (
 	"log/slog"
 	"net/http"
 	"time"
-
+    "github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/config"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/db"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/logger"
@@ -67,6 +67,12 @@ func main(){
         WriteTimeout: cfg.Server.WriteTimeout,
         IdleTimeout: cfg.Server.IdleTimeout,
     }
+
+    // go prometheus metrics
+    go func (){
+        http.Handle("/metrics", promhttp.Handler())
+        http.ListenAndServe(":9100", nil)
+    }()
 
     log.Info(fmt.Sprintf("Server listening on port %d", cfg.Server.Port))
     if err := srv.ListenAndServe(); err != nil {

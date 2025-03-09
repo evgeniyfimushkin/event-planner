@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+    "github.com/prometheus/client_golang/prometheus/promhttp"
 	"time"
 
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/auth"
@@ -51,6 +52,11 @@ func main(){
     go grpcApp.MustRun()
     
 
+    // go prometheus metrics
+    go func (){
+        http.Handle("/metrics", promhttp.Handler())
+        http.ListenAndServe(":9100", nil)
+    }()
    // -----------------HTTP SERVER------------------------ 
 
     handler := handler.NewEventHandler(eventService, verifier)
