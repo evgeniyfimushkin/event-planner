@@ -1,7 +1,11 @@
+div.calendar {
+    overflow-x: scroll;
+}
+
 .calendar {
     /* display: block; */
     font-size: 1.1em;
-    border: 2px solid black;
+    /* border: 2px solid black; */
     border-collapse: collapse;
     margin: 0 auto;
     /* overflow: auto; */
@@ -9,8 +13,8 @@
 .calendar th,
 .calendar td {
     border: 1px solid grey;
-    width: 1.5em;
-    height: 1.5em;
+    min-width: 1.5em;
+    min-height: 1.5em;
 }
 
 .calendar .card {
