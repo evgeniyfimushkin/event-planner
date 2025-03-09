@@ -45,7 +45,7 @@ jobs:
           ssh -i ~/.ssh/id_rsa ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "mkdir -p ~/event-planner"
           sed -i "s/localhost/${{ secrets.DOMAIN }}/g" ./services/nginx/conf.d/front-and-auth.conf
           scp -i ~/.ssh/id_rsa ./services/nginx/conf.d/front-and-auth.conf ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner/nginx/conf.d/front-and-auth.conf
-         scp -r -i ~/.ssh/id_rsa ./services ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner 
+          scp -r -i ~/.ssh/id_rsa ./services ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner
           scp -i ~/.ssh/id_rsa ./services/nginx/conf.d/front-and-auth.conf ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner/nginx/conf.d/front-and-auth.conf
           scp -i ~/.ssh/id_rsa ./services/database/init.sql ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner/database/init.sql
           scp -i ~/.ssh/id_rsa ./services/docker-compose.yaml ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner/docker-compose.yaml
@@ -60,8 +60,6 @@ jobs:
           ssh -i ~/.ssh/id_rsa ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "mkdir -p ~/event-planner/nginx/ssl"
           scp -i ~/.ssh/id_rsa fullchain.pem ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner/nginx/ssl/fullchain.pem
           scp -i ~/.ssh/id_rsa certificate.key ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner/nginx/ssl/certificate.key
-
-
 
       - name: Start application containers
         uses: appleboy/ssh-action@master
