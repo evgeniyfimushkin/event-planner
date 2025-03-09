@@ -67,6 +67,7 @@ services:
     image: evgeniyfimushkin/auth-service
     build: ./auth-service
     environment:
+      - ENV=${ENV}
       - SERVER_PORT=8081
       - DB_NAME=auth_db
       - DB_USER=${POSTGRES_USER}
@@ -90,6 +91,7 @@ services:
     image: evgeniyfimushkin/event-service
     build: ./event-service
     environment:
+      - ENV=${ENV}
       - SERVER_PORT=8082
       - GRPC_SERVER_PORT=9091
       - DB_NAME=events_db
@@ -114,6 +116,7 @@ services:
     image: evgeniyfimushkin/registration-service
     build: ./registration-service
     environment:
+      - ENV=${ENV}
       - GRPC_CLIENT_HOST=event-service
       - GRPC_CLIENT_PORT=9091
       - SERVER_PORT=8083
