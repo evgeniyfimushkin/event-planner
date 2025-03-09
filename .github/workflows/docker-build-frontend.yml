@@ -42,6 +42,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd event-planner
+            export ENV=prod
             export PUBLIC_KEY=${{ secrets.PUBLIC_KEY }}
             export PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}
             export POSTGRES_HOST=db
