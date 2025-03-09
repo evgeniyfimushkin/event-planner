@@ -43,6 +43,8 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
           ssh -i ~/.ssh/id_rsa ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "mkdir -p ~/event-planner"
+          ssh -i ~/.ssh/id_rsa ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "mkdir -p ~/event-planner/promtail"
+          ssh -i ~/.ssh/id_rsa ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "mkdir -p ~/event-planner/prometheus"
           sed -i "s/localhost/${{ secrets.DOMAIN }}/g" ./services/nginx/conf.d/front-and-auth.conf
           scp -i ~/.ssh/id_rsa ./services/nginx/conf.d/front-and-auth.conf ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner/nginx/conf.d/front-and-auth.conf
           scp -r -i ~/.ssh/id_rsa ./services ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner
