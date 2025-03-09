@@ -18,6 +18,13 @@ services:
         tag: "nginx|{{.Name}}|{{.ID}}"
     restart: always
 
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: nginx-exporter
+    command:
+      - '-nginx.scrape-uri=http://nginx/nginx_status'
+    depends_on:
+      - nginx
 
   db:
     container_name: db
