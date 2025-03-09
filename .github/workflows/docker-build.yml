@@ -6,31 +6,32 @@ on:
       - backend
 
 jobs:
-#  publish:
-#    runs-on: ubuntu-latest
-#
-#    strategy:
-#      matrix:
-#        service:
-#          - auth-service
-#          - event-service
-#          - registration-service
-#
-#    steps:
-#      - name: checkout repository
-#        uses: actions/checkout@v2
-#
-#      - name: Build docker image for ${{ matrix.service }}
-#        run: |
-#          docker build -t evgeniyfimushkin/${{ matrix.service }}:latest services/${{ matrix.service }}
-#
-#      - name: Log in to DockerHub
-#        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-#
-#      - name: Push docker image for ${{ matrix.service }}
-#        run: docker push evgeniyfimushkin/${{ matrix.service }}:latest
+  publish:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service:
+          - auth-service
+          - event-service
+          - registration-service
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build docker image for ${{ matrix.service }}
+        run: |
+          docker build -t evgeniyfimushkin/${{ matrix.service }}:latest services/${{ matrix.service }}
+
+      - name: Log in to DockerHub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Push docker image for ${{ matrix.service }}
+        run: docker push evgeniyfimushkin/${{ matrix.service }}:latest
+
   deploy:
-    #needs: publish
+    needs: publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -41,16 +42,27 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          cat ./services/docker-compose.yaml
           ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
           ssh -i ~/.ssh/id_rsa ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "mkdir -p ~/event-planner"
-<<<<<<< HEAD
           scp -r -i ~/.ssh/id_rsa ./services ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner 
-        
-=======
-          rsync -vz -e "ssh -i ~/.ssh/id_rsa" ./services ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner
+          scp -i ~/.ssh/id_rsa ./services/nginx/conf.d/front-and-auth.conf ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner/nginx/conf.d/front-and-auth.conf
+          scp -i ~/.ssh/id_rsa ./services/database/init.sql ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner/database/init.sql
+          scp -i ~/.ssh/id_rsa ./services/docker-compose.yaml ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner/docker-compose.yaml
 
->>>>>>> backend
+      - name: Deploy SSL certificates
+        run: |
+          printf "%s" "${{ secrets.SSL_CERT }}" > fullchain.pem
+          printf "%s" "${{ secrets.SSL_KEY }}" > certificate.key
+          sudo chmod 600 certificate.key
+          ssh -i ~/.ssh/id_rsa ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "mkdir -p ~/event-planner/nginx/ssl"
+          scp -i ~/.ssh/id_rsa fullchain.pem ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner/nginx/ssl/fullchain.pem
+          scp -i ~/.ssh/id_rsa certificate.key ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner/nginx/ssl/certificate.key
+          sed -i "s/localhost/${{ secrets.DOMAIN }}/g" ./services/nginx/conf.d/front-and-auth.conf
+          scp -i ~/.ssh/id_rsa ./services/nginx/conf.d/front-and-auth.conf ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:event-planner/nginx/conf.d/front-and-auth.conf
+
+
+
+
 
       - name: Start application containers
         uses: appleboy/ssh-action@master
