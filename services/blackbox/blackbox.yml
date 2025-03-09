@@ -1,0 +1,11 @@
+modules:
+  http_any_response:
+    prober: http
+    timeout: 5s
+    http:
+      method: GET  
+      valid_http_versions: [ "1.1", "2" ]
+      valid_status_codes: []  
+      headers:
+        User-Agent: "Prometheus Blackbox Exporter"
+

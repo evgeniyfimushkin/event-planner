@@ -190,6 +190,12 @@ services:
     privileged: true
     container_name: promtail
     image: grafana/promtail:2.9.4
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "promtail|{{.Name}}|{{.ID}}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./promtail/promtail.yaml:/etc/promtail/promtail.yaml:z
@@ -210,6 +216,22 @@ services:
         max-file: "3"
         tag: "node-exporter|{{.Name}}|{{.ID}}"
     restart: always
+
+    #blackbox:
+    #  image: prom/blackbox-exporter:latest
+    #  container_name: blackbox
+    #  ports:
+    #    - "9115:9115"
+    #  volumes:
+    #    - ./blackbox/blackbox.yml:/etc/blackbox_exporter/config.yml:z
+    #  logging:
+    #    driver: "json-file"
+    #    options:
+    #      max-size: "10m"
+    #      max-file: "3"
+    #      tag: "blackbox|{{.Name}}|{{.ID}}"
+    #  restart: always
+
 
 
 
