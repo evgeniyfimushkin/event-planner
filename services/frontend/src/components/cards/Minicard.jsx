@@ -26,8 +26,8 @@ export default function Minicard({event, subscribed}) {
             <div className="line">
                 {image_data && <img src={image_data || null}/>}
                 <h1 className="title">{name}</h1>
+                {description && <p className="description">{description}</p>}
             </div>
-            {description && <p className="description">{description}</p>}
             {fullAddress && (
                 <p>Местоположение: {fullAddress}</p>
             )}
