@@ -43,7 +43,7 @@ export default function Login({}) {
     };
 
     return (
-        <div>
+        <div className="login">
             <h1>Вход</h1>
             <form onSubmit={handleLogin} className="form">
                 <input type="text" placeholder="Имя пользователя" value={username} onChange={(e) => setUsername(e.target.value)} />
