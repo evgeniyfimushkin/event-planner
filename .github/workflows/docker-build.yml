@@ -78,7 +78,7 @@ jobs:
             export POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
             export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
             export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-            docker ps | awk '{system("docker rmi "$1)}'
+            docker ps | awk '{system("docker rmi "$3)}'
             docker-compose pull
             docker-compose down
             docker-compose up -d

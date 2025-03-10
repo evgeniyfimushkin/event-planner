@@ -147,6 +147,7 @@ services:
     image: prom/prometheus
     container_name: prometheus
     volumes:
+      - prometheus-data:/prometheus:z
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:z
       #ports:
       #  - "9090:9090"
@@ -178,6 +179,8 @@ services:
   loki:
     image: grafana/loki:latest
     container_name: loki
+    volumes:
+      - loki-data:/loki
     logging:
       driver: "json-file"
       options:
@@ -225,3 +228,5 @@ volumes:
   pg-events-data:
   grafana-provisioning:
   grafana-data:
+  prometheus-data:
+  loki-data:
