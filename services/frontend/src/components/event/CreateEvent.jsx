@@ -59,53 +59,31 @@ export default function CreateEvent({}) {
     };
 
     return (
-        <div>
+        <div className="create-event">
             <h1>Создать мероприятие</h1>
             <form onSubmit={createEvent} className="form">
-                <div>
                     <label for="name">Название:</label>
                     <input id="name" type="text" value={name} onChange={e=>setName(e.target.value)} required />
-                </div>
-                <div>
                     <label for="desctiption">Описание:</label>
                     <textarea id="description" type="text" value={description} onChange={e=>setDescription(e.target.value)} required />
-                </div>
-                <div>
                     <label for="category">Категория:</label>
                     <input id="category" type="text" value={category} onChange={e=>setCategory(e.target.value)} required />
-                </div>
-                <div>
                     <label for="maxParticipants">Участники:</label>
                     <input id="maxParticipants" type="number" min="1" value={maxParticipants} onChange={e=>setMaxParticipants(e.target.value)} required />
-                </div>
-                <div>
                     <label for="imageData">Иконка:</label>
                     <input id="imageData" type="file" accept="image/*" onChange={e=>handleImageData(e)} />
-                </div>
-                <div>
                     <label for="city">Город:</label>
                     <input id="city" type="text" value={city} onChange={e=>setCity(e.target.value)} />
-                </div>
-                <div>
                     <label for="address">Адрес:</label>
                     <input id="address" type="text" value={address} onChange={e=>setAddress(e.target.value)} />
-                </div>
-                <div>
                     <label for="latitude">Широта:</label>
                     <input id="latitude" type="number" min="-90" max="90" value={latitude} onChange={e=>setLatitude(e.target.value)} />
-                </div>
-                <div>
                     <label for="longitude">Долгота:</label>
                     <input id="longitude" type="number" value={longitude} min="-180" max="180" onChange={e=>setLongitude(e.target.value)} />
-                </div>
-                <div>
                     <label for="startTime">Время начала:</label>
                     <input id="startTime" type="datetime-local" value={startTime} onChange={e=>setStartTime(e.target.value)} required />
-                </div>
-                <div>
                     <label for="endTime">Время окончания:</label>
                     <input id="endTime" type="datetime-local" value={endTime} onChange={e=>setEndTime(e.target.value)} />
-                </div>
                 <button type="submit">Создать мероприятие</button>
             </form>
         </div>

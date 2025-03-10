@@ -1,3 +1,39 @@
 label {
     margin-right: 1em;
 }
+
+.create-event h1 {
+    margin: 0.5em 1em;
+    text-align: center;
+}
+
+.create-event form {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    /* gap: 10px 20px; */
+    padding: 20px;
+    max-width: 600px;
+    /* max-height: 600px; */
+    /* margin: 0 auto; */
+}
+
+.create-event label {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+}
+
+.create-event input, .create-event textarea {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    /* width: 100%; */
+    box-sizing: border-box;
+    /* transition: border-color 0.2s; */
+}
+
+.create-event input:focus, .create-event textarea:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+
