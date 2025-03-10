@@ -11,6 +11,7 @@ import (
 	"registration-service/internal/models"
 	"registration-service/internal/repository"
 	"registration-service/internal/service"
+    "github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/auth"
 	"github.com/evgeniyfimushkin/event-planner/services/common/pkg/config"
@@ -84,6 +85,11 @@ func main(){
     //router.Put("/api/v1/registrations/bulk", handler.BulkUpdateHandler())
 
 
+    // go prometheus metrics
+    go func (){
+        http.Handle("/metrics", promhttp.Handler())
+        http.ListenAndServe(":9100", nil)
+    }()
 
     srv := &http.Server{
         Addr: fmt.Sprintf("%s:%d",cfg.Server.Addr, cfg.Server.Port),

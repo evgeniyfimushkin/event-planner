@@ -18,6 +18,13 @@ services:
         tag: "nginx|{{.Name}}|{{.ID}}"
     restart: always
 
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: nginx-exporter
+    command:
+      - '-nginx.scrape-uri=http://nginx/nginx_status'
+    depends_on:
+      - nginx
 
   db:
     container_name: db
@@ -67,6 +74,7 @@ services:
     image: evgeniyfimushkin/auth-service
     build: ./auth-service
     environment:
+      - ENV=${ENV}
       - SERVER_PORT=8081
       - DB_NAME=auth_db
       - DB_USER=${POSTGRES_USER}
@@ -90,6 +98,7 @@ services:
     image: evgeniyfimushkin/event-service
     build: ./event-service
     environment:
+      - ENV=${ENV}
       - SERVER_PORT=8082
       - GRPC_SERVER_PORT=9091
       - DB_NAME=events_db
@@ -114,6 +123,7 @@ services:
     image: evgeniyfimushkin/registration-service
     build: ./registration-service
     environment:
+      - ENV=${ENV}
       - GRPC_CLIENT_HOST=event-service
       - GRPC_CLIENT_PORT=9091
       - SERVER_PORT=8083
@@ -133,5 +143,90 @@ services:
         tag: "registration-service|{{.Name}}|{{.ID}}"
     restart: always
 
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - prometheus-data:/prometheus:z
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:z
+      #ports:
+      #  - "9090:9090"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "prometheus|{{.Name}}|{{.ID}}"
+    restart: always
+
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    volumes:
+      - grafana-provisioning:/etc/grafana/provisioning:z
+      - grafana-data:/var/lib/grafana:z
+    ports:
+      - '3000:3000'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "grafana|{{.Name}}|{{.ID}}"
+    restart: always
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    volumes:
+      - loki-data:/loki
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "loki|{{.Name}}|{{.ID}}"
+    restart: always
+
+
+  promtail:
+    user: root
+    privileged: true
+    container_name: promtail
+    image: grafana/promtail:2.9.4
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "promtail|{{.Name}}|{{.ID}}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./promtail/promtail.yaml:/etc/promtail/promtail.yaml:z
+    command: -config.file=/etc/promtail/promtail.yaml
+    restart: always
+
+  node-exporter:
+    image: prom/node-exporter
+    container_name: node-exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "node-exporter|{{.Name}}|{{.ID}}"
+    restart: always
+
+
+
 volumes:
   pg-events-data:
+  grafana-provisioning:
+  grafana-data:
+  prometheus-data:
+  loki-data:
