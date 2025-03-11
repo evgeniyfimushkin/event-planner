@@ -73,12 +73,15 @@ jobs:
             cd event-planner
             rm .env
             export ENV=prod
-            export PUBLIC_KEY=${{ secrets.PUBLIC_KEY }}
-            export PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}
+            echo "${{ secrets.PUBLIC_KEY }}" > public_key.pem
+            echo "${{ secrets.PRIVATE_KEY }}" > private_key.pem
+            export PUBLIC_KEY=$(cat public_key.pem)
+            export PRIVATE_KEY=$(cat private_key.pem)
             export POSTGRES_HOST=db
             export POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
             export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
             export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            echo $PUBLIC_KEY > nginx/jwt_public_key.pem
             docker ps | awk '{system("docker rmi "$3)}'
             docker-compose pull
             docker-compose down
