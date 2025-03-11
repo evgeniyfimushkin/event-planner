@@ -3,7 +3,6 @@ package auth
 import (
 	"crypto/ecdsa"
 	"crypto/x509"
-	"encoding/base64"
 	"encoding/pem"
 	"errors"
 	"fmt"

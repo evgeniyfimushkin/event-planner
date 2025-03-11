@@ -5,7 +5,6 @@ import (
 	"auth-service/internal/repository"
 	"crypto/ecdsa"
 	"crypto/x509"
-	"encoding/base64"
 	"encoding/pem"
 	"errors"
 	"fmt"
@@ -21,12 +20,7 @@ type LoginService struct {
 }
 
 func NewLoginService(userRepo *repository.UserRepository, secret string, tokenTTL time.Duration) (*LoginService, error) {
-	keyBytes, err := base64.StdEncoding.DecodeString(secret)
-	if err != nil {
-		return nil, fmt.Errorf("failed to decode secret: %w", err)
-	}
-
-	block, _ := pem.Decode(keyBytes)
+	block, _ := pem.Decode([]byte(secret))
 	if block == nil {
 		return nil, errors.New("failed to parse PEM block containing the key")
 	}
@@ -36,9 +30,9 @@ func NewLoginService(userRepo *repository.UserRepository, secret string, tokenTT
 	}
 
 	return &LoginService{
-		userRepo:  userRepo,
+		userRepo:   userRepo,
 		privateKey: privateKey,
-        tokenTTL: tokenTTL,
+		tokenTTL:   tokenTTL,
 	}, nil
 }
 

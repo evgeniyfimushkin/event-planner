@@ -5,7 +5,6 @@ import (
 	"auth-service/internal/repository"
 	"crypto/ecdsa"
 	"crypto/x509"
-	"encoding/base64"
 	"encoding/pem"
 	"errors"
 	"fmt"
@@ -20,46 +19,36 @@ type RefreshService struct {
     publicKey *ecdsa.PublicKey
 }
 
-func NewRefreshService (userRepo *repository.UserRepository, privateKeyString string, publicKeyString string) (*RefreshService, error) {
-    privateKeyBytes, err := base64.StdEncoding.DecodeString(privateKeyString)
-    if err != nil {
-        return nil, fmt.Errorf("failed to decode private key: %w", err)
+func NewRefreshService(userRepo *repository.UserRepository, privateKeyString string, publicKeyString string) (*RefreshService, error) {
+	privateBlock, _ := pem.Decode([]byte(privateKeyString))
+	if privateBlock == nil {
+		return nil, errors.New("failed to parse PEM block containing the private key")
 	}
-    
-    privateBlock, _ := pem.Decode(privateKeyBytes)
-    if privateBlock == nil {
-        return nil, errors.New("failed to parse PEM block containing the private key")
-    }
-    privateKey, err := x509.ParseECPrivateKey(privateBlock.Bytes)
-    if err != nil {
-        return nil, fmt.Errorf("failed to parce EC private key: %w", err)
-    }
+	privateKey, err := x509.ParseECPrivateKey(privateBlock.Bytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse EC private key: %w", err)
+	}
 
-    publicKeyBytes, err := base64.StdEncoding.DecodeString(publicKeyString)
-    if err != nil {
-        return nil, fmt.Errorf("failed to decode public key: %w", err)
-    }
-    
-    publicBlock, _ := pem.Decode(publicKeyBytes)
-    if publicBlock == nil {
-        return nil, errors.New("failed to parse PEM block containing the public key")
-    }
-    
-    publicKeyInterface, err := x509.ParsePKIXPublicKey(publicBlock.Bytes)
-    if err != nil {
-        return nil, fmt.Errorf("failed to parse EC public key: %w", err)
-    }
+	publicBlock, _ := pem.Decode([]byte(publicKeyString))
+	if publicBlock == nil {
+		return nil, errors.New("failed to parse PEM block containing the public key")
+	}
 
-    publicKey, ok := publicKeyInterface.(*ecdsa.PublicKey)
-    if !ok {
-        return nil, errors.New("public key is not a valid ECDSA key")
-    } 
+	publicKeyInterface, err := x509.ParsePKIXPublicKey(publicBlock.Bytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse EC public key: %w", err)
+	}
 
-    return &RefreshService{
-        userRepo: userRepo,
-        privateKey: privateKey,
-        publicKey:  publicKey,
-    }, nil
+	publicKey, ok := publicKeyInterface.(*ecdsa.PublicKey)
+	if !ok {
+		return nil, errors.New("public key is not a valid ECDSA key")
+	}
+
+	return &RefreshService{
+		userRepo:   userRepo,
+		privateKey: privateKey,
+		publicKey:  publicKey,
+	}, nil
 }
 
 func (r *RefreshService) Refresh(refreshToken string) (string, error) {
