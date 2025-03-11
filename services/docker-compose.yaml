@@ -1,6 +1,7 @@
 services:
   nginx:
     container_name: nginx
+    #nginx/1.27.4
     image: evgeniyfimushkin/nginx-auth:latest
     #network_mode: "host"
     ports:
