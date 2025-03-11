@@ -27,16 +27,12 @@ type Verifier struct {
 	publicKey  *ecdsa.PublicKey
 }
 
-// NewVerifier takes a Base64-encoded EC256 public key,
+// NewVerifier takes a EC256 public key,
 // decodes them, and returns an instance of Verifier
-func NewVerifier (publicKeyString string) (*Verifier, error) {
+func NewVerifier(publicKeyString string) (*Verifier, error) {
+    publicKeyBytes := []byte(publicKeyString)
 
-    publicKetBytes, err := base64.StdEncoding.DecodeString(publicKeyString)
-    if err != nil {
-        return nil, fmt.Errorf("failed to decode public key: %w", err)
-    }
-
-    publicBlock, _ := pem.Decode(publicKetBytes)
+    publicBlock, _ := pem.Decode(publicKeyBytes)
     if publicBlock == nil {
         return nil, errors.New("failed to parse PEM block containing the public key")
     }
@@ -56,6 +52,7 @@ func NewVerifier (publicKeyString string) (*Verifier, error) {
     }, nil
 }
 
+
 // VerifyJWTToken takes accessToken as string and verified the signature
 func (v *Verifier) VerifyJWTToken(accessToken string) (jwt.MapClaims, error) {
 	if accessToken == "" {
@@ -69,7 +66,6 @@ func (v *Verifier) VerifyJWTToken(accessToken string) (jwt.MapClaims, error) {
 		return v.publicKey, nil
 	})
 	if err != nil {
-		// Если ошибка вызвана просроченностью токена, возвращаем ErrTokenExpired
 		if errors.Is(err, jwt.ErrTokenExpired) {
 			return nil, ErrTokenExpired
 		}
