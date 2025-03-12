@@ -81,6 +81,7 @@ jobs:
             export POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
             export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
             export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            export TZ=$(timedatectl | grep "Time zone" | awk '{print $3}')
             cp public_key.pem nginx/jwt_public_key.pem
             docker ps | awk '{system("docker rmi "$3)}'
             docker-compose pull
