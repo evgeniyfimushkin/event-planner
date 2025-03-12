@@ -84,6 +84,7 @@ jobs:
             export TZ=$(timedatectl | grep "Time zone" | awk '{print $3}')
             cp public_key.pem nginx/jwt_public_key.pem
             docker ps | awk '{system("docker rmi "$3)}'
+            docker system prune -af
             docker-compose pull
             docker-compose down
             docker-compose up -d
