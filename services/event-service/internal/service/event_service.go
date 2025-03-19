@@ -25,6 +25,24 @@ func NewEventService(repo *repository.EventRepository) *EventService {
 	}
 }
 
+func (s *EventService) GetUpcomingEvents(claims jwt.MapClaims) ([]models.Event, error) {
+    now := time.Now()
+    upcomingEvents, err := s.GenericService.Find(nil, "start_time > ?", now)
+    if err != nil {
+        return nil, fmt.Errorf("Cannot get upcoming events")
+    }
+    return upcomingEvents, nil
+}
+
+func (s *EventService) GetPreviousEvents(claims jwt.MapClaims) ([]models.Event, error) {
+    now := time.Now()
+    previousEvents, err := s.GenericService.Find(nil, "start_time < ?", now)
+    if err != nil {
+        return nil, fmt.Errorf("Cannot get previous events")
+    }
+    return previousEvents, nil
+}
+
 func (s *EventService) Create(claims jwt.MapClaims, entity *models.Event) (*models.Event, error) {
     username, ok := claims["username"].(string)
     if !ok {

@@ -69,7 +69,8 @@ func main(){
     router.Use(middleware.URLFormat)
 
     router.Post("/api/v1/events", handler.CreateHandler())
-    router.Get("/api/v1/events", handler.GetAllHandler())
+    router.Get("/api/v1/events", handler.GetUpcomingEvents())
+    router.Get("/api/v1/events/previous", handler.GetPreviousEvents())
     router.Get("/api/v1/events/{id}", handler.GetByIDHandler())
     router.Put("/api/v1/events", handler.UpdateHandler())
     router.Delete("/api/v1/events/{id}", handler.DeleteHandler())
