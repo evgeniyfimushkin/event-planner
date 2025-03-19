@@ -74,8 +74,13 @@ func (s *EventService) Create(claims jwt.MapClaims, entity *models.Event) (*mode
 func (s *EventService) Update(claims jwt.MapClaims, entity *models.Event) (*models.Event, error) {
     now := time.Now()
     oneYearLater := now.AddDate(1, 0, 0)
+    
+    oldEntiry, err := s.GenericService.GetByID(claims, int(entity.ID))
+    if err != nil {
+        return nil, fmt.Errorf("error get event from repository")
+    }
 
-    if entity.StartTime.Before(now) {
+    if entity.StartTime != oldEntiry.StartTime && entity.StartTime.Before(now) {
         return nil, fmt.Errorf("start time cannot be in the past")
     }
     if entity.StartTime.After(oneYearLater) {
