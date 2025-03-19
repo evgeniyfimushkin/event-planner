@@ -79,6 +79,7 @@ func (s *serverAPI) RemoveRegistration(ctx context.Context, req *events.RemoveRe
     event.Participants = event.Participants - 1
     _, err = s.service.Update(nil, event)
     if err != nil {
+        fmt.Println(err)
         return &events.RemoveRegistrationResponse {
             Status: events.ReserveStatus_INTERNAL_ERROR,
         }, nil
