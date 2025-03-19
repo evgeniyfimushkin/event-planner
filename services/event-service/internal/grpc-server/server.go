@@ -30,7 +30,6 @@ func (s *serverAPI) CheckAndReserve(ctx context.Context, req *events.CheckAndRes
     }
 
     if strings.TrimSpace(req.Username) == strings.TrimSpace(event.CreatedBy) {
-        fmt.Println("HELLLLOO")
         return &events.CheckAndReserveResponse{
             Status: events.ReserveStatus_RESERVE_STATUS_UNSPECIFIED,
         }, nil
@@ -45,6 +44,7 @@ func (s *serverAPI) CheckAndReserve(ctx context.Context, req *events.CheckAndRes
     event.Participants = event.Participants + 1
     updatedEvent, err := s.service.Update(nil, event)
     if err != nil {
+        fmt.Println(fmt.Errorf("error creating update events: %w", err))
         return &events.CheckAndReserveResponse {
             Status: events.ReserveStatus_INTERNAL_ERROR,
         }, nil
