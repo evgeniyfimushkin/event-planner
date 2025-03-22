@@ -4,10 +4,14 @@ import { useState } from "react";
 import ModalWindow from "../misc/ModalWindow";
 import { explainRequestError, localDate } from "../../services/Utilities";
 import axios from "axios";
+import { useEffect } from "react";
+import { authCall } from "../../services/Utilities";
 
-export default function Card({event, subscribedInitially}) {
+export default function Card({event}) {
     const [showModal, setShowModal] = useState(false);
-    const [subscribed, setSubscribed] = useState(subscribedInitially);
+    const [subscribed, setSubscribed] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const {
         id,
@@ -50,6 +54,31 @@ export default function Card({event, subscribedInitially}) {
         }
     }
 
+    const fetchSubscribed = async () => {
+        try {
+            await authCall(async () => { // success
+                setLoading(true);
+                const responseSubscriptions = await axios.get("/api/v1/registrations/my");
+                setSubscribed(responseSubscriptions.data.some(s=>s.event_id === id));
+            }, (err) => { // unauthorized
+                logout();
+                navigate("/login");
+            });
+        } catch (err) {
+            setError("Не удалось загрузить статус записи!\n"+explainRequestError(err));
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchSubscribed();
+    }, []);
+
+    // if (loading) return <p>Загрузка...</p>;
+    // if (error) return <p>{error}</p>;
+
     return (
         <>
         <div className="card" onClick={()=>setShowModal(true)}>
@@ -66,11 +95,11 @@ export default function Card({event, subscribedInitially}) {
             {end_time && <p className="endTime">Окончание: {localDate(new Date(end_time))}</p>}
             {category && <p className="category">{category}</p>}
             {/* todo refresh */}
-            {subscribed && <>
+            {!loading && !error && (subscribed && <>
                 <input type="button" value="Отписаться" onClick={unsubscribe} />
             </> || <>
                 <input type="button" value="Записаться" onClick={subscribe} />
-            </>}
+            </>)}
         </div>
         </>
     )

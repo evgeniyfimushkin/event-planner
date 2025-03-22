@@ -5,7 +5,7 @@ import ModalWindow from "../misc/ModalWindow";
 import Card from "./Card";
 import { localDate } from "../../services/Utilities";
 
-export default function Minicard({event, subscribed}) {
+export default function Minicard({event}) {
     const [showModal, setShowModal] = useState(false);
     const {
         id,
@@ -34,7 +34,7 @@ export default function Minicard({event, subscribed}) {
             {start_time && <p className="startTime">Начало: {localDate(new Date(start_time))}</p>}
             {showModal && createPortal(
                 <ModalWindow onClose={()=>{setShowModal(false);}}>
-                    <Card event={event} subscribedInitially={subscribed} />
+                    <Card event={event} />
                 </ModalWindow>,
                 document.body
             )}

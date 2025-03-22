@@ -6,7 +6,7 @@ export default function Grid({cards=[], subscriptions=[]}) {
         <div className="container">
             <div className="grid">
                 {cards.map((card,index) => (
-                    <Minicard key={card.id} event={card} subscribed={subscriptions.some(c=>c.event_id === card.id)}/>
+                    <Minicard key={card.id} event={card} />
                 ))}
             </div>
         </div>
