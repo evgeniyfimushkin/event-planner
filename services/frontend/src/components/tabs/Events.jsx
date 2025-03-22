@@ -8,6 +8,7 @@ import ModalWindow from "../misc/ModalWindow";
 import CreateEvent from "../event/CreateEvent";
 import { authCall, explainRequestError } from "../../services/Utilities";
 import AuthContext from "../../services/AuthContext";
+import "./Events.css";
 
 export default function Events() {
     const [events, setEvents] = useState([]);
@@ -17,14 +18,22 @@ export default function Events() {
     const [showCreateEvent, setShowCreateEvent] = useState(false);
     const { logout } = useContext(AuthContext);
     const navigate = useNavigate();
+    const [query, setQuery] = useState("");
 
-    const fetchData = async () => {
+    const fetchData = async (e) => {
+        setLoading(true);
+        setError(null);
         try {
             await authCall(async () => { // success
                 setLoading(true);
-                const responseEvents = await axios.get("/api/v1/events");
+                if (query) {
+                    const responseEvents = await axios.get(`/api/v1/events/search?${query}`);
+                    setEvents(responseEvents.data);
+                } else {
+                    const responseEvents = await axios.get("/api/v1/events");
+                    setEvents(responseEvents.data);
+                }
                 const responseSubscriptions = await axios.get("/api/v1/registrations/my");
-                setEvents(responseEvents.data);
                 setSubscriptions(responseSubscriptions.data);
                 // console.log(response.data);
             }, (err) => { // unauthorized
@@ -39,22 +48,34 @@ export default function Events() {
         }
     }
 
+    const search = async (e) => {
+        e.preventDefault();
+        fetchData();
+    }
+
     useEffect(() => {
         fetchData();
     }, []);
 
-    if (loading) return <p>Загрузка...</p>;
-    if (error) return <p>{error}</p>;
-
     return (
         <>
-            <Grid cards={events} subscriptions={subscriptions} />
-            <FloatingButton text="Добавить мероприятие" onClick={()=>setShowCreateEvent(true)} />
-            {showCreateEvent && createPortal(
-                <ModalWindow onClose={()=>{setShowCreateEvent(false);fetchData()}}>
-                    <CreateEvent />
-                </ModalWindow>, document.body
-            )}
+            <form className="search" onSubmit={search}>
+                <input type="text" placeholder="Запрос" value={query} onChange={(e) => setQuery(e.target.value)} />
+                <button type="submit">Поиск</button>
+            </form>
+            {
+                (loading && <p>Загрузка...</p>) ||
+                (error && <p>{error}</p> ) ||
+                <>
+                    <Grid cards={events} subscriptions={subscriptions} />
+                    <FloatingButton text="Добавить мероприятие" onClick={()=>setShowCreateEvent(true)} />
+                    {showCreateEvent && createPortal(
+                        <ModalWindow onClose={()=>{setShowCreateEvent(false);fetchData()}}>
+                            <CreateEvent />
+                        </ModalWindow>, document.body
+                    )}
+                </>
+            }
         </>
     );
 }
