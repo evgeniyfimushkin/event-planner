@@ -19,6 +19,7 @@ export default function Events() {
     const { logout } = useContext(AuthContext);
     const navigate = useNavigate();
     const [query, setQuery] = useState("");
+    const [includePrevious, setIncludePrevious] = useState(false);
 
     const fetchData = async (e) => {
         setLoading(true);
@@ -26,12 +27,14 @@ export default function Events() {
         try {
             await authCall(async () => { // success
                 setLoading(true);
+                let events
                 if (query) {
                     const responseEvents = await axios.get(`/api/v1/events/search?${query}`);
                     setEvents(responseEvents.data);
                 } else {
                     const responseEvents = await axios.get("/api/v1/events");
-                    setEvents(responseEvents.data);
+                    const responseEventsPrevious = includePrevious ? await axios.get("/api/v1/events/previous") : {data: []};
+                    setEvents([...responseEventsPrevious.data, ...responseEvents.data]);
                 }
                 const responseSubscriptions = await axios.get("/api/v1/registrations/my");
                 setSubscriptions(responseSubscriptions.data);
@@ -55,7 +58,7 @@ export default function Events() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [includePrevious]);
 
     return (
         <>
@@ -63,6 +66,14 @@ export default function Events() {
                 <input type="text" placeholder="Запрос" value={query} onChange={(e) => setQuery(e.target.value)} />
                 <button type="submit">Поиск</button>
             </form>
+            {!query && <>
+                <div className="options">
+                    <label>
+                        Включить предыдущие мероприятия
+                        <input id="includePrevious" type="checkbox" value={includePrevious} onChange={e => {setIncludePrevious(e.target.checked)}} />
+                    </label>
+                </div>
+            </>}
             {
                 (loading && <p>Загрузка...</p>) ||
                 (error && <p>{error}</p> ) ||
