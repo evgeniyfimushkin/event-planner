@@ -41,7 +41,7 @@ export default function Card({event, subscribedInitially}) {
     const unsubscribe = async (e) => {
         try {
             const refresh = await axios.get("/api/v1/auth/refresh");
-            const res = await axios.delete("/api/v1/registrations", { params: {event_id: id} });
+            const res = await axios.delete("/api/v1/registrations", { data: {event_id: id} });
             alert("Вы отписаны от события!");
             setSubscribed(false);
         } catch (error) {
