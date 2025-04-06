@@ -1,12 +1,16 @@
-import Tab from "./Tab.jsx"
+import React from "react";
+
+import Tab from "./Tab.js"
 import "./Menu.css"
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
 
-export default function Dropdown({items=[]}) {
+export default function Dropdown({items=[]}: {
+    items: Array<[string, string?]>
+}) {
     const location = useLocation();
-    const currentTab = items.find(e=>e[1]===location.pathname)?.[0] || "Меню";
-    const [showItems, setShowItems] = useState(false);
+    const currentTab: string = items.find(e=>e[1]===location.pathname)?.[0] || "Меню";
+    const [showItems, setShowItems] = useState<boolean>(false);
     const toggleState = () => {
         setShowItems(!showItems);
     }

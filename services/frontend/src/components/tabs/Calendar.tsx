@@ -1,18 +1,20 @@
+import React from "react";
+
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
-import ModalWindow from "../misc/ModalWindow";
-import { authCall, explainRequestError } from "../../services/Utilities";
-import AuthContext from "../../services/AuthContext";
-import CalendarGrid from "../calendar/CalendarGrid";
+import ModalWindow from "../misc/ModalWindow.jsx";
+import { authCall, explainRequestError } from "../../utilities/Utilities.js";
+import AuthContext from "../../services/AuthContext.jsx";
+import CalendarGrid from "../calendar/CalendarGrid.tsx";
+import { Event, Registration } from "../../utilities/Types.ts";
 
 export default function Calendar() {
-    const [events, setEvents] = useState([]);
-    const [subscriptions, setSubscriptions] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    // const [showCreateEvent, setShowCreateEvent] = useState(false);
+    const [events, setEvents] = useState<Array<Event>>([]);
+    const [subscriptions, setSubscriptions] = useState<Array<Registration>>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<null | string>(null);
     const { logout } = useContext(AuthContext);
     const navigate = useNavigate();
 

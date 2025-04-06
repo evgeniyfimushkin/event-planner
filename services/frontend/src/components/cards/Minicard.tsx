@@ -1,12 +1,17 @@
+import React from "react";
+
 import { createPortal } from "react-dom";
 import "./Cards.css"
 import { useState } from "react";
 import ModalWindow from "../misc/ModalWindow";
 import Card from "./Card";
-import { localDate } from "../../services/Utilities";
+import { localDate } from "../../utilities/Utilities";
+import { Event } from "../../utilities/Types";
 
-export default function Minicard({event}) {
-    const [showModal, setShowModal] = useState(false);
+export default function Minicard({event}: {
+    event: Event
+}) {
+    const [showModal, setShowModal] = useState<boolean>(false);
     const {
         id,
         name,
@@ -18,13 +23,13 @@ export default function Minicard({event}) {
         longitude,
         start_time,
     } = event;
-    const coords = (latitude && longitude) && "координаты " + latitude + " " + longitude;
-    const fullAddress = [city, address, coords].filter(e=>e).join(", ");
+    const coords: string | false = (["latitude", "longitude"].every(e=>e in event)) && "координаты " + latitude + " " + longitude;
+    const fullAddress: string = [city, address, coords].filter(e=>e).join(", ");
     return (
         <>
         <div className="card mini" onClick={()=>setShowModal(true)}>
             <div className="line">
-                {image_data && <img src={image_data || null}/>}
+                {image_data && <img src={image_data}/>}
                 <h1 className="title">{name}</h1>
                 {description && <p className="description">{description}</p>}
             </div>

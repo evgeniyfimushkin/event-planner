@@ -1,7 +1,13 @@
+import React from "react"
+
 import Minicard from "./Minicard.jsx"
 import "./Cards.css"
+import { Event, Registration } from "../../utilities/Types"
 
-export default function Grid({cards=[], subscriptions=[]}) {
+export default function Grid({cards=[], subscriptions=[]}: {
+    cards: Array<Event>,
+    subscriptions: Array<Registration>
+}) {
     return (
         <div className="container">
             <div className="grid">

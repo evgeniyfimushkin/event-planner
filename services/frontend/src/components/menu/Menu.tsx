@@ -1,3 +1,5 @@
+import React from "react"
+
 import Bar from "./Bar"
 import Dropdown from "./Dropdown"
 import "./Menu.css"

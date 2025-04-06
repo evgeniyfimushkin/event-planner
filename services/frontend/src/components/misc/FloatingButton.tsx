@@ -1,10 +1,16 @@
-import "./FloatingButton.css"
+import React from "react";
+
+import "./FloatingButton.css";
 import { useNavigate } from "react-router-dom";
 
-export default function FloatingButton({text, onClick, target}) {
+export default function FloatingButton({text, onClick, target}: {
+    text: string,
+    onClick?: ()=>void,
+    target?: string
+}) {
     const navigate = useNavigate();
     const redirect = () => {
-        navigate(target);
+        navigate(target as string);
     }
     return (
         <input className="floatingButton" type="button" value={text} onClick={()=>{

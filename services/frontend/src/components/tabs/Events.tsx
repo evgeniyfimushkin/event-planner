@@ -1,3 +1,5 @@
+import React from "react";
+
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Grid from "../cards/Grid";
@@ -6,28 +8,29 @@ import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import ModalWindow from "../misc/ModalWindow";
 import CreateEvent from "../event/CreateEvent";
-import { authCall, explainRequestError } from "../../services/Utilities";
+import { authCall, explainRequestError } from "../../utilities/Utilities";
 import AuthContext from "../../services/AuthContext";
 import "./Events.css";
+import { Event, Registration } from "../../utilities/Types";
 
 export default function Events() {
-    const [events, setEvents] = useState([]);
-    const [subscriptions, setSubscriptions] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [showCreateEvent, setShowCreateEvent] = useState(false);
+    const [events, setEvents] = useState<Array<Event>>([]);
+    const [subscriptions, setSubscriptions] = useState<Array<Registration>>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [showCreateEvent, setShowCreateEvent] = useState<boolean>(false);
     const { logout } = useContext(AuthContext);
     const navigate = useNavigate();
-    const [query, setQuery] = useState("");
-    const [includePrevious, setIncludePrevious] = useState(false);
+    const [query, setQuery] = useState<string>("");
+    const [includePrevious, setIncludePrevious] = useState<boolean>(false);
 
-    const fetchData = async (e) => {
+    const fetchData = async (e?) => {
         setLoading(true);
         setError(null);
         try {
             await authCall(async () => { // success
                 setLoading(true);
-                let events
+                let events;
                 if (query) {
                     const responseEvents = await axios.get(`/api/v1/events/search?${query}`);
                     setEvents(responseEvents.data);
@@ -70,7 +73,7 @@ export default function Events() {
                 <div className="options">
                     <label>
                         Включить предыдущие мероприятия
-                        <input id="includePrevious" type="checkbox" value={includePrevious} onChange={e => {setIncludePrevious(e.target.checked)}} />
+                        <input id="includePrevious" type="checkbox" checked={includePrevious} onChange={e => {setIncludePrevious(e.target.checked)}} />
                     </label>
                 </div>
             </>}

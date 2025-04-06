@@ -1,13 +1,13 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
-export function localDate(date) {
+export function localDate(date: Date): string {
     return date.toLocaleString("ru", {
         dateStyle: "medium",
         timeStyle: "long",
     });
 }
 
-export async function authCall(request, handler401) {
+export async function authCall(request: (...args: any[]) => any, handler401: (...args: any[]) => any) {
     const handlerOther = (err) => {
         throw new Error("Auth call error (not 401)", {cause: err});
     }
@@ -34,8 +34,8 @@ export async function authCall(request, handler401) {
     }
 };
 
-export function explainRequestError(error) {
-    return (error.response)
-        ? `Статус ответа: ${error.response.status}\nСообщение:\n${error.response.data}`
+export function explainRequestError(error: Error | AxiosError) {
+    return (axios.isAxiosError(error))
+        ? `Статус ответа: ${error.response?.status}\nСообщение:\n${error.response?.data}`
         : `Сообщение библиотеки:\n${error.message}`;
 }

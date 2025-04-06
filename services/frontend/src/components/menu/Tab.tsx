@@ -1,6 +1,13 @@
+import React from "react";
+
 import "./Menu.css";
 
-export default function Tab({title, target, onClick, isOpen}) {
+export default function Tab({title, target, onClick, isOpen}: {
+    title: string,
+    target?: string,
+    onClick?: ()=>void,
+    isOpen?: boolean,
+}) {
     return (
         <div className={"tab " + (isOpen && "open" || "")} onClick={onClick || (()=>{})}>
             {target

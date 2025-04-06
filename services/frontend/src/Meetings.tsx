@@ -1,3 +1,5 @@
+import React from 'react';
+
 import './Meetings.css'
 import Bar from "./components/menu/Bar.jsx"
 import Grid from "./components/cards/Grid.jsx"
@@ -9,7 +11,7 @@ import Register from './components/auth/Register.jsx';
 import PrivateRoute from './services/PrivateRoute.jsx';
 import CreateEvent from './components/event/CreateEvent.jsx';
 import Events from './components/tabs/Events.jsx';
-import Calendar from './components/tabs/Calendar.jsx';
+import Calendar from './components/tabs/Calendar.tsx';
 import Dropdown from './components/menu/Dropdown.jsx';
 import Menu from './components/menu/Menu.jsx';
 

@@ -1,8 +1,11 @@
+import React from "react";
+
 import "./Event.css"
 
 import { useState, useContext } from "react";
 import axios from "axios";
-import { explainRequestError } from "../../services/Utilities";
+import { explainRequestError } from "../../utilities/Utilities";
+import { Event } from "../../utilities/Types";
 
 export default function CreateEvent({}) {
     const [name, setName] = useState("Без названия");
@@ -21,7 +24,7 @@ export default function CreateEvent({}) {
         e.preventDefault();
         try {
             await axios.get("/api/v1/auth/refresh");
-            const pack = {
+            const pack: Event = {
                 name,
                 description,
                 category,
@@ -50,11 +53,11 @@ export default function CreateEvent({}) {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => {
-            setImageData(reader.result);
+            setImageData(reader.result as string);
         };
-        reader.onerror = (error) => {
-            alert("Невозможно загрузить изображение!\n"+error.message)
-            console.error(error);
+        reader.onerror = (pe) => {
+            alert("Невозможно загрузить изображение!\n"+reader.error)
+            console.error(reader.error);
         };
     };
 
@@ -62,27 +65,27 @@ export default function CreateEvent({}) {
         <div className="create-event">
             <h1>Создать мероприятие</h1>
             <form onSubmit={createEvent} className="form">
-                    <label for="name">Название:</label>
+                    <label htmlFor="name">Название:</label>
                     <input id="name" type="text" value={name} onChange={e=>setName(e.target.value)} required />
-                    <label for="desctiption">Описание:</label>
-                    <textarea id="description" type="text" value={description} onChange={e=>setDescription(e.target.value)} required />
-                    <label for="category">Категория:</label>
+                    <label htmlFor="desctiption">Описание:</label>
+                    <textarea id="description" value={description} onChange={e=>setDescription(e.target.value)} required />
+                    <label htmlFor="category">Категория:</label>
                     <input id="category" type="text" value={category} onChange={e=>setCategory(e.target.value)} required />
-                    <label for="maxParticipants">Участники:</label>
-                    <input id="maxParticipants" type="number" min="1" value={maxParticipants} onChange={e=>setMaxParticipants(e.target.value)} required />
-                    <label for="imageData">Иконка:</label>
+                    <label htmlFor="maxParticipants">Участники:</label>
+                    <input id="maxParticipants" type="number" min="1" value={maxParticipants} onChange={e=>setMaxParticipants(+e.target.value)} required />
+                    <label htmlFor="imageData">Иконка:</label>
                     <input id="imageData" type="file" accept="image/*" onChange={e=>handleImageData(e)} />
-                    <label for="city">Город:</label>
+                    <label htmlFor="city">Город:</label>
                     <input id="city" type="text" value={city} onChange={e=>setCity(e.target.value)} />
-                    <label for="address">Адрес:</label>
+                    <label htmlFor="address">Адрес:</label>
                     <input id="address" type="text" value={address} onChange={e=>setAddress(e.target.value)} />
-                    <label for="latitude">Широта:</label>
-                    <input id="latitude" type="number" min="-90" max="90" value={latitude} onChange={e=>setLatitude(e.target.value)} />
-                    <label for="longitude">Долгота:</label>
-                    <input id="longitude" type="number" value={longitude} min="-180" max="180" onChange={e=>setLongitude(e.target.value)} />
-                    <label for="startTime">Время начала:</label>
+                    <label htmlFor="latitude">Широта:</label>
+                    <input id="latitude" type="number" min="-90" max="90" value={latitude} onChange={e=>setLatitude(+e.target.value)} />
+                    <label htmlFor="longitude">Долгота:</label>
+                    <input id="longitude" type="number" value={longitude} min="-180" max="180" onChange={e=>setLongitude(+e.target.value)} />
+                    <label htmlFor="startTime">Время начала:</label>
                     <input id="startTime" type="datetime-local" value={startTime} onChange={e=>setStartTime(e.target.value)} required />
-                    <label for="endTime">Время окончания:</label>
+                    <label htmlFor="endTime">Время окончания:</label>
                     <input id="endTime" type="datetime-local" value={endTime} onChange={e=>setEndTime(e.target.value)} />
                 <button type="submit">Создать мероприятие</button>
             </form>

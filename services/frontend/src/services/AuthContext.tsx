@@ -1,14 +1,26 @@
+import React from "react";
+
 import { createContext, useState, useEffect } from "react";
 import { useCookies } from "react-cookie";
 
-const AuthContext = createContext();
+interface AuthContextType {
+    loggedIn: boolean,
+    login: ()=>void,
+    logout: ()=>void,
+};
+
+const AuthContext = createContext<AuthContextType>({
+    loggedIn: false,
+    login: ()=>console.error("login(): Некорректное использование AuthContext"),
+    logout: ()=>console.error("logout(): Некорректное использование AuthContext"),
+});
 
 export const AuthProvider = ({ children }) => {
     // const [token, setToken] = useState(localStorage.getItem("token") || null);
     const [cookies, setCookie, removeCookie] = useCookies(["access_token", "refresh_token"]);
     // const [setAccessToken] = useState(cookies?.access_token || null);
     // const [setRefreshToken] = useState(cookies?.refresh_token || null);
-    const [loggedIn, setLoggedIn] = useState(localStorage.getItem("loggedIn") || false);
+    const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem("loggedIn") || false);
 
     const login = () => {
         // setToken(newToken);
@@ -20,7 +32,7 @@ export const AuthProvider = ({ children }) => {
         // setCookie("access_token", newTokens.access_token, {path: "/"});
         // setCookie("refresh_token", newTokens.refresh_token, {path: "/"});
         setLoggedIn(true);
-        localStorage.setItem("loggedIn", true);
+        localStorage.setItem("loggedIn", ""+true);
     };
 
     const logout = () => {

@@ -1,3 +1,5 @@
+import React from "react";
+
 import "./Auth.css"
 
 import { useState, useContext } from "react";
@@ -5,18 +7,18 @@ import axios from "axios";
 import AuthContext from "../../services/AuthContext";
 import { useNavigate } from "react-router-dom";
 import CryptoJS from "crypto-js";
-import { explainRequestError } from "../../services/Utilities";
+import { explainRequestError } from "../../utilities/Utilities";
 
 export default function Login({}) {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const [username, setUsername] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const passhash = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+            const passhash: string = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
             const res = await axios.post("/api/v1/auth/login", { username, passhash });
 
             // const fr = await fetch("http://localhost/api/v1/auth/login", {
