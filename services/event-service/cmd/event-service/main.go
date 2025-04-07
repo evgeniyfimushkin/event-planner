@@ -24,6 +24,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+    "github.com/go-chi/httprate"
 )
 
 
@@ -68,7 +69,6 @@ func main(){
     router.Use(middleware.Recoverer)
     router.Use(middleware.URLFormat)
 
-    router.Post("/api/v1/events", handler.CreateHandler())
     router.Get("/api/v1/events", handler.GetUpcomingEvents())
     router.Get("/api/v1/events/previous", handler.GetPreviousEvents())
     router.Get("/api/v1/events/{id}", handler.GetByIDHandler())
@@ -79,10 +79,11 @@ func main(){
     router.Get("/api/v1/events/search/first", handler.FindFirstHandler())
     router.Get("/api/v1/events/count", handler.CountHandler())
     router.Get("/api/v1/events/page", handler.GetPageHandler())
-    router.Post("/api/v1/events/bulk", handler.BulkInsertHandler())
     router.Put("/api/v1/events/bulk", handler.BulkUpdateHandler())
 
-
+    registerLimiter := httprate.LimitByRealIP(5, 1*time.Minute)
+    router.With(registerLimiter).Post("/api/v1/events", handler.CreateHandler())
+    router.With(registerLimiter).Post("/api/v1/events/bulk", handler.BulkInsertHandler())
 
     srv := &http.Server{
         Addr: fmt.Sprintf("%s:%d",cfg.Server.Addr, cfg.Server.Port),

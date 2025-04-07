@@ -54,7 +54,7 @@ func main(){
     router.Use(middleware.URLFormat)
     router.Post("/api/v1/auth/login", handler.Login(loginService))
     router.Get("/api/v1/auth/refresh", handler.Refresh(refreshService))
-    registerLimiter := httprate.LimitByIP(5, 1*time.Minute)
+    registerLimiter := httprate.LimitByRealIP(5, 1*time.Minute)
     router.With(registerLimiter).Post("/api/v1/auth/register", handler.Register(registerService))
 
 
