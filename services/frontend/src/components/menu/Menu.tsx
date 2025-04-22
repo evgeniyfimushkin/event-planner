@@ -1,8 +1,8 @@
-import React from "react"
+import "./Menu.css"
 
+import React from "react"
 import Bar from "./Bar"
 import Dropdown from "./Dropdown"
-import "./Menu.css"
 import { menuItems } from "../../assets/Relations"
 
 export default function Menu() {

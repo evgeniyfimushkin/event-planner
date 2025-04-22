@@ -1,5 +1,6 @@
-import React from "react";
+import "./Events.css";
 
+import React from "react";
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Grid from "../cards/Grid";
@@ -10,7 +11,6 @@ import ModalWindow from "../misc/ModalWindow";
 import CreateEvent from "../event/CreateEvent";
 import { authCall, explainRequestError } from "../../utilities/Utilities";
 import AuthContext from "../../services/AuthContext";
-import "./Events.css";
 import { Event, Registration } from "../../utilities/Types";
 
 export default function Events() {
@@ -41,7 +41,6 @@ export default function Events() {
                 }
                 const responseSubscriptions = await axios.get("/api/v1/registrations/my");
                 setSubscriptions(responseSubscriptions.data);
-                // console.log(response.data);
             }, (err) => { // unauthorized
                 signOut();
                 navigate("/signIn");
@@ -53,7 +52,6 @@ export default function Events() {
             setLoading(false);
         }
     }
-
     const search = async (e) => {
         e.preventDefault();
         fetchData();

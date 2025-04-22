@@ -1,9 +1,7 @@
-import React, { useContext } from "react";
-
-import { createPortal } from "react-dom";
 import "./Cards.css"
+
+import React, { useContext } from "react";
 import { useState } from "react";
-import ModalWindow from "../misc/ModalWindow";
 import { explainRequestError, localDate } from "../../utilities/Utilities";
 import axios from "axios";
 import { useEffect } from "react";
@@ -15,13 +13,11 @@ import AuthContext from "../../services/AuthContext";
 export default function Card({event}: {
     event: Event
 }) {
-    const [showModal, setShowModal] = useState<boolean>(false);
     const [subscribed, setSubscribed] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const { signOut } = useContext(AuthContext);
     const navigate = useNavigate();
-
     const {
         id,
         name,
@@ -62,7 +58,6 @@ export default function Card({event}: {
             console.error(error);
         }
     }
-
     const fetchSubscribed = async () => {
         try {
             await authCall(async () => { // success
@@ -85,12 +80,9 @@ export default function Card({event}: {
         fetchSubscribed();
     }, []);
 
-    // if (loading) return <p>Загрузка...</p>;
-    // if (error) return <p>{error}</p>;
-
     return (
         <>
-        <div className="card" onClick={()=>setShowModal(true)}>
+        <div className="card">
             <div className="line">
                 {image_data && <img src={image_data}/>}
                 <h1 className="title">{name}</h1>

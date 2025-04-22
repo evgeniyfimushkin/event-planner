@@ -1,7 +1,7 @@
-import React from "react"
-
-import Tab from "./Tab.jsx"
 import "./Menu.css"
+
+import React from "react"
+import Tab from "./Tab.jsx"
 
 export default function Bar({items=[]}: {
     items: Array<[string, string?]>

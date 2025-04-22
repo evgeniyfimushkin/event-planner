@@ -1,6 +1,6 @@
-import React from "react";
-
 import "./Menu.css";
+
+import React from "react";
 
 export default function Tab({title, target, onClick, isOpen}: {
     title: string,

@@ -1,7 +1,6 @@
-import React from "react";
-
 import "./Auth.css"
 
+import React from "react";
 import { useState, useContext } from "react";
 import axios from "axios";
 import CryptoJS from "crypto-js";
@@ -18,7 +17,7 @@ export default function SignUp({}) {
         e.preventDefault();
         try {
             const passhash: string = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
-            const res = await axios.post("/api/v1/auth/register", { username, email, passhash });
+            await axios.post("/api/v1/auth/register", { username, email, passhash });
             alert("Зарегистрировано!")
             navigate("/signIn");
         } catch (error) {

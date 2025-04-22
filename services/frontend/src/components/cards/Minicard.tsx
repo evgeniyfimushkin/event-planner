@@ -1,7 +1,7 @@
-import React from "react";
-
-import { createPortal } from "react-dom";
 import "./Cards.css"
+
+import React from "react";
+import { createPortal } from "react-dom";
 import { useState } from "react";
 import ModalWindow from "../misc/ModalWindow";
 import Card from "./Card";
@@ -25,8 +25,8 @@ export default function Minicard({event}: {
     } = event;
     const coords: string | false = (["latitude", "longitude"].every(e=>e in event)) && "координаты " + latitude + " " + longitude;
     const fullAddress: string = [city, address, coords].filter(e=>e).join(", ");
+
     return (
-        <>
         <div className="card mini" onClick={()=>setShowModal(true)}>
             <div className="line">
                 {image_data && <img src={image_data}/>}
@@ -44,6 +44,5 @@ export default function Minicard({event}: {
                 document.body
             )}
         </div>
-        </>
     )
 }

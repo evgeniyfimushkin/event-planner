@@ -1,7 +1,6 @@
-import React from "react";
-
 import "./Event.css"
 
+import React from "react";
 import { useState, useContext } from "react";
 import axios from "axios";
 import { explainRequestError } from "../../utilities/Utilities";
@@ -49,7 +48,6 @@ export default function CreateEvent({}) {
     const handleImageData = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => {

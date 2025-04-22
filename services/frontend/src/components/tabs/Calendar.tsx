@@ -1,10 +1,7 @@
 import React from "react";
-
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { createPortal } from "react-dom";
-import ModalWindow from "../misc/ModalWindow.js";
 import { authCall, explainRequestError } from "../../utilities/Utilities.js";
 import AuthContext from "../../services/AuthContext.jsx";
 import CalendarGrid from "../calendar/CalendarGrid.tsx";
@@ -46,15 +43,6 @@ export default function Calendar() {
     if (error) return <p>{error}</p>;
 
     return (
-        <>
-            <CalendarGrid events={events.filter(e => subscriptions.some(s => s.event_id === e.id))} />
-            {/* <Grid cards={events} subscriptions={subscriptions} />
-            <FloatingButton text="Добавить мероприятие" onClick={()=>setShowCreateEvent(true)} /> */}
-            {/* {showCreateEvent && createPortal(
-                <ModalWindow onClose={()=>{setShowCreateEvent(false);fetchData()}}>
-                    <CreateEvent />
-                </ModalWindow>, document.body
-            )} */}
-        </>
+        <CalendarGrid events={events.filter(e => subscriptions.some(s => s.event_id === e.id))} />
     );
 }

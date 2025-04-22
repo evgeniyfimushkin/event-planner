@@ -1,7 +1,6 @@
-import React from "react";
-
 import "./Auth.css"
 
+import React from "react";
 import { useState, useContext } from "react";
 import axios from "axios";
 import AuthContext from "../../services/AuthContext";
@@ -19,25 +18,10 @@ export default function SignIn({}) {
         e.preventDefault();
         try {
             const passhash: string = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
-            const res = await axios.post("/api/v1/auth/login", { username, passhash });
-
-            // const fr = await fetch("http://localhost/api/v1/auth/login", {
-            //     method: "POST",
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify({ username, passhash }),
-            // });
-
-            // signIn({
-            //     "access_token": res.data.access_token,
-            //     "refresh_token": res.data.refresh_token,
-            // });
+            await axios.post("/api/v1/auth/login", { username, passhash });
             signIn();
-            alert("Подключено!");
-            const refresh = await axios.get("/api/v1/auth/refresh");
+            await axios.get("/api/v1/auth/refresh");
             navigate("/");
-            // console.log(res.headers);
         } catch (error) {
             alert("Ошибка подключения!\n"+explainRequestError(error));
             console.error(error);

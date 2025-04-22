@@ -1,7 +1,7 @@
-import React from "react";
-
-import Tab from "./Tab.js"
 import "./Menu.css"
+
+import React from "react";
+import Tab from "./Tab.js"
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
 
@@ -14,6 +14,7 @@ export default function Dropdown({items=[]}: {
     const toggleState = () => {
         setShowItems(!showItems);
     }
+    
     return (
         <div className="dropdown">
             <Tab key={-1} title={currentTab} onClick={toggleState} isOpen={showItems} />

@@ -1,6 +1,6 @@
-import React from "react";
-
 import "./ModalWindow.css";
+
+import React from "react";
 
 export default function ModalWindow({ children, onClose }: {
     children: React.JSX.Element,

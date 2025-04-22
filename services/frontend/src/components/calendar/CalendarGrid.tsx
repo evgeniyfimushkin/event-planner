@@ -1,17 +1,15 @@
-import React from "react";
-
-import Minicard from "../cards/Minicard";
 import "./Calendar.css";
+
+import React from "react";
+import Minicard from "../cards/Minicard";
 import { Event } from "../../utilities/Types";
 
 export default function CalendarGrid({events=[]}: {
     events: Array<Event>
 }) {
-
     const getCurrentDate = () => {
         return new Date();
     }
-
     const isEventNow = (event: Event, day: number, hour: number) => {
         const eventDate = new Date(event.start_time);
         const date = getCurrentDate();
@@ -43,29 +41,25 @@ export default function CalendarGrid({events=[]}: {
         rangeHour.push(hour);
     }
 
-    const grid = <div className="calendar">
-        <table className="calendar">
-            <caption>{getCurrentDate().toLocaleString("ru", {month: "long", year: "numeric"})}</caption>
-            <thead>
-                <tr>
-                    <td>\</td>
-                    {rangeDate.map((day,di)=><td key={di}>{day}</td>)}
-                </tr>
-            </thead>
-            <tbody>
-                {rangeHour.map((hour,hi) => <tr key={hi}>
-                    <td>{hour}:00</td>
-                    {rangeDate.map((day,di) => <td key={di} className={(isToday(day) && "today" || "") + " " + (isNow(hour) && "now" || "")}>
-                        {events.filter(e=>isEventNow(e,day,hour)).map(e=><Minicard event={e} />)}
-                    </td>)}
-                </tr>)}
-            </tbody>
-        </table>
-    </div>
-
     return (
-        <>
-            {grid}
-        </>
+        <div className="calendar">
+            <table className="calendar">
+                <caption>{getCurrentDate().toLocaleString("ru", {month: "long", year: "numeric"})}</caption>
+                <thead>
+                    <tr>
+                        <td>\</td>
+                        {rangeDate.map((day,di)=><td key={di}>{day}</td>)}
+                    </tr>
+                </thead>
+                <tbody>
+                    {rangeHour.map((hour,hi) => <tr key={hi}>
+                        <td>{hour}:00</td>
+                        {rangeDate.map((day,di) => <td key={di} className={(isToday(day) && "today" || "") + " " + (isNow(hour) && "now" || "")}>
+                            {events.filter(e=>isEventNow(e,day,hour)).map(e=><Minicard event={e} />)}
+                        </td>)}
+                    </tr>)}
+                </tbody>
+            </table>
+        </div>
     );
 }
