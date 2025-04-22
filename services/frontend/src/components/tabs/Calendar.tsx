@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
-import ModalWindow from "../misc/ModalWindow.jsx";
+import ModalWindow from "../misc/ModalWindow.js";
 import { authCall, explainRequestError } from "../../utilities/Utilities.js";
 import AuthContext from "../../services/AuthContext.jsx";
 import CalendarGrid from "../calendar/CalendarGrid.tsx";
@@ -15,7 +15,7 @@ export default function Calendar() {
     const [subscriptions, setSubscriptions] = useState<Array<Registration>>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<null | string>(null);
-    const { logout } = useContext(AuthContext);
+    const { signOut } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const fetchData = async () => {
@@ -27,8 +27,8 @@ export default function Calendar() {
                 setEvents(responseEvents.data);
                 setSubscriptions(responseSubscriptions.data);
             }, (err) => { // unauthorized
-                logout();
-                navigate("/login");
+                signOut();
+                navigate("/signIn");
             });
         } catch (err) {
             setError("Не удалось загрузить мероприятия!\n"+explainRequestError(err));

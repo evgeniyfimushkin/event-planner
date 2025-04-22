@@ -1,26 +1,26 @@
 import React from 'react';
 
-import './Meetings.css'
-import Bar from "./components/menu/Bar.jsx"
-import Grid from "./components/cards/Grid.jsx"
-import Login from './components/auth/Login.jsx'
+import './App.css'
+import Bar from "./components/menu/Bar.js"
+import Grid from "./components/cards/Grid.js"
+import SignIn from './components/auth/SignIn.tsx'
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./services/AuthContext.jsx";
-import Register from './components/auth/Register.jsx';
-import PrivateRoute from './services/PrivateRoute.jsx';
-import CreateEvent from './components/event/CreateEvent.jsx';
-import Events from './components/tabs/Events.jsx';
+import { AuthProvider } from "./services/AuthContext.js";
+import SignUp from './components/auth/SignUp.js';
+import PrivateRoute from './services/PrivateRoute.js';
+import CreateEvent from './components/event/CreateEvent.js';
+import Events from './components/tabs/Events.js';
 import Calendar from './components/tabs/Calendar.tsx';
-import Dropdown from './components/menu/Dropdown.jsx';
-import Menu from './components/menu/Menu.jsx';
+import Dropdown from './components/menu/Dropdown.js';
+import Menu from './components/menu/Menu.js';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/signIn" element={<SignIn />} />
           <Route path="/" element={
             <PrivateRoute>
               <Menu />
@@ -38,7 +38,7 @@ function App() {
               <CreateEvent />
             </PrivateRoute>
           }/>
-          <Route path="/register" element={<Register />}/>
+          <Route path="/signUp" element={<SignUp />}/>
         </Routes>
       </Router>
     </AuthProvider>

@@ -4,15 +4,15 @@ import { createContext, useState, useEffect } from "react";
 import { useCookies } from "react-cookie";
 
 interface AuthContextType {
-    loggedIn: boolean,
-    login: ()=>void,
-    logout: ()=>void,
+    signedIn: boolean,
+    signIn: ()=>void,
+    signOut: ()=>void,
 };
 
 const AuthContext = createContext<AuthContextType>({
-    loggedIn: false,
-    login: ()=>console.error("login(): Некорректное использование AuthContext"),
-    logout: ()=>console.error("logout(): Некорректное использование AuthContext"),
+    signedIn: false,
+    signIn: ()=>console.error("signIn(): Некорректное использование AuthContext"),
+    signOut: ()=>console.error("signOut(): Некорректное использование AuthContext"),
 });
 
 export const AuthProvider = ({ children }) => {
@@ -20,9 +20,9 @@ export const AuthProvider = ({ children }) => {
     const [cookies, setCookie, removeCookie] = useCookies(["access_token", "refresh_token"]);
     // const [setAccessToken] = useState(cookies?.access_token || null);
     // const [setRefreshToken] = useState(cookies?.refresh_token || null);
-    const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem("loggedIn") || false);
+    const [signedIn, setSignedIn] = useState(!!localStorage.getItem("signedIn") || false);
 
-    const login = () => {
+    const signIn = () => {
         // setToken(newToken);
         // localStorage.setItem("token", newToken);
         // todo set expiration
@@ -31,11 +31,11 @@ export const AuthProvider = ({ children }) => {
         // setRefreshToken(newTokens.refresh_token);
         // setCookie("access_token", newTokens.access_token, {path: "/"});
         // setCookie("refresh_token", newTokens.refresh_token, {path: "/"});
-        setLoggedIn(true);
-        localStorage.setItem("loggedIn", ""+true);
+        setSignedIn(true);
+        localStorage.setItem("signedIn", ""+true);
     };
 
-    const logout = () => {
+    const signOut = () => {
         // setToken(null);
         // localStorage.removeItem("token");
 
@@ -43,12 +43,12 @@ export const AuthProvider = ({ children }) => {
         // setRefreshToken(null);
         removeCookie("access_token");
         removeCookie("refresh_token");
-        setLoggedIn(false);
-        localStorage.removeItem("loggedIn");
+        setSignedIn(false);
+        localStorage.removeItem("signedIn");
     };
 
     return (
-        <AuthContext.Provider value={{ loggedIn, login, logout }}>
+        <AuthContext.Provider value={{ signedIn, signIn, signOut }}>
             {children}
         </AuthContext.Provider>
     );

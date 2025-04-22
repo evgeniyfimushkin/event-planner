@@ -7,9 +7,9 @@ import AuthContext from "./AuthContext";
 const PrivateRoute = ({ children }: {
     children: React.JSX.Element | React.JSX.Element[]
 }) => {
-    const { loggedIn } = useContext(AuthContext);
-    console.log(loggedIn);
-    return loggedIn ? children : <Navigate to="/login" />;
+    const { signedIn } = useContext(AuthContext);
+    console.log(signedIn);
+    return signedIn ? children : <Navigate to="/signIn" />;
 };
 
 export default PrivateRoute;

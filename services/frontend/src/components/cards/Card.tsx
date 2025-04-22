@@ -19,7 +19,7 @@ export default function Card({event}: {
     const [subscribed, setSubscribed] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const { logout } = useContext(AuthContext);
+    const { signOut } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const {
@@ -70,8 +70,8 @@ export default function Card({event}: {
                 const responseSubscriptions = await axios.get("/api/v1/registrations/my");
                 setSubscribed(responseSubscriptions.data.some(s=>s.event_id === id));
             }, (err) => { // unauthorized
-                logout();
-                navigate("/login");
+                signOut();
+                navigate("/signIn");
             });
         } catch (err) {
             setError("Не удалось загрузить статус записи!\n"+explainRequestError(err));

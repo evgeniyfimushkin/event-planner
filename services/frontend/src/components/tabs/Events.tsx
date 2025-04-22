@@ -19,7 +19,7 @@ export default function Events() {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [showCreateEvent, setShowCreateEvent] = useState<boolean>(false);
-    const { logout } = useContext(AuthContext);
+    const { signOut } = useContext(AuthContext);
     const navigate = useNavigate();
     const [query, setQuery] = useState<string>("");
     const [includePrevious, setIncludePrevious] = useState<boolean>(false);
@@ -43,8 +43,8 @@ export default function Events() {
                 setSubscriptions(responseSubscriptions.data);
                 // console.log(response.data);
             }, (err) => { // unauthorized
-                logout();
-                navigate("/login");
+                signOut();
+                navigate("/signIn");
             });
         } catch (err) {
             setError("Не удалось загрузить мероприятия!\n"+explainRequestError(err));

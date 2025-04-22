@@ -9,13 +9,13 @@ import { useNavigate } from "react-router-dom";
 import CryptoJS from "crypto-js";
 import { explainRequestError } from "../../utilities/Utilities";
 
-export default function Login({}) {
+export default function SignIn({}) {
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    const { login } = useContext(AuthContext);
+    const { signIn } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const handleLogin = async (e) => {
+    const handleSignIn = async (e) => {
         e.preventDefault();
         try {
             const passhash: string = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
@@ -29,11 +29,11 @@ export default function Login({}) {
             //     body: JSON.stringify({ username, passhash }),
             // });
 
-            // login({
+            // signIn({
             //     "access_token": res.data.access_token,
             //     "refresh_token": res.data.refresh_token,
             // });
-            login();
+            signIn();
             alert("Подключено!");
             const refresh = await axios.get("/api/v1/auth/refresh");
             navigate("/");
@@ -45,14 +45,14 @@ export default function Login({}) {
     };
 
     return (
-        <div className="login">
+        <div className="signIn">
             <h1>Вход</h1>
-            <form onSubmit={handleLogin} className="form">
+            <form onSubmit={handleSignIn} className="form">
                 <input type="text" placeholder="Имя пользователя" value={username} onChange={(e) => setUsername(e.target.value)} />
                 <input type="password" placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} />
-                <button type="submit">Log in</button>
+                <button type="submit">Войти</button>
             </form>
-            <a href="/register">Впервые здесь?</a>
+            <a href="/signUp">Впервые здесь?</a>
         </div>
     )
 }

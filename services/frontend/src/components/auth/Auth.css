@@ -1,9 +1,9 @@
-.login, .register {
+.signIn, .signUp {
     max-width: 600px;
     margin: 0 auto;
 }
 
-.login input, .register input {
+.signIn input, .signUp input {
     padding: 8px;
     width: 100%;
 }
