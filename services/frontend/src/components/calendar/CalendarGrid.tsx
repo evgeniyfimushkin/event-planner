@@ -1,8 +1,11 @@
 import "./Calendar.css";
 
-import React from "react";
+import React, { useState } from "react";
 import Minicard from "../cards/Minicard";
 import { Event } from "../../utilities/Types";
+import { createPortal } from "react-dom";
+import ModalWindow from "../misc/ModalWindow";
+import Card from "../cards/Card";
 
 export default function CalendarGrid({events=[]}: {
     events: Array<Event>
@@ -41,25 +44,41 @@ export default function CalendarGrid({events=[]}: {
         rangeHour.push(hour);
     }
 
+    const [showModal, setShowModal] = useState<boolean>(false);
+    const [event, setEvent] = useState<Event | null>(null);
+
+    const clickCallback = async (event: Event) => {
+        setEvent(event);
+        setShowModal(true);
+    }
+
     return (
-        <div className="calendar">
-            <table className="calendar">
-                <caption>{getCurrentDate().toLocaleString("ru", {month: "long", year: "numeric"})}</caption>
-                <thead>
-                    <tr>
-                        <td>\</td>
-                        {rangeDate.map((day,di)=><td key={di}>{day}</td>)}
-                    </tr>
-                </thead>
-                <tbody>
-                    {rangeHour.map((hour,hi) => <tr key={hi}>
-                        <td>{hour}:00</td>
-                        {rangeDate.map((day,di) => <td key={di} className={(isToday(day) && "today" || "") + " " + (isNow(hour) && "now" || "")}>
-                            {events.filter(e=>isEventNow(e,day,hour)).map(e=><Minicard event={e} />)}
-                        </td>)}
-                    </tr>)}
-                </tbody>
-            </table>
-        </div>
+        <>
+            <div className="calendar">
+                <table className="calendar">
+                    <caption>{getCurrentDate().toLocaleString("ru", {month: "long", year: "numeric"})}</caption>
+                    <thead>
+                        <tr>
+                            <td>\</td>
+                            {rangeDate.map((day,di)=><td key={di}>{day}</td>)}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {rangeHour.map((hour,hi) => <tr key={hi}>
+                            <td>{hour}:00</td>
+                            {rangeDate.map((day,di) => <td key={di} className={(isToday(day) && "today" || "") + " " + (isNow(hour) && "now" || "")}>
+                                {events.filter(e=>isEventNow(e,day,hour)).map(e=><Minicard event={e} callback={clickCallback} />)}
+                            </td>)}
+                        </tr>)}
+                    </tbody>
+                </table>
+            </div>
+            {showModal && createPortal(
+                <ModalWindow onClose={()=>{setShowModal(false);}}>
+                    <Card event={event!} />
+                </ModalWindow>,
+                document.body
+            )}
+        </>
     );
 }

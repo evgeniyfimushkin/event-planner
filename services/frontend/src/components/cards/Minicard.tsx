@@ -1,17 +1,14 @@
 import "./Cards.css"
 
-import React from "react";
-import { createPortal } from "react-dom";
+import React, { useCallback } from "react";
 import { useState } from "react";
-import ModalWindow from "../misc/ModalWindow";
-import Card from "./Card";
 import { localDate } from "../../utilities/Utilities";
 import { Event } from "../../utilities/Types";
 
-export default function Minicard({event}: {
-    event: Event
+export default function Minicard({event, callback}: {
+    event: Event,
+    callback?: (event: Event) => any
 }) {
-    const [showModal, setShowModal] = useState<boolean>(false);
     const {
         id,
         name,
@@ -26,8 +23,10 @@ export default function Minicard({event}: {
     const coords: string | false = (["latitude", "longitude"].every(e=>e in event)) && "координаты " + latitude + " " + longitude;
     const fullAddress: string = [city, address, coords].filter(e=>e).join(", ");
 
+    const onClickCallback = callback ? (() => callback(event)) : (()=>{});
+
     return (
-        <div className="card mini" onClick={()=>setShowModal(true)}>
+        <div className="card mini" onClick={onClickCallback}>
             <div className="line">
                 {image_data && <img src={image_data}/>}
                 <h1 className="title">{name}</h1>
@@ -37,12 +36,6 @@ export default function Minicard({event}: {
                 <p>Местоположение: {fullAddress}</p>
             )}
             {start_time && <p className="startTime">Начало: {localDate(new Date(start_time))}</p>}
-            {showModal && createPortal(
-                <ModalWindow onClose={()=>{setShowModal(false);}}>
-                    <Card event={event} />
-                </ModalWindow>,
-                document.body
-            )}
         </div>
     )
 }

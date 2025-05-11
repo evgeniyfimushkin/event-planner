@@ -1,3 +1,14 @@
+.modal-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    /* opacity: 0.75; */
+    /* visibility: hidden; */
+    background-color: rgba(100, 100, 111, 0.3);
+}
+
 .modal {
     align-items: center;
     box-shadow: rgba(100, 100, 111, 0.3) 0px 7px 29px 0px;
