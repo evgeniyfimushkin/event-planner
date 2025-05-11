@@ -2,10 +2,10 @@ import "./Auth.css"
 
 import React from "react";
 import { useState, useContext } from "react";
-import axios from "axios";
 import CryptoJS from "crypto-js";
 import { useNavigate } from "react-router-dom";
 import { explainRequestError } from "../../utilities/Utilities";
+import { API } from "../../utilities/API";
 
 export default function SignUp({}) {
     const [username, setUsername] = useState<string>("");
@@ -17,7 +17,7 @@ export default function SignUp({}) {
         e.preventDefault();
         try {
             const passhash: string = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
-            await axios.post("/api/v1/auth/register", { username, email, passhash });
+            await API.Auth.Register({ username, email, passhash })
             alert("Зарегистрировано!")
             navigate("/signIn");
         } catch (error) {

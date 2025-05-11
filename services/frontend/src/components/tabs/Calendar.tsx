@@ -1,11 +1,11 @@
 import React from "react";
 import { useContext, useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { authCall, explainRequestError } from "../../utilities/Utilities.js";
 import AuthContext from "../../services/AuthContext.jsx";
 import CalendarGrid from "../calendar/CalendarGrid.tsx";
 import { Event, Registration } from "../../utilities/Types.ts";
+import { API } from "../../utilities/API.ts";
 
 export default function Calendar() {
     const [events, setEvents] = useState<Array<Event>>([]);
@@ -19,8 +19,8 @@ export default function Calendar() {
         try {
             await authCall(async () => { // success
                 setLoading(true);
-                const responseEvents = await axios.get("/api/v1/events");
-                const responseSubscriptions = await axios.get("/api/v1/registrations/my");
+                const responseEvents = await API.Events.Get();
+                const responseSubscriptions = await API.Registrations.GetMy();
                 setEvents(responseEvents.data);
                 setSubscriptions(responseSubscriptions.data);
             }, (err) => { // unauthorized

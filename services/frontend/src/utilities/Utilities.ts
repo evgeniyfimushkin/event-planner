@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios";
+import { API } from "./API";
 
 export function localDate(date: Date): string {
     return date.toLocaleString("ru", {
@@ -17,7 +18,7 @@ export async function authCall(request: (...args: any[]) => any, handler401: (..
     } catch (err) {
         if (err.status === 401) {
             try {
-                await axios.get("/api/v1/auth/refresh");
+                await API.Auth.Refresh();
                 const out = await request();
                 return out;
             } catch (err) {

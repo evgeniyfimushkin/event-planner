@@ -3,12 +3,12 @@ import "./Cards.css"
 import React, { useContext } from "react";
 import { useState } from "react";
 import { explainRequestError, localDate } from "../../utilities/Utilities";
-import axios from "axios";
 import { useEffect } from "react";
 import { authCall } from "../../utilities/Utilities";
 import { Event } from "../../utilities/Types";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../../services/AuthContext";
+import { API } from "../../utilities/API";
 
 export default function Card({event}: {
     event: Event
@@ -38,8 +38,8 @@ export default function Card({event}: {
 
     const subscribe = async (e) => {
         try {
-            const refresh = await axios.get("/api/v1/auth/refresh");
-            const res = await axios.post("/api/v1/registrations", { event_id: id });
+            await API.Auth.Refresh();
+            await API.Registrations.Create(id!);
             alert("Вы подписаны на событие!");
             setSubscribed(true);
         } catch (error) {
@@ -49,8 +49,8 @@ export default function Card({event}: {
     }
     const unsubscribe = async (e) => {
         try {
-            const refresh = await axios.get("/api/v1/auth/refresh");
-            const res = await axios.delete("/api/v1/registrations", { data: {event_id: id} });
+            await API.Auth.Refresh();
+            await API.Registrations.Delete(id!);
             alert("Вы отписаны от события!");
             setSubscribed(false);
         } catch (error) {
@@ -62,7 +62,7 @@ export default function Card({event}: {
         try {
             await authCall(async () => { // success
                 setLoading(true);
-                const responseSubscriptions = await axios.get("/api/v1/registrations/my");
+                const responseSubscriptions = await API.Registrations.GetMy();
                 setSubscribed(responseSubscriptions.data.some(s=>s.event_id === id));
             }, (err) => { // unauthorized
                 signOut();

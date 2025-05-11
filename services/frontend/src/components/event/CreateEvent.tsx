@@ -2,9 +2,9 @@ import "./Event.css"
 
 import React from "react";
 import { useState, useContext } from "react";
-import axios from "axios";
 import { explainRequestError } from "../../utilities/Utilities";
 import { Event } from "../../utilities/Types";
+import { API } from "../../utilities/API";
 
 export default function CreateEvent({}) {
     const [name, setName] = useState("Без названия");
@@ -22,7 +22,7 @@ export default function CreateEvent({}) {
     const createEvent = async (e) => {
         e.preventDefault();
         try {
-            await axios.get("/api/v1/auth/refresh");
+            await API.Auth.Refresh();
             const pack: Event = {
                 name,
                 description,
@@ -37,7 +37,7 @@ export default function CreateEvent({}) {
                 end_time: new Date(endTime).toISOString(),
             };
             console.log(pack);
-            const res = await axios.post("/api/v1/events", pack);
+            const res = await API.Events.Create(pack);
             alert("Мероприятие создано!");
         } catch (error) {
             alert("Ошибка создания мероприятия!\n" + explainRequestError(error));

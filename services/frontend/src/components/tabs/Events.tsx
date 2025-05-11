@@ -2,7 +2,6 @@ import "./Events.css";
 
 import React from "react";
 import { useContext, useEffect, useState } from "react";
-import axios from "axios";
 import Grid from "../cards/Grid";
 import FloatingButton from "../misc/FloatingButton";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +11,7 @@ import CreateEvent from "../event/CreateEvent";
 import { authCall, explainRequestError } from "../../utilities/Utilities";
 import AuthContext from "../../services/AuthContext";
 import { Event, Registration } from "../../utilities/Types";
+import { API } from "../../utilities/API";
 
 export default function Events() {
     const [events, setEvents] = useState<Array<Event>>([]);
@@ -32,14 +32,14 @@ export default function Events() {
                 setLoading(true);
                 let events;
                 if (query) {
-                    const responseEvents = await axios.get(`/api/v1/events/search?${query}`);
+                    const responseEvents = await API.Events.Search(query);
                     setEvents(responseEvents.data);
                 } else {
-                    const responseEvents = await axios.get("/api/v1/events");
-                    const responseEventsPrevious = includePrevious ? await axios.get("/api/v1/events/previous") : {data: []};
+                    const responseEvents = await API.Events.Get();
+                    const responseEventsPrevious = includePrevious ? await API.Events.GetPrevious() : {data: []};
                     setEvents([...responseEventsPrevious.data, ...responseEvents.data]);
                 }
-                const responseSubscriptions = await axios.get("/api/v1/registrations/my");
+                const responseSubscriptions = await API.Registrations.GetMy();
                 setSubscriptions(responseSubscriptions.data);
             }, (err) => { // unauthorized
                 signOut();

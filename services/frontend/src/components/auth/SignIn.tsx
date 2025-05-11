@@ -2,11 +2,11 @@ import "./Auth.css"
 
 import React from "react";
 import { useState, useContext } from "react";
-import axios from "axios";
 import AuthContext from "../../services/AuthContext";
 import { useNavigate } from "react-router-dom";
 import CryptoJS from "crypto-js";
 import { explainRequestError } from "../../utilities/Utilities";
+import { API } from "../../utilities/API";
 
 export default function SignIn({}) {
     const [username, setUsername] = useState<string>("");
@@ -18,9 +18,9 @@ export default function SignIn({}) {
         e.preventDefault();
         try {
             const passhash: string = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
-            await axios.post("/api/v1/auth/login", { username, passhash });
+            await API.Auth.Login({username, passhash});
             signIn();
-            await axios.get("/api/v1/auth/refresh");
+            await API.Auth.Refresh();
             navigate("/");
         } catch (error) {
             alert("Ошибка подключения!\n"+explainRequestError(error));
