@@ -27,6 +27,7 @@ export const API = {
         Get: async () => axios.get("/api/v1/events"),
         GetPrevious: async () => axios.get("/api/v1/events/previous"),
         Search: async (query: string) => axios.get(`/api/v1/events/search?${query}`),
+        Update: async (args: Event) => {console.log("API.Events.Update", args)} // async (args: Event) => axios.post("/api/v1/events", args), // todo use actual endpoint
     },
     Registrations: {
         Create: async (id: number) => axios.post("/api/v1/registrations", { event_id: id }),

@@ -82,7 +82,9 @@ export default function Events() {
                     <Grid cards={events} subscriptions={subscriptions} />
                     <FloatingButton text="Добавить мероприятие" onClick={()=>setShowCreateEvent(true)} />
                     {showCreateEvent && createPortal(
-                        <ModalWindow onClose={()=>{setShowCreateEvent(false);fetchData()}}>
+                        <ModalWindow buttons={[
+                            {name: "Закрыть", onClick: ()=>{setShowCreateEvent(false);fetchData()}}
+                        ]}>
                             <CreateEvent />
                         </ModalWindow>, document.body
                     )}

@@ -2,7 +2,7 @@ import "./Cards.css"
 
 import React, { useContext } from "react";
 import { useState } from "react";
-import { explainRequestError, localDate } from "../../utilities/Utilities";
+import { explainRequestError, localeDateString } from "../../utilities/Utilities";
 import { useEffect } from "react";
 import { authCall } from "../../utilities/Utilities";
 import { Event } from "../../utilities/Types";
@@ -92,8 +92,8 @@ export default function Card({event}: {
             {fullAddress && (
                 <p>Местоположение: {fullAddress}</p>
             )}
-            {start_time && <p className="startTime">Начало: {localDate(new Date(start_time))}</p>}
-            {end_time && <p className="endTime">Окончание: {localDate(new Date(end_time))}</p>}
+            {start_time && <p className="startTime">Начало: {localeDateString(new Date(start_time))}</p>}
+            {end_time && <p className="endTime">Окончание: {localeDateString(new Date(end_time))}</p>}
             {category && <p className="category">{category}</p>}
             {/* todo refresh */}
             {!loading && !error && (subscribed && <>

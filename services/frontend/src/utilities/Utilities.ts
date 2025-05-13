@@ -1,11 +1,18 @@
 import axios, { AxiosError } from "axios";
 import { API } from "./API";
 
-export function localDate(date: Date): string {
+export function localeDateString(date: Date): string { // для отображения
     return date.toLocaleString("ru", {
         dateStyle: "medium",
         timeStyle: "long",
     });
+}
+
+export function toLocalDate(date: Date): string { // для datetime-local
+    const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    const formattedDate = offsetDate.toISOString();
+    const formattedLocalDate = formattedDate.replace(/:\d{2}\.\d{3}Z$/, '');
+    return formattedLocalDate;
 }
 
 export async function authCall(request: (...args: any[]) => any, handler401: (...args: any[]) => any) {

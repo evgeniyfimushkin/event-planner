@@ -2,7 +2,7 @@ import "./Cards.css"
 
 import React, { useCallback } from "react";
 import { useState } from "react";
-import { localDate } from "../../utilities/Utilities";
+import { localeDateString } from "../../utilities/Utilities";
 import { Event } from "../../utilities/Types";
 
 export default function Minicard({event, callback}: {
@@ -35,7 +35,7 @@ export default function Minicard({event, callback}: {
             {fullAddress && (
                 <p>Местоположение: {fullAddress}</p>
             )}
-            {start_time && <p className="startTime">Начало: {localDate(new Date(start_time))}</p>}
+            {start_time && <p className="startTime">Начало: {localeDateString(new Date(start_time))}</p>}
         </div>
     )
 }

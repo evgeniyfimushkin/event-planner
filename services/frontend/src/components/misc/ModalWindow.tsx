@@ -2,16 +2,22 @@ import "./ModalWindow.css";
 
 import React from "react";
 
-export default function ModalWindow({ children, onClose }: {
+interface Button {
+    name: string,
+    onClick: (e?)=>any,
+}
+
+export default function ModalWindow({ children, buttons }: {
     children: React.JSX.Element,
-    onClose: ()=>void
+    buttons?: Array<Button>
 }) {
     return (
         <div className="modal-background">
             <div className="modal" onClick={(e)=>e.stopPropagation()}>
                 {children}
                 <div className="center">
-                    <button onClick={onClose}>Close</button>
+                    {buttons?.map((button, index)=><button key={index} onClick={button.onClick}>{button.name}</button>)}
+                    {/* <button onClick={onClose}>Close</button> */}
                 </div>
             </div>
         </div>
