@@ -10,6 +10,7 @@ import CreateEvent from './components/event/CreateEvent.js';
 import Events from './components/tabs/Events.js';
 import Calendar from './components/tabs/Calendar.tsx';
 import Menu from './components/menu/Menu.js';
+import Profile from './components/tabs/Profile.tsx';
 
 function App() {
   return (
@@ -35,6 +36,12 @@ function App() {
             </PrivateRoute>
           }/>
           <Route path="/signUp" element={<SignUp />}/>
+          <Route path="/profile" element={
+            <PrivateRoute>
+              <Menu />
+              <Profile />
+            </PrivateRoute>
+          }/>
         </Routes>
       </Router>
     </AuthProvider>

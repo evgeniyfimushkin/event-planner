@@ -31,3 +31,9 @@ export interface Review {
     posted_at: string,
     updated_at: string,
 }
+
+export interface UserData {
+    id: number,
+    username: string,
+    picture?: string,
+}

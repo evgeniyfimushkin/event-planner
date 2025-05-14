@@ -2,14 +2,15 @@ import "./Menu.css"
 
 import React from "react"
 import Tab from "./Tab.jsx"
+import { Relation } from "../../assets/Relations.js"
 
 export default function Bar({items=[]}: {
-    items: Array<[string, string?]>
+    items: Array<Relation>
 }) {
     return (
         <div className="bar">
             {items.map((e,i) => (
-                <Tab key={i} title={e[0]} target={e[1]}/>
+                <Tab key={i} title={e.from} target={e.to}/>
             ))}
         </div>
     )

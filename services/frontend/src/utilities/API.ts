@@ -1,5 +1,5 @@
 import axios from "axios"
-import { Event, Review } from "./Types";
+import { Event, Review, UserData } from "./Types";
 
 interface RequestArguments {
     [key: string]: any
@@ -49,6 +49,16 @@ export const API = {
                 g(3, 3, `г${"о".repeat(200)}л`, "2025-05-21T21:04:00Z", "2025-05-27T23:06:00Z"),
                 g(4, 4, `ты совсем? мы фронтенд тестируем`, "2025-05-21T21:04:00Z", "2025-05-27T23:06:00Z"),
             ] as any}
+        }, // todo use actual endpoint
+    },
+    Users: {
+        GetMy: async () => ({data: {
+            id: 1,
+            username: "ExampleUser",
+            picture: (Math.random()<0.5) ? undefined : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII",
+        } as UserData}), //todo use actual endpoint
+        UpdateMy: async (args: UserData) => {
+            console.log("API.Users.UpdateMy", args);
         }, // todo use actual endpoint
     }
 };

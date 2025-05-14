@@ -4,12 +4,13 @@ import React from "react";
 import Tab from "./Tab.js"
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
+import { Relation } from "../../assets/Relations.js";
 
 export default function Dropdown({items=[]}: {
-    items: Array<[string, string?]>
+    items: Array<Relation>
 }) {
     const location = useLocation();
-    const currentTab: string = items.find(e=>e[1]===location.pathname)?.[0] || "Меню";
+    const currentTab: string = items.find(e=>e.to===location.pathname)?.[0] || "Меню";
     const [showItems, setShowItems] = useState<boolean>(false);
     const toggleState = () => {
         setShowItems(!showItems);
@@ -20,7 +21,7 @@ export default function Dropdown({items=[]}: {
             <Tab key={-1} title={currentTab} onClick={toggleState} isOpen={showItems} />
             {showItems && <div className="dropdown-content">
                 {items.map((e,i) => (
-                    <Tab key={i} title={e[0]} target={e[1]}/>
+                    <Tab key={i} title={e.from} target={e.to}/>
                 ))}
             </div>}
         </div>

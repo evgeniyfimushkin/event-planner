@@ -1,0 +1,17 @@
+.hidden {
+    display: none;
+}
+
+.profile img {
+    width: 18em;
+    height: 18em;
+    object-fit: cover;
+    border: thin solid black;
+    transition: box-shadow 0.3s ease-in-out, scale 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.profile img:hover {
+    scale: 1.01;
+    box-shadow: 0 0 10px 5px #8f008a80;
+}

@@ -1,5 +1,12 @@
-export const menuItems: Array<[string, string?]> = [
-    ["Мероприятия", "/"],
-    ["Календарь", "/calendar"],
-    ["Профиль",],
+export interface Relation {
+    from: any,
+    to?: any,
+}
+
+const g = (from, to?) => ({from, to} as Relation);
+
+export const menuItems: Array<Relation> = [
+    g("Мероприятия", "/"),
+    g("Календарь", "/calendar"),
+    g("Профиль", "/profile"),
 ];
