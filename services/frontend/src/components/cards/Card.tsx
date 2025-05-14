@@ -5,7 +5,7 @@ import { useState } from "react";
 import { explainRequestError, localeDateString } from "../../utilities/Utilities";
 import { useEffect } from "react";
 import { authCall } from "../../utilities/Utilities";
-import { Event, Review } from "../../utilities/Types";
+import { Event, Review, UserData } from "../../utilities/Types";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../../services/AuthContext";
 import { API } from "../../utilities/API";
@@ -17,6 +17,11 @@ export default function Card({event}: {
     const [subscribed, setSubscribed] = useState<boolean>(false);
     const [loadingRegistration, setLoadingRegistration] = useState<boolean>(true);
     const [errorRegistration, setErrorRegistration] = useState<string | null>(null);
+
+    const [user, setUser] = useState<UserData | null>(null);
+    const [loadingUser, setLoadingUser] = useState<boolean>(true);
+    const [errorUser, setErrorUser] = useState<string | null>(null);
+
     const { signOut } = useContext(AuthContext);
     const navigate = useNavigate();
     const {
@@ -33,6 +38,7 @@ export default function Card({event}: {
         longitude,
         start_time,
         end_time,
+        created_by,
     } = event;
     const coords: string | false = (["latitude", "longitude"].every(e=>e in event)) && "координаты " + latitude + " " + longitude;
     const fullAddress: string = [city, address, coords].filter(e=>e).join(", ");
@@ -80,6 +86,29 @@ export default function Card({event}: {
         fetchSubscribed();
     }, []);
 
+    const fetchUser = async () => {
+        try {
+            await authCall(async () => { // success
+                setLoadingUser(true);
+                // @ts-ignore
+                const responseData = await API.Users.Get(created_by!);
+                setUser(responseData.data);
+            }, (err) => { // unauthorized
+                // signOut();
+                // navigate("/signIn");
+                throw new Error("Unauthorized"); // is this applicable?
+            });
+        } catch (err) {
+            setErrorUser("Не удалось загрузить данные пользователя!\n"+explainRequestError(err));
+            console.error(err);
+        } finally {
+            setLoadingUser(false);
+        }
+    }
+    useEffect(() => {
+        fetchUser();
+    }, []);
+
     return (
         <>
         <div className="card">
@@ -94,7 +123,15 @@ export default function Card({event}: {
             )}
             {start_time && <p className="startTime">Начало: {localeDateString(new Date(start_time))}</p>}
             {end_time && <p className="endTime">Окончание: {localeDateString(new Date(end_time))}</p>}
-            {category && <p className="category">{category}</p>}
+            {category && <p className="category">Категория: {category}</p>}
+            <p className="user">{
+                (loadingUser && <></>) ||
+                (errorUser && <>Пользователь <span className="username">{created_by}</span></> ) ||
+                <>
+                    {user!.picture && <img src={user!.picture}/>}
+                    <span className="username">{user!.username}</span>
+                </>
+            }</p>
             {/* todo refresh */}
             {!loadingRegistration && !errorRegistration && (subscribed && <>
                 <input type="button" value="Отписаться" onClick={unsubscribe} />

@@ -61,7 +61,15 @@
     font-style: italic;
 }
 
-.card .category {
+.card .user {
     text-align: right;
     font-size: 1em;
+}
+
+.user img {
+    float: none;
+    margin: 0 0em 0 0;
+    width: 2em !important;
+    height: 2em !important;
+    object-fit: cover;
 }

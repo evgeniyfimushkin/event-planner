@@ -12,6 +12,7 @@ export interface Event {
     longitude?: number,
     start_time: string,
     end_time: string,
+    created_by?: string, // or number?
 };
 
 export interface Registration {

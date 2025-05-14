@@ -1,5 +1,6 @@
 import axios from "axios"
 import { Event, Review, UserData } from "./Types";
+import { Picture } from "../assets/Placeholders";
 
 interface RequestArguments {
     [key: string]: any
@@ -52,13 +53,24 @@ export const API = {
         }, // todo use actual endpoint
     },
     Users: {
-        GetMy: async () => ({data: {
-            id: 1,
-            username: "ExampleUser",
-            picture: (Math.random()<0.5) ? undefined : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII",
-        } as UserData}), //todo use actual endpoint
+        GetMy: async () => {
+            const out = {
+                id: 1,
+                username: "ExampleUser",
+            } as UserData;
+            if (Math.random() < 0.5) out.picture = Picture;
+            return {data: out};
+        }, //todo use actual endpoint
         UpdateMy: async (args: UserData) => {
             console.log("API.Users.UpdateMy", args);
         }, // todo use actual endpoint
+        Get: async (id: number) => {
+            const out = {
+                username: "ID:"+id,
+            } as UserData;
+            if (Math.random() < 0.5) out.picture = Picture;
+            return {data: out};
+        }, // todo use actual endpoint
+        // GetPicture: async (id: number) => ({data: Picture}) // todo use actual endpoint
     }
 };
