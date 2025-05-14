@@ -5,17 +5,18 @@ import { useState } from "react";
 import { explainRequestError, localeDateString } from "../../utilities/Utilities";
 import { useEffect } from "react";
 import { authCall } from "../../utilities/Utilities";
-import { Event } from "../../utilities/Types";
+import { Event, Review } from "../../utilities/Types";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../../services/AuthContext";
 import { API } from "../../utilities/API";
+import Reviews from "../reviews/Reviews";
 
 export default function Card({event}: {
     event: Event
 }) {
     const [subscribed, setSubscribed] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+    const [loadingRegistration, setLoadingRegistration] = useState<boolean>(true);
+    const [errorRegistration, setErrorRegistration] = useState<string | null>(null);
     const { signOut } = useContext(AuthContext);
     const navigate = useNavigate();
     const {
@@ -61,7 +62,7 @@ export default function Card({event}: {
     const fetchSubscribed = async () => {
         try {
             await authCall(async () => { // success
-                setLoading(true);
+                setLoadingRegistration(true);
                 const responseSubscriptions = await API.Registrations.GetMy();
                 setSubscribed(responseSubscriptions.data.some(s=>s.event_id === id));
             }, (err) => { // unauthorized
@@ -69,13 +70,12 @@ export default function Card({event}: {
                 navigate("/signIn");
             });
         } catch (err) {
-            setError("Не удалось загрузить статус записи!\n"+explainRequestError(err));
+            setErrorRegistration("Не удалось загрузить статус записи!\n"+explainRequestError(err));
             console.error(err);
         } finally {
-            setLoading(false);
+            setLoadingRegistration(false);
         }
     }
-
     useEffect(() => {
         fetchSubscribed();
     }, []);
@@ -96,11 +96,12 @@ export default function Card({event}: {
             {end_time && <p className="endTime">Окончание: {localeDateString(new Date(end_time))}</p>}
             {category && <p className="category">{category}</p>}
             {/* todo refresh */}
-            {!loading && !error && (subscribed && <>
+            {!loadingRegistration && !errorRegistration && (subscribed && <>
                 <input type="button" value="Отписаться" onClick={unsubscribe} />
             </> || <>
                 <input type="button" value="Записаться" onClick={subscribe} />
             </>)}
+            <Reviews event_id={id!} />
         </div>
         </>
     )

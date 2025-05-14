@@ -23,3 +23,11 @@ export interface Registration {
     updated_at: string,
     comment?: string,
 };
+
+export interface Review {
+    id: number,
+    user_id: number,
+    content: string,
+    posted_at: string,
+    updated_at: string,
+}
