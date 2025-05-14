@@ -12,24 +12,30 @@ import { authCall, explainRequestError } from "../../utilities/Utilities";
 import AuthContext from "../../services/AuthContext";
 import { Event, Registration } from "../../utilities/Types";
 import { API } from "../../utilities/API";
+import Card from "../cards/Card";
+import EditEvent from "../event/EditEvent";
 
 export default function Events() {
     const [events, setEvents] = useState<Array<Event>>([]);
     const [subscriptions, setSubscriptions] = useState<Array<Registration>>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+    const [loadingEvents, setLoadingEvents] = useState<boolean>(true);
+    const [errorEvents, setErrorEvents] = useState<string | null>(null);
     const [showCreateEvent, setShowCreateEvent] = useState<boolean>(false);
     const { signOut } = useContext(AuthContext);
     const navigate = useNavigate();
     const [query, setQuery] = useState<string>("");
     const [includePrevious, setIncludePrevious] = useState<boolean>(false);
 
-    const fetchData = async (e?) => {
-        setLoading(true);
-        setError(null);
+    const [showCard, setShowCard] = useState<boolean>(false);
+    const [showEditEvent, setShowEditEvent] = useState<boolean>(false);
+    const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+
+    const fetchEvents = async (e?) => {
+        setLoadingEvents(true);
+        setErrorEvents(null);
         try {
             await authCall(async () => { // success
-                setLoading(true);
+                setLoadingEvents(true);
                 let events;
                 if (query) {
                     const responseEvents = await API.Events.Search(query);
@@ -46,20 +52,27 @@ export default function Events() {
                 navigate("/signIn");
             });
         } catch (err) {
-            setError("Не удалось загрузить мероприятия!\n"+explainRequestError(err));
+            setErrorEvents("Не удалось загрузить мероприятия!\n"+explainRequestError(err));
             console.error(err);
         } finally {
-            setLoading(false);
+            setLoadingEvents(false);
         }
     }
     const search = async (e) => {
         e.preventDefault();
-        fetchData();
+        fetchEvents();
     }
-
     useEffect(() => {
-        fetchData();
+        fetchEvents();
     }, [includePrevious]);
+
+    const cardClickCallback = async (event: Event) => {
+        setSelectedEvent(event);
+        setShowCard(true);
+    }
+    const editOpenCallback = async () => {
+        setShowEditEvent(true);
+    }
 
     return (
         <>
@@ -76,20 +89,37 @@ export default function Events() {
                 </div>
             </>}
             {
-                (loading && <p>Загрузка...</p>) ||
-                (error && <p>{error}</p> ) ||
+                (loadingEvents && <p>Загрузка...</p>) ||
+                (errorEvents && <p>{errorEvents}</p> ) ||
                 <>
-                    <Grid cards={events} subscriptions={subscriptions} />
+                    <Grid cards={events} subscriptions={subscriptions} cardCallback={cardClickCallback} />
                     <FloatingButton text="Добавить мероприятие" onClick={()=>setShowCreateEvent(true)} />
                     {showCreateEvent && createPortal(
                         <ModalWindow buttons={[
-                            {name: "Закрыть", onClick: ()=>{setShowCreateEvent(false);fetchData()}}
+                            {name: "Закрыть", onClick: ()=>{setShowCreateEvent(false);fetchEvents()}}
                         ]}>
                             <CreateEvent />
                         </ModalWindow>, document.body
                     )}
                 </>
             }
+            {showCard && createPortal(
+                <ModalWindow buttons={[
+                    {name: "Редактировать", onClick: editOpenCallback},
+                    {name: "Закрыть", onClick: ()=>{setShowCard(false);}},
+                ]}>
+                    <Card event={selectedEvent!} />
+                </ModalWindow>,
+                document.body
+            )}
+            {showEditEvent && createPortal(
+                <ModalWindow buttons={[
+                    {name: "Закрыть", onClick: ()=>{setShowEditEvent(false);}}, // todo refresh
+                ]}>
+                    <EditEvent event={selectedEvent!} />
+                </ModalWindow>,
+                document.body
+            )}
         </>
     );
 }
