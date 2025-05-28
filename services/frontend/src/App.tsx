@@ -18,6 +18,12 @@ function App() {
       <Router>
         <Routes>
           <Route path="/signIn" element={<SignIn />} />
+          <Route path="/profile" element={
+            <PrivateRoute>
+              <Menu />
+              <Profile />
+            </PrivateRoute>
+          }/>
           <Route path="/" element={
             <PrivateRoute>
               <Menu />
@@ -36,12 +42,6 @@ function App() {
             </PrivateRoute>
           }/>
           <Route path="/signUp" element={<SignUp />}/>
-          <Route path="/profile" element={
-            <PrivateRoute>
-              <Menu />
-              <Profile />
-            </PrivateRoute>
-          }/>
         </Routes>
       </Router>
     </AuthProvider>

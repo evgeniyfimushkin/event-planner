@@ -74,7 +74,9 @@ export default function CalendarGrid({events=[]}: {
                 </table>
             </div>
             {showModal && createPortal(
-                <ModalWindow onClose={()=>{setShowModal(false);}}>
+                <ModalWindow buttons={[
+                    {name: "Закрыть", onClick: ()=>{setShowModal(false);}}, // todo refresh
+                ]}>
                     <Card event={event!} />
                 </ModalWindow>,
                 document.body

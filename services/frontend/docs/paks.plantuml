@@ -1,0 +1,43 @@
+@startuml architecture
+
+scale 2
+'left to right direction
+
+package src {
+	package assets {
+		object Placeholders
+		object Relations
+		object Types
+	}
+	package components {
+		package auth {
+		}
+		package calendar {
+		}
+		package cards {
+		}
+		package event {
+		}
+		package menu {
+		}
+		package misc {
+		}
+		package reviews {
+		}
+		package tabs {
+		}
+	}
+	package services {
+		object AuthContext
+		object PrivateRoute
+	}
+	package utilities {
+		object API
+		object Utilities
+	}
+}
+
+assets ---[hidden] components
+
+
+@enduml

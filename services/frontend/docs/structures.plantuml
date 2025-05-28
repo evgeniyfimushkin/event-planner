@@ -1,0 +1,58 @@
+@startuml structures
+
+scale 2
+left to right direction
+
+class Event {
+    {abstract} id: number
+    name: string
+    description: string
+    category: string
+    {abstract} participants: number
+    max_participants: number
+    {abstract} image_data: string
+    {abstract} city: string
+    {abstract} address: string
+    {abstract} latitude: number
+    {abstract} longitude: number
+    start_time: string
+    end_time: string
+    {abstract} created_by: number
+}
+
+class Registration {
+    id: number
+    event_id: number
+    user_id: number
+    registration_time: string
+}
+
+class Review {
+    id: number
+    user_id: number
+    content: string
+    posted_at: string
+    updated_at: string
+}
+
+class UserData {
+    id: number
+    username: string
+    {abstract} picture: string
+}
+
+class UserSettings {
+    interval: number
+    {abstract} email: string
+    {abstract} passhash: string
+}
+
+' alignment
+UserSettings -|> UserData
+Registration -[hidden] Review
+Event --[hidden] Registration
+Event --[hidden] Review
+Registration --[hidden] UserSettings
+Review --[hidden] UserData
+
+@enduml

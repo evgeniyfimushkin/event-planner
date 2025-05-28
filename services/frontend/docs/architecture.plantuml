@@ -1,0 +1,16 @@
+@startuml architecture
+
+scale 2
+left to right direction
+
+actor "Клиент" as H
+rectangle "Прокси-сервер" as Proxy
+rectangle "Сервер\nбизнес-логики" as S
+rectangle "BFF-сервер" as C
+
+H --> Proxy : /*
+Proxy --> C : "/*"
+Proxy --> S : "/api"
+C -[hidden] S
+
+@enduml

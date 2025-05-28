@@ -1,0 +1,72 @@
+@startuml structures
+
+scale 2
+left to right direction
+
+object "Страница\nавторизации" as Signin {
+	Ссылка на стр. регистрации
+}
+object "Страница\nрегистрации" as Signup {
+	Переход на стр. ''Мероприятия''
+}
+object "Навигационное меню" as Menu {
+	Ссылка на стр. ''Мероприятия''
+	Ссылка на стр. ''Календарь''
+	Ссылка на стр. ''Профиль''
+}
+object "Страница\n''Мероприятия''" as Events {
+	Мини-карточки мероприятий
+	Кнопка создания мероприятия
+}
+object "Страница\n''Календарь''" as Calendar {
+	Мини-карточки мероприятий
+}
+object "Страница\n''Профиль''" as Profile {
+	Данные пользователя
+}
+object "Окно\nсоздания мероприятия" as CreateEvent {
+	Форма с данными мероприятия
+}
+object "Окно\nредактирования мероприятия" as EditEvent {
+	Форма с данными мероприятия
+}
+object "Окно\nсоздания отзыва" as CreateReview {
+	Форма с данными отзыва
+}
+object "Окно\nредактирования отзыва" as EditReview {
+	Форма с данными отзыва
+}
+object "Окно\n''Карточка мероприятия''" as Card {
+	Данные о мероприятии
+}
+object "Всплывающее окно\n" as Modal
+
+Signin --> Signup
+Signup -> Events
+Events o- Menu : включается в
+Calendar o- Menu : включается в
+Profile o- Menu : включается в
+Menu -> Events
+Menu -> Calendar
+Menu -> Profile
+
+Events o- CreateEvent : включается в
+Events o- Card : включается в
+
+Card o-- EditEvent : включается в
+Card o-- CreateReview : включается в
+Card o-- EditReview : включается в
+
+CreateEvent --|> Modal : наследуется от
+EditEvent --|> Modal : наследуется от
+Card --|> Modal : наследуется от
+CreateReview --|> Modal : наследуется от
+EditReview --|> Modal : наследуется от
+
+' alignment
+Events --[hidden] Calendar
+Events --[hidden] Calendar
+Calendar --[hidden] Profile
+Calendar --[hidden] Profile
+
+@enduml

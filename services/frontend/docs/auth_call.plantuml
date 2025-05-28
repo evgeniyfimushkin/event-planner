@@ -1,0 +1,27 @@
+@startuml auth call
+
+scale 2
+
+:Запрос, требующий авторизации;
+	<<save>>:Ввод:\nrequest, handler401, handlerOther;
+	:Вызов:\nrequest;
+	if (Запрос успешен?) then (да)
+	else (нет)
+		if (Ошибка 401\n(Not authorized)?) then (да)
+			:Обновить токен;
+			if (Обновление токена\nуспешно?) then (да)
+				:Вызов:\nrequest;
+			else (нет)
+				if (Ошибка 401\n(Not authorized)?) then (да)
+					:Вызов:\nhandler401;
+				else (нет)
+					:Вызов:\nhandlerOther;
+				endif
+			endif
+		else (нет)
+			:Вызов:\nhandlerOther;
+		endif
+	endif
+:Конец;
+
+@enduml

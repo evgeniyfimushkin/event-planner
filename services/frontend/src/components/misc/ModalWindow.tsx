@@ -16,7 +16,9 @@ export default function ModalWindow({ children, buttons }: {
             <div className="modal" onClick={(e)=>e.stopPropagation()}>
                 {children}
                 <div className="center">
-                    {buttons?.map((button, index)=><button key={index} onClick={button.onClick}>{button.name}</button>)}
+                    {buttons?.map((button, index)=><button key={index} onClick={button.onClick}>
+                        {button.name}
+                    </button>)}
                     {/* <button onClick={onClose}>Close</button> */}
                 </div>
             </div>

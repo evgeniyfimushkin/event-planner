@@ -90,8 +90,7 @@ export default function Card({event}: {
         try {
             await authCall(async () => { // success
                 setLoadingUser(true);
-                // @ts-ignore
-                const responseData = await API.Users.Get(created_by!);
+                const responseData = await API.Users.GetData(created_by!);
                 setUser(responseData.data);
             }, (err) => { // unauthorized
                 // signOut();

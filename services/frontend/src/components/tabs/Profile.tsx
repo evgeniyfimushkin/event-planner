@@ -2,39 +2,40 @@ import "./Profile.css";
 
 import React from "react";
 import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 import { authCall, explainRequestError } from "../../utilities/Utilities";
 import AuthContext from "../../services/AuthContext";
-import { UserData } from "../../utilities/Types";
+import { UserData, UserSettings } from "../../utilities/Types";
 import { API } from "../../utilities/API";
 import Menu from "../menu/Menu";
+import CryptoJS from "crypto-js";
 
 export default function Profile() {
-    const [data, setData] = useState<UserData | null>(null);
+    const [settings, setSettings] = useState<UserSettings | null>(null);
+    const [loadingSettings, setLoadingSettings] = useState<boolean>(true);
+    const [errorSettings, setErrorSettings] = useState<string | null>(null);
     const [image, setImage] = useState<string | null>(null);
-    const [loadingData, setLoadingData] = useState<boolean>(true);
-    const [errorData, setErrorData] = useState<string | null>(null);
     const { signOut } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const fetchData = async (e?) => {
-        setLoadingData(true);
-        setErrorData(null);
+        setLoadingSettings(true);
+        setErrorSettings(null);
         try {
             await authCall(async () => { // success
-                setLoadingData(true);
-                const responseData = await API.Users.GetMy();
-                setData(responseData.data);
-                setImage(responseData.data.picture ?? null);
+                setLoadingSettings(true);
+                const responseSettings = await API.Users.GetSettingsMy();
+                setSettings(responseSettings.data);
+                setImage(responseSettings.data.picture ?? null);
             }, (err) => { // unauthorized
                 signOut();
                 navigate("/signIn");
             });
         } catch (err) {
-            setErrorData("Не удалось загрузить информацию о пользователе!\n"+explainRequestError(err));
+            setErrorSettings("Не удалось загрузить данные о пользователе!\n"+explainRequestError(err));
             console.error(err);
         } finally {
-            setLoadingData(false);
+            setLoadingSettings(false);
         }
     }
     useEffect(() => {
@@ -45,7 +46,7 @@ export default function Profile() {
         e.preventDefault();
         try {
             await API.Auth.Refresh();
-            await API.Users.UpdateMy(data!);
+            await API.Users.UpdateSettingsMy(settings!);
             alert("Профиль обновлён!");
         } catch (error) {
             alert("Ошибка обновления!\n" + explainRequestError(error));
@@ -65,10 +66,10 @@ export default function Profile() {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => {
-            const newData = data!;
-            newData.picture = reader.result as string;
-            setData(newData);
-            setImage(newData.picture);
+            const newSettings = settings!;
+            newSettings.picture = reader.result as string;
+            setSettings(newSettings);
+            setImage(newSettings.picture);
             console.log("set image")
         };
         reader.onerror = (pe) => {
@@ -76,18 +77,36 @@ export default function Profile() {
             console.error(reader.error);
         };
     };
+    const setInterval = (e) => {
+        const newSettings = settings!;
+        newSettings.interval = e;
+        setSettings(newSettings);
+    }
+    const setEmail = (e) => {
+        const newSettings = settings!;
+        if (e !== "") newSettings.email = e;
+        setSettings(newSettings);
+    }
+    const setPasshash = (e) => {
+        const newSettings = settings!;
+        if (e !== "") newSettings.passhash = CryptoJS.SHA256(e).toString(CryptoJS.enc.Hex);
+        setSettings(newSettings);
+    }
 
     return (
         <>{
-            (loadingData && <p>Загрузка...</p>) ||
-            (errorData && <p>{errorData}</p> ) ||
+            (loadingSettings && <p>Загрузка...</p>) ||
+            (errorSettings && <p>{errorSettings}</p> ) ||
             <>
             <div className="profile">
-                <h1>Добро пожаловать,<br/>{data!.username}</h1>
+                <h1>Добро пожаловать,<br/>{settings!.username}</h1>
                 {image && <img src={image} onClick={imageClickHandler}/>}
                 <form onSubmit={updateData} className="form">
                     {image ? <></> : <label htmlFor="imageData">Иконка:</label>}
                     <input id="imageData" type="file" accept="image/*" onChange={e=>handleImageData(e)} className={image ? "hidden" : ""} />
+                    <p><label>Интервал уведомления (с): <input id="interval" type="number" min="1" value={settings!.interval} onChange={e=>setInterval(+e.target.value)} required /></label></p>
+                    <p>Сменить почту: <input type="email" placeholder="Сменить почту" value={settings!.email} onChange={(e) => setEmail(e.target.value)} /></p>
+                    <p>Сменить пароль: <input type="password" placeholder="Сменить пароль" value={settings!.passhash} onChange={(e) => setPasshash(e.target.value)} /></p>
                     <p><button type="submit">Применить изменения</button></p>
                 </form>
             </div>

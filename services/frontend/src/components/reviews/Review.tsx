@@ -24,7 +24,7 @@ export default function Review({review}: {
         try {
             await authCall(async () => { // success
                 setLoadingData(true);
-                const responseData = await API.Users.Get(user_id);
+                const responseData = await API.Users.GetData(user_id);
                 setData(responseData.data);
             }, (err) => { // unauthorized
                 // signOut();

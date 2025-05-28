@@ -12,7 +12,7 @@ export interface Event {
     longitude?: number,
     start_time: string,
     end_time: string,
-    created_by?: string, // or number?
+    created_by?: number,
 };
 
 export interface Registration {
@@ -20,9 +20,9 @@ export interface Registration {
     event_id: number,
     user_id: number,
     registration_time: string,
-    status: string,
-    updated_at: string,
-    comment?: string,
+    // status: string,
+    // updated_at: string,
+    // comment?: string,
 };
 
 export interface Review {
@@ -37,4 +37,10 @@ export interface UserData {
     id: number,
     username: string,
     picture?: string,
+}
+
+export interface UserSettings extends UserData {
+    interval: number, // не надо
+    email?: string, // telegram id
+    passhash?: string, // разрешить ли?
 }

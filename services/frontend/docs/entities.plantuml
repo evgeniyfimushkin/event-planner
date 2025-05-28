@@ -1,0 +1,26 @@
+@startuml entities
+
+scale 2
+'left to right direction
+
+class Event as "Мероприятие" {
+}
+
+class Registration as "Запись" {
+}
+
+class User as "Пользователь" {
+	isAdmin
+}
+
+class Review as "Отзыв" {
+}
+
+Event "*" -- "1" User
+Event "1" - "*" Registration
+Registration "*" -- "1" User
+' Registration "1" -- "1" Review
+Event "1" - "*" Review
+User "1" - "*" Review
+
+@enduml

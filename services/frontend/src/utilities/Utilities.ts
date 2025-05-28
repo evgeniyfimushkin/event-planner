@@ -15,9 +15,9 @@ export function toLocalDate(date: Date): string { // для datetime-local
     return formattedLocalDate;
 }
 
-export async function authCall(request: (...args: any[]) => any, handler401: (...args: any[]) => any) {
+export async function authCall(request: () => any, handler401: (err) => any) {
     const handlerOther = (err) => {
-        throw new Error("Auth call error (not 401)", {cause: err});
+        throw new Error("Ошибка при запросе (не 401)", {cause: err});
     }
     try {
         const out = await request();
@@ -45,5 +45,5 @@ export async function authCall(request: (...args: any[]) => any, handler401: (..
 export function explainRequestError(error: Error | AxiosError) {
     return (axios.isAxiosError(error))
         ? `Статус ответа: ${error.response?.status}\nСообщение:\n${error.response?.data}`
-        : `Сообщение библиотеки:\n${error.message}`;
+        : `Общая ошибка:\n${error.message}`;
 }
