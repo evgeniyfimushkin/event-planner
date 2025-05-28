@@ -18,8 +18,8 @@ export default function SignIn({}) {
         e.preventDefault();
         try {
             const passhash: string = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
-            await API.Auth.Login({username, passhash});
-            signIn();
+            const res = await API.Auth.Login({username, passhash});
+            signIn(res.data);
             await API.Auth.Refresh();
             navigate("/");
         } catch (error) {

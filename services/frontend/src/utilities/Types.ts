@@ -31,16 +31,21 @@ export interface Review {
     content: string,
     posted_at: string,
     updated_at: string,
-}
+};
 
 export interface UserData {
-    id: number,
+    // id: number,
     username: string,
     picture?: string,
-}
+};
 
 export interface UserSettings extends UserData {
-    interval: number, // не надо
-    email?: string, // telegram id
+    //interval: number, // не надо
+    telegram?: string, // telegram id
     passhash?: string, // разрешить ли?
-}
+};
+
+export interface UserCredentials {
+    username: string,
+    passhash: string,
+};

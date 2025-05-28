@@ -1,27 +1,27 @@
 import axios from "axios"
-import { Event, Review, UserData, UserSettings } from "./Types";
+import { Event, Review, UserCredentials, UserData, UserSettings } from "./Types";
 import { Picture } from "../assets/Placeholders";
+import { useContext } from "react";
+import AuthContext from "../services/AuthContext";
 
 interface RequestArguments {
     [key: string]: any
 }
 
-interface LoginCredentials {
-    username: string,
-    passhash: string,
-}
-
-interface RegisterCredentials {
-    username: string,
+interface TemporaryRegisterCredentials extends UserCredentials {
     email: string,
-    passhash: string,
 }
 
 export const API = {
     Auth: {
         Refresh: async () => axios.get("/api/v1/auth/refresh"),
-        Login: async (args: LoginCredentials) => axios.post("/api/v1/auth/login", args),
-        Register: async (args: RegisterCredentials) => axios.post("/api/v1/auth/register", args),
+        Login: async (args: UserCredentials) => {
+            const res = await axios.post("/api/v1/auth/login", args);
+            return res;
+        },
+        Register: async (args: TemporaryRegisterCredentials) => {
+            axios.post("/api/v1/auth/register", args)
+        },
     },
     Events: {
         Create: async (args: Event) => axios.post("/api/v1/events", args),
@@ -63,6 +63,10 @@ export const API = {
         }
     },
     Users: {
+        GetUsername: async () => {
+            const { username } = useContext(AuthContext);
+            return username;
+        },
         GetDataMy: async () => {
             const out = {
                 id: 1,

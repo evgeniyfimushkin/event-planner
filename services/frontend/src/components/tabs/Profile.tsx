@@ -15,7 +15,7 @@ export default function Profile() {
     const [loadingSettings, setLoadingSettings] = useState<boolean>(true);
     const [errorSettings, setErrorSettings] = useState<string | null>(null);
     const [image, setImage] = useState<string | null>(null);
-    const { signOut } = useContext(AuthContext);
+    const { signOut, username } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const fetchData = async (e?) => {
@@ -77,14 +77,9 @@ export default function Profile() {
             console.error(reader.error);
         };
     };
-    const setInterval = (e) => {
+    const setTelegram = (e) => {
         const newSettings = settings!;
-        newSettings.interval = e;
-        setSettings(newSettings);
-    }
-    const setEmail = (e) => {
-        const newSettings = settings!;
-        if (e !== "") newSettings.email = e;
+        if (e !== "") newSettings.telegram = e;
         setSettings(newSettings);
     }
     const setPasshash = (e) => {
@@ -99,14 +94,14 @@ export default function Profile() {
             (errorSettings && <p>{errorSettings}</p> ) ||
             <>
             <div className="profile">
-                <h1>Добро пожаловать,<br/>{settings!.username}</h1>
+                <h1>Добро пожаловать,<br/>{username}</h1>
                 {image && <img src={image} onClick={imageClickHandler}/>}
                 <form onSubmit={updateData} className="form">
                     {image ? <></> : <label htmlFor="imageData">Иконка:</label>}
                     <input id="imageData" type="file" accept="image/*" onChange={e=>handleImageData(e)} className={image ? "hidden" : ""} />
-                    <p><label>Интервал уведомления (с): <input id="interval" type="number" min="1" value={settings!.interval} onChange={e=>setInterval(+e.target.value)} required /></label></p>
-                    <p>Сменить почту: <input type="email" placeholder="Сменить почту" value={settings!.email} onChange={(e) => setEmail(e.target.value)} /></p>
-                    <p>Сменить пароль: <input type="password" placeholder="Сменить пароль" value={settings!.passhash} onChange={(e) => setPasshash(e.target.value)} /></p>
+                    {/* <p><label>Интервал уведомления (с): <input id="interval" type="number" min="1" value={settings!.interval} onChange={e=>setInterval(+e.target.value)} required /></label></p> */}
+                    <p>Сменить Telegram: <input type="text" placeholder="Telegram" value={settings!.telegram} onChange={(e) => setTelegram(e.target.value)} /></p>
+                    <p>Сменить пароль: <input type="password" placeholder="Пароль" value={settings!.passhash} onChange={(e) => setPasshash(e.target.value)} /></p>
                     <p><button type="submit">Применить изменения</button></p>
                 </form>
             </div>

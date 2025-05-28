@@ -18,6 +18,7 @@ export default function SignUp({}) {
         try {
             const passhash: string = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
             await API.Auth.Register({ username, email, passhash })
+            //await API.Auth.Register({ username, passhash })
             alert("Зарегистрировано!")
             navigate("/signIn");
         } catch (error) {
@@ -31,7 +32,7 @@ export default function SignUp({}) {
             <h1>Регистрация</h1>
             <form onSubmit={handleSignUp} className="form">
                 <input type="text" placeholder="Имя пользователя" value={username} onChange={(e) => setUsername(e.target.value)} />
-                <input type="email" placeholder="Почта" value={email} onChange={(e) => setEmail(e.target.value)} />
+                {/* <input type="email" placeholder="Почта" value={email} onChange={(e) => setEmail(e.target.value)} /> */}
                 <input type="password" placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} />
                 <button type="submit">Зарегистрироваться</button>
             </form>
