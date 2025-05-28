@@ -135,6 +135,33 @@ services:
         tag: "registration-service|{{.Name}}|{{.ID}}"
     restart: always
 
+  review-service:
+    container_name: review-service
+    image: evgeniyfimushkin/review-service
+    build: ./review-service
+    environment:
+      - TZ=${TZ}
+      - ENV=${ENV}
+      - GRPC_CLIENT_HOST=event-service
+      - GRPC_CLIENT_PORT=9091
+      - SERVER_PORT=8084
+      - DB_NAME=reviews_db
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_HOST=${POSTGRES_HOST}
+      - DB_PORT=${POSTGRES_PORT}
+      - PUBLIC_KEY=${PUBLIC_KEY}
+    ports:
+      - "8084:8084"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "review-service|{{.Name}}|{{.ID}}"
+    restart: always
+
+
   prometheus:
     image: prom/prometheus
     container_name: prometheus

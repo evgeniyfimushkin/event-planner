@@ -15,6 +15,7 @@ jobs:
           - auth-service
           - event-service
           - registration-service
+          - review-service
 
     steps:
       - name: checkout repository
