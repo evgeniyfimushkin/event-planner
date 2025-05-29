@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-service-deployment
+  labels:
+    app: event-service
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: event-service
+  template:
+    metadata:
+      labels:
+        app: event-service
+    spec:
+      containers:
+        - name: event-service
+          image: evgeniyfimushkin/event-service:last
+          ports:
+          - containerPort: 8082
+          env:
+
+          - name: ENV
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: ENV
+
+          - name:SERVER_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: EVENT_SERVICE_SERVER_PORT
+
+          - name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: app-secrets
+                key: EVENT_SERVICE_DB_NAME
+
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: app-secrets
+                key: EVENT_SERVICE_DB_USER
+
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: app-secrets
+                key: EVENT_SERVICE_DB_PASSWORD
+
+          - name: DB_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: DB_HOST
+
+          - name: DB_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: DB_PORT
+
+          - name: PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: app-secrets
+                key: PRIVATE_KEY
+
+          - name: PUBLIC_KEY
+            valueFrom:
+              secretKeyRef:
+                name: app-secrets
+                key: PUBLIC_KEY
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: event-service
+spec:
+  selector:
+    app: event-service
+  ports:
+    - protocol: TCP
+      port: 8082
+      targetPort: 8082
